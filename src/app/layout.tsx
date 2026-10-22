@@ -7,6 +7,7 @@ import { Header } from "@/components/header";
 import "./globals.css";
 import "./public-tournament.css";
 import "./workspace.css";
+import "./public-pastel.css";
 import { cookies } from "next/headers";
 import { readTheme, themeCookie } from "@/lib/preferences";
 import { NextIntlClientProvider } from "next-intl";

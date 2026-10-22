@@ -60,6 +60,7 @@ export default async function Overview({
         aria-labelledby="event-title"
       >
         <div className="event-intro">
+          <Badge>{tr(edition.status)}</Badge>
           <h1 id="event-title">{edition.name}</h1>
           {publicEditionSummary(edition.summary) && (
             <p className="muted">{publicEditionSummary(edition.summary)}</p>
@@ -76,7 +77,6 @@ export default async function Overview({
               {tr("Explore mappools")}
             </Action>
           </div>
-          <Badge>{tr(edition.status)}</Badge>
         </div>
         {edition.branding.keyVisual && (
           <EventArtwork src={edition.branding.keyVisual} name={edition.name} />

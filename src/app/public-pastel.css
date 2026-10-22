@@ -1,0 +1,859 @@
+/*
+ * Cute pastel public theme (design branch).
+ * Scoped to public routes only: Admin, Player/Captain workspaces and the
+ * broadcast overlay keep the shared lavender workspace theme.
+ */
+@font-face {
+  font-family: "Quicksand";
+  src: url("/fonts/quicksand-latin-variable.woff2") format("woff2");
+  font-weight: 300 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+html:has(.public-site) {
+  background: #fff4f8;
+}
+
+html[data-theme="dark"]:has(.public-site) {
+  background: #241a20;
+}
+
+body:has(.public-site) {
+  background: #fff4f8;
+}
+
+html[data-theme="dark"] body:has(.public-site) {
+  background: #241a20;
+}
+
+.themed-site.public-site {
+  --pastel-pink: #ff7aaf;
+  --pastel-pink-soft: #ffd6e5;
+  --pastel-blue: #7cb7ff;
+  --pastel-yellow: #ffd36b;
+  --pastel-red: #ff8f8f;
+  --pastel-teal: #5fdcc8;
+  --pastel-orange: #ffaa6b;
+  --font-sans:
+    "Quicksand", "PingFang TC", "PingFang SC", "Hiragino Maru Gothic ProN",
+    "Noto Sans TC", "Noto Sans SC", "Microsoft JhengHei", "Microsoft YaHei",
+    system-ui, sans-serif;
+  --site-background: #fff4f8;
+  --site-surface: #ffffff;
+  --site-raised: #fff0f5;
+  --site-tint: #ffe8f1;
+  --site-foreground: #4a2c3a;
+  --site-muted: #7d5c6c;
+  --site-secondary-text: #6b4a5a;
+  --site-accent: #b02a5f;
+  --site-accent-strong: #8f1e4c;
+  --site-border: #ffd6e5;
+  --site-control-border: #f0b6cf;
+  --site-header: #fff8fb;
+  --site-success: #17644b;
+  --site-warning: #875505;
+  --site-danger: #b3264d;
+  --site-focus: #b02a5f;
+  --site-selection: #ffd6e5;
+  --site-highlight: #e84f8a;
+  --site-connector: #ffbfd7;
+  --site-shadow: #ff7aaf2e;
+  --site-soft-shadow: #ff7aaf1a;
+  --site-panel-shadow: #ff7aaf40;
+  --site-dialog-shadow: #4a2c3a40;
+  --site-backdrop: #4a2c3a66;
+  --site-on-primary: #4a2c3a;
+  --site-primary: #ff9dbe;
+  --site-primary-hover: #ff86b5;
+  --button-radius: 999px;
+  --radius-panel: 1.5rem;
+  color-scheme: light;
+  background: var(--site-background);
+  color: var(--site-foreground);
+  font-family: var(--font-sans);
+  line-height: 1.7;
+}
+
+html[data-theme="dark"] .themed-site.public-site {
+  --site-background: #241a20;
+  --site-surface: #2f2229;
+  --site-raised: #382830;
+  --site-tint: #3b2a33;
+  --site-foreground: #ffeaf2;
+  --site-muted: #d1aebf;
+  --site-secondary-text: #e8ceda;
+  --site-accent: #ffb3d0;
+  --site-accent-strong: #ffd6e6;
+  --site-border: #4d3641;
+  --site-control-border: #704c5c;
+  --site-header: #241a20;
+  --site-success: #7fe3cf;
+  --site-warning: #ffd36b;
+  --site-danger: #ff9eaf;
+  --site-focus: #ffb3d0;
+  --site-selection: #5a3544;
+  --site-highlight: #ff9dbf;
+  --site-connector: #a06b80;
+  --site-shadow: #00000059;
+  --site-soft-shadow: #00000033;
+  --site-panel-shadow: #00000080;
+  --site-dialog-shadow: #00000099;
+  --site-backdrop: #00000099;
+  --site-on-primary: #3a1f2a;
+  --site-primary: #ff9dbe;
+  --site-primary-hover: #ffb3d0;
+  color-scheme: dark;
+}
+
+.themed-site.public-site :focus-visible {
+  outline-color: var(--site-focus);
+  outline-offset: 3px;
+}
+
+.themed-site.public-site ::selection {
+  background: var(--site-selection);
+  color: var(--site-foreground);
+}
+
+.themed-site.public-site h1,
+.themed-site.public-site h2,
+.themed-site.public-site h3 {
+  letter-spacing: -0.02em;
+}
+
+/* Site header: soft bar with a pink active pill, no underline tabs. */
+.themed-site.public-site .site-header {
+  background: color-mix(in srgb, var(--site-header) 90%, transparent);
+  border-bottom: 1.5px solid var(--site-border);
+  backdrop-filter: blur(16px);
+}
+
+.themed-site.public-site .nav-wrap {
+  max-width: 1240px;
+  height: 74px;
+  padding-inline: clamp(1.1rem, 3vw, 2.5rem);
+  gap: 1rem;
+}
+
+.themed-site.public-site .brand {
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.themed-site.public-site .main-nav {
+  align-self: center;
+  gap: 0.15rem;
+  margin-left: auto;
+}
+
+.themed-site.public-site .main-nav > a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 42px;
+  padding: 0.45rem 0.95rem;
+  border: 0;
+  border-radius: 999px;
+  color: var(--site-secondary-text);
+  font-size: 0.9rem;
+  font-weight: 600;
+  line-height: 1.2;
+  transition:
+    background 0.16s,
+    color 0.16s;
+}
+
+.themed-site.public-site .main-nav > a:hover {
+  background: var(--site-tint);
+  color: var(--site-accent);
+  border: 0;
+}
+
+.themed-site.public-site .main-nav > a[aria-current] {
+  background: var(--site-primary);
+  color: var(--site-on-primary);
+  border: 0;
+  font-weight: 700;
+}
+
+.themed-site.public-site .site-preferences {
+  gap: 0.45rem;
+}
+
+.themed-site.public-site .theme-control {
+  width: 44px;
+  border-radius: 999px;
+}
+
+.themed-site.public-site .language-control select {
+  min-height: 44px;
+  border-radius: 999px;
+  border: 1.5px solid var(--site-control-border);
+  background: var(--site-surface);
+  color: var(--site-foreground);
+  font-weight: 600;
+}
+
+.themed-site.public-site :is(button, .button) {
+  font-weight: 700;
+  letter-spacing: 0.01em;
+}
+
+.themed-site.public-site :is(button, .button).secondary {
+  background: var(--site-surface);
+  color: var(--site-accent);
+  border: 1.5px solid var(--site-control-border);
+}
+
+.themed-site.public-site .nav-login,
+.themed-site.public-site .account-control {
+  border-radius: 999px;
+}
+
+.themed-site.public-site .hero .actions .button,
+.themed-site.public-site .event-intro .actions .button,
+.themed-site.public-site .page-heading .actions .button {
+  box-shadow: 0 10px 22px -12px
+    color-mix(in srgb, var(--site-primary) 80%, transparent);
+}
+
+.themed-site.public-site
+  :is(input:not([type="checkbox"]):not([type="radio"]), select, textarea) {
+  border: 1.5px solid var(--site-control-border);
+  border-radius: 1rem;
+  background: var(--site-surface);
+  color: var(--site-foreground);
+}
+
+.themed-site.public-site :is(input, textarea)::placeholder {
+  color: var(--site-muted);
+  opacity: 1;
+}
+
+.themed-site.public-site .badge {
+  border: 0;
+  border-radius: 999px;
+  background: var(--pastel-yellow);
+  color: #6b4a00;
+  padding: 0.08rem 0.7rem;
+  font-weight: 700;
+}
+
+html[data-theme="dark"] .themed-site.public-site .badge {
+  background: #4a3820;
+  color: #ffe6a8;
+}
+
+.themed-site.public-site .eyebrow {
+  color: var(--site-accent);
+  font-weight: 700;
+  letter-spacing: 0.14em;
+}
+
+.themed-site.public-site :is(.text-link, .context-link, .prose a:not(.button)) {
+  color: var(--site-accent);
+  text-decoration-color: color-mix(
+    in srgb,
+    var(--site-accent) 45%,
+    transparent
+  );
+  text-underline-offset: 4px;
+}
+
+/* Rounded page band used by Rules, Schedule, Mappools, Teams, Players, etc. */
+.themed-site.public-site .page-heading {
+  position: relative;
+  overflow: hidden;
+  padding: clamp(1.6rem, 4vw, 2.6rem);
+  margin-bottom: 1.5rem;
+  border: 1.5px solid var(--site-border);
+  border-radius: 2rem;
+  background: linear-gradient(
+    120deg,
+    var(--site-tint),
+    var(--site-surface) 78%
+  );
+  box-shadow: 0 22px 55px -42px var(--site-shadow);
+}
+
+.themed-site.public-site .page-heading::after {
+  content: "";
+  position: absolute;
+  right: -3.5rem;
+  top: -3.5rem;
+  width: 11rem;
+  height: 11rem;
+  border: 1.15rem solid color-mix(in srgb, var(--site-primary) 30%, transparent);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.themed-site.public-site .page-heading > * {
+  position: relative;
+  z-index: 1;
+}
+
+.themed-site.public-site .page-heading h1 {
+  margin-bottom: 0.65rem;
+  font-size: clamp(2.2rem, 5vw, 3.5rem);
+  letter-spacing: -0.03em;
+  line-height: 1.05;
+}
+
+.themed-site.public-site .page-heading .muted {
+  max-width: 62ch;
+  margin-bottom: 0;
+  color: var(--site-secondary-text);
+}
+
+/* Home hero: the S11 artwork stays, washed in the same soft pink paper. */
+.themed-site.public-site .hero {
+  border-radius: 0 0 2.5rem 2.5rem;
+  background: var(--site-tint);
+  margin-bottom: 0;
+  color: var(--site-foreground);
+}
+
+.themed-site.public-site .hero-art {
+  opacity: 0.94;
+}
+
+.themed-site.public-site .hero-shade {
+  background:
+    linear-gradient(
+      90deg,
+      color-mix(in srgb, var(--site-background) 98%, transparent) 0%,
+      color-mix(in srgb, var(--site-background) 90%, transparent) 32%,
+      color-mix(in srgb, var(--site-background) 42%, transparent) 58%,
+      transparent 82%
+    ),
+    linear-gradient(0deg, var(--site-background), transparent 40%);
+}
+
+.themed-site.public-site .hero-content {
+  min-height: clamp(22rem, 32vw, 29rem);
+  padding-block: clamp(2rem, 5vw, 4rem);
+}
+
+.themed-site.public-site .hero-kicker {
+  color: var(--site-accent);
+  font-weight: 700;
+  letter-spacing: 0.14em;
+}
+
+.themed-site.public-site .hero h1 {
+  margin-bottom: 1.15rem;
+  color: var(--site-foreground);
+  font-size: clamp(3rem, 6.5vw, 5.5rem);
+  font-weight: 700;
+  line-height: 0.98;
+  letter-spacing: -0.035em;
+}
+
+.themed-site.public-site .hero-copy {
+  max-width: 34rem;
+  color: var(--site-secondary-text);
+  font-size: 1rem;
+  line-height: 1.75;
+}
+
+.themed-site.public-site .hero .hero-enrollment {
+  color: var(--site-secondary-text);
+}
+
+.themed-site.public-site .hero-status {
+  border-inline-start-color: var(--site-border);
+  color: var(--site-secondary-text);
+}
+
+.themed-site.public-site .hero-status::before {
+  background: var(--site-primary);
+}
+
+.themed-site.public-site .hero-status[data-state="live"]::before {
+  background: #35b98f;
+}
+
+.themed-site.public-site .hero-status[data-state="completed"]::before {
+  background: var(--site-muted);
+}
+
+.themed-site.public-site .hero .actions {
+  gap: 0.75rem;
+}
+
+/* Home sections and edition cards. */
+.themed-site.public-site .home-updates aside {
+  border-left: 1.5px solid var(--site-border);
+}
+
+.themed-site.public-site .home-news li {
+  border-top: 1.5px solid var(--site-border);
+}
+
+.themed-site.public-site .edition-card {
+  border: 1.5px solid var(--site-border);
+  border-radius: 1.5rem;
+  background: var(--site-surface);
+  box-shadow: 0 20px 48px -40px var(--site-shadow);
+}
+
+.themed-site.public-site .edition-art {
+  border-radius: 1.1rem;
+}
+
+.themed-site.public-site .edition-facts {
+  border-left-color: var(--site-border);
+}
+
+.themed-site.public-site .edition-copy h2 {
+  letter-spacing: -0.02em;
+}
+
+/* Public tournament shell and pill navigation. */
+.themed-site.public-site .public-tournament {
+  padding-top: 1.1rem;
+}
+
+.themed-site.public-site .public-tournament .event-context {
+  margin-bottom: 0.9rem;
+}
+
+.themed-site.public-site .public-tournament .tournament-navigation nav {
+  gap: 0.4rem;
+  padding: 0;
+  border-radius: 0;
+  background: transparent;
+}
+
+.themed-site.public-site .public-tournament .tournament-navigation nav a {
+  min-height: 44px;
+  padding: 0.5rem 1rem;
+  border: 1.5px solid var(--site-border);
+  border-radius: 999px;
+  background: var(--site-surface);
+  color: var(--site-secondary-text);
+  font-weight: 700;
+  box-shadow: 0 8px 18px -16px var(--site-shadow);
+}
+
+.themed-site.public-site .public-tournament .tournament-navigation nav a:hover {
+  background: var(--site-tint);
+  color: var(--site-accent);
+  text-decoration: none;
+}
+
+.themed-site.public-site
+  .public-tournament
+  .tournament-navigation
+  nav
+  a[aria-current] {
+  border-color: var(--site-primary);
+  background: var(--site-primary);
+  color: var(--site-on-primary);
+  box-shadow: 0 8px 18px -12px
+    color-mix(in srgb, var(--site-primary) 80%, transparent);
+}
+
+.themed-site.public-site
+  .public-tournament
+  .tournament-navigation
+  nav
+  a[aria-current]::before {
+  content: none;
+}
+
+.themed-site.public-site .public-tournament .tournament-menu {
+  border: 1.5px solid var(--site-control-border);
+  border-radius: 999px;
+}
+
+/* Tournament overview hero and milestones. */
+.themed-site.public-site .event-hero {
+  border: 1.5px solid var(--site-border);
+  border-radius: 2rem;
+  background: var(--site-tint);
+  box-shadow: 0 24px 60px -46px var(--site-shadow);
+}
+
+.themed-site.public-site .event-intro {
+  position: relative;
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--site-primary) 20%, var(--site-surface)),
+    var(--site-surface) 72%
+  );
+}
+
+.themed-site.public-site .event-intro::after {
+  content: "";
+  position: absolute;
+  right: -2.5rem;
+  bottom: -3rem;
+  width: 8.5rem;
+  height: 8.5rem;
+  border: 1rem solid color-mix(in srgb, var(--site-primary) 26%, transparent);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.themed-site.public-site .event-intro > * {
+  position: relative;
+  z-index: 1;
+}
+
+.themed-site.public-site .event-intro > .badge {
+  margin-bottom: 1rem;
+}
+
+.themed-site.public-site .event-intro h1 {
+  font-size: clamp(2.4rem, 5vw, 4.4rem);
+  line-height: 1.02;
+  letter-spacing: -0.03em;
+}
+
+.themed-site.public-site .event-milestones li {
+  border: 1.5px solid var(--site-border);
+  border-radius: 1.25rem;
+  background: var(--site-surface);
+  box-shadow: 0 12px 24px -20px var(--site-shadow);
+}
+
+.themed-site.public-site .event-step {
+  display: grid;
+  place-items: center;
+  width: 2rem;
+  height: 2rem;
+  padding: 0;
+  border-radius: 50%;
+  background: var(--site-primary);
+  color: var(--site-on-primary);
+}
+
+.themed-site.public-site .event-pool-list a,
+.themed-site.public-site .event-team-links li {
+  border-color: var(--site-border);
+}
+
+/* Shared surfaces, tables and forms. */
+.themed-site.public-site :is(.panel, .directory-details, .about-aside) {
+  border: 1.5px solid var(--site-border);
+  border-radius: 1.5rem;
+  background: var(--site-surface);
+  box-shadow: 0 20px 48px -42px var(--site-shadow);
+}
+
+.themed-site.public-site :is(th, td) {
+  border-color: var(--site-border);
+}
+
+.themed-site.public-site th {
+  background: var(--site-raised);
+  color: var(--site-secondary-text);
+}
+
+.themed-site.public-site .notice {
+  border: 1.5px solid var(--site-border);
+  border-radius: 1.25rem;
+  background: var(--site-raised);
+  color: var(--site-secondary-text);
+}
+
+.themed-site.public-site .empty-state {
+  border: 1.5px dashed var(--site-control-border);
+  border-radius: 1.5rem;
+  background: var(--site-surface);
+}
+
+/* Rules handbook: compact index + soft cards per chapter. */
+.themed-site.public-site .rules-version {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.2rem 0.8rem;
+  border: 1.5px solid var(--site-border);
+  border-radius: 999px;
+  background: var(--site-surface);
+  color: var(--site-muted);
+}
+
+.themed-site.public-site .rules-handbook {
+  grid-template-columns: 240px minmax(0, 1fr);
+  gap: 1.5rem;
+}
+
+.themed-site.public-site .rules-desktop-contents {
+  top: 96px;
+  padding: 1rem;
+  border: 1.5px solid var(--site-border);
+  border-radius: 1.5rem;
+  background: var(--site-surface);
+  box-shadow: 0 20px 48px -42px var(--site-shadow);
+}
+
+.themed-site.public-site .rules-handbook nav a {
+  min-height: 44px;
+  padding: 0.5rem 0.7rem;
+  border-radius: 999px;
+  color: var(--site-secondary-text);
+  font-weight: 600;
+}
+
+.themed-site.public-site .rules-handbook nav a span {
+  color: var(--site-accent);
+  font-weight: 700;
+}
+
+.themed-site.public-site .rules-handbook nav a:hover {
+  background: var(--site-tint);
+  color: var(--site-accent);
+}
+
+.themed-site.public-site .rules-handbook nav a[aria-current] {
+  background: var(--site-primary);
+  color: var(--site-on-primary);
+}
+
+.themed-site.public-site .rules-handbook nav a[aria-current] span {
+  color: inherit;
+}
+
+.themed-site.public-site .rules-article {
+  display: grid;
+  gap: 1rem;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.themed-site.public-site .rules-article section {
+  padding: clamp(1.25rem, 3vw, 2rem);
+  border: 1.5px solid var(--site-border);
+  border-radius: 1.5rem;
+  background: var(--site-surface);
+  box-shadow: 0 20px 48px -42px var(--site-shadow);
+}
+
+.themed-site.public-site .rules-article section + section {
+  margin-top: 0;
+  padding-top: clamp(1.25rem, 3vw, 2rem);
+  border-top: 1.5px solid var(--site-border);
+}
+
+.themed-site.public-site .rules-article h2 {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  margin-bottom: 0.9rem;
+  font-size: clamp(1.2rem, 2vw, 1.5rem);
+}
+
+.themed-site.public-site .rules-article h2 span {
+  display: grid;
+  flex: 0 0 2.2rem;
+  place-items: center;
+  width: 2.2rem;
+  height: 2.2rem;
+  border-radius: 50%;
+  background: var(--site-primary);
+  color: var(--site-on-primary);
+  font-size: 0.8rem;
+  line-height: 1;
+}
+
+.themed-site.public-site .rules-article p {
+  max-width: 74ch;
+  line-height: 1.9;
+}
+
+.themed-site.public-site .rules-mobile-contents {
+  border: 1.5px solid var(--site-border);
+  border-radius: 1.5rem;
+  background: var(--site-surface);
+  box-shadow: 0 16px 36px -32px var(--site-shadow);
+}
+
+/* Match, pool and bracket surfaces inherit the same rounded language. */
+.themed-site.public-site .public-tournament .public-match-card {
+  border: 1.5px solid var(--site-border);
+  border-radius: 1.35rem;
+  background: var(--site-surface);
+  box-shadow: 0 16px 36px -34px var(--site-shadow);
+}
+
+.themed-site.public-site
+  .public-match-list[data-view="compact"]
+  .public-match-card {
+  border: 0;
+  border-bottom: 1.5px solid var(--site-border);
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.themed-site.public-site .public-tournament .event-pills {
+  border: 1.5px solid var(--site-border);
+  background: var(--site-surface);
+}
+
+.themed-site.public-site
+  .public-tournament
+  .event-pills
+  button[aria-pressed="true"] {
+  background: var(--site-primary);
+  color: var(--site-on-primary);
+}
+
+.themed-site.public-site .public-tournament .mappool-public-round,
+.themed-site.public-site .public-tournament .map-browse-card {
+  border: 1.5px solid var(--site-border);
+  border-radius: 1.5rem;
+  background: var(--site-surface);
+  box-shadow: 0 16px 36px -36px var(--site-shadow);
+}
+
+.themed-site.public-site .public-tournament .map-slot-badge {
+  background: var(--site-primary);
+  color: var(--site-on-primary);
+}
+
+.themed-site.public-site .public-tournament .workspace-tabs {
+  background: var(--site-tint);
+  border: 1.5px solid var(--site-border);
+}
+
+.themed-site.public-site
+  .public-tournament
+  .workspace-tabs
+  button[aria-selected="true"],
+.themed-site.public-site
+  .public-tournament
+  .bracket-tabs
+  button[aria-pressed="true"] {
+  background: var(--site-primary);
+  color: var(--site-on-primary);
+}
+
+.themed-site.public-site .public-tournament .bracket-tabs button {
+  border: 1.5px solid var(--site-border);
+  border-radius: 999px;
+  background: var(--site-surface);
+}
+
+.themed-site.public-site .public-tournament .pool-summary {
+  border: 1.5px solid var(--site-border);
+  border-radius: 1.25rem;
+  background: var(--site-raised);
+}
+
+.themed-site.public-site .site-footer {
+  border-top: 1.5px solid var(--site-border);
+  background: transparent;
+  color: var(--site-muted);
+  padding-block: 1.5rem 2.5rem;
+}
+
+.themed-site.public-site .site-footer .footer-credit {
+  color: var(--site-accent);
+  text-decoration-color: color-mix(
+    in srgb,
+    var(--site-accent) 45%,
+    transparent
+  );
+}
+
+@media (max-width: 950px) {
+  .themed-site.public-site .main-nav {
+    padding: 0.8rem;
+    border: 1.5px solid var(--site-border);
+    border-radius: 0 0 1.5rem 1.5rem;
+    background: var(--site-surface);
+    box-shadow: 0 22px 44px -28px var(--site-shadow);
+  }
+
+  .themed-site.public-site .main-nav > a {
+    padding: 0.8rem 1rem;
+    border-radius: 999px;
+  }
+}
+
+@media (max-width: 980px) {
+  .themed-site.public-site .rules-handbook {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .themed-site.public-site .event-intro::after {
+    display: none;
+  }
+}
+
+@media (max-width: 760px) {
+  .themed-site.public-site .nav-wrap {
+    height: auto;
+    min-height: 68px;
+  }
+
+  .themed-site.public-site .page-heading {
+    padding: 1.5rem 1.25rem;
+    border-radius: 1.5rem;
+  }
+
+  .themed-site.public-site .page-heading::after {
+    right: -4.5rem;
+    top: -4.5rem;
+    width: 9rem;
+    height: 9rem;
+    border-width: 0.9rem;
+  }
+
+  .themed-site.public-site .hero {
+    border-radius: 0 0 1.75rem 1.75rem;
+  }
+
+  .themed-site.public-site .hero-art::after {
+    background: linear-gradient(0deg, var(--site-background), transparent 55%);
+  }
+
+  .themed-site.public-site .hero-shade {
+    background: linear-gradient(
+      0deg,
+      var(--site-background) 2%,
+      color-mix(in srgb, var(--site-background) 38%, transparent) 58%,
+      transparent 100%
+    );
+  }
+
+  .themed-site.public-site .hero-content {
+    min-height: 0;
+    padding-block: 2rem 2.5rem;
+  }
+
+  .themed-site.public-site .hero h1 {
+    font-size: clamp(2.6rem, 11vw, 4rem);
+  }
+
+  .themed-site.public-site .event-hero {
+    border-radius: 1.5rem;
+  }
+
+  .themed-site.public-site .rules-article section {
+    padding: 1.25rem;
+    border-radius: 1.25rem;
+  }
+
+  .themed-site.public-site .rules-article h2 span {
+    flex-basis: 2rem;
+    width: 2rem;
+    height: 2rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .themed-site.public-site *,
+  .themed-site.public-site *::before,
+  .themed-site.public-site *::after {
+    animation: none;
+    transition: none;
+  }
+}

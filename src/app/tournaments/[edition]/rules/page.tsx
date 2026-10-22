@@ -21,7 +21,9 @@ export default async function Rules({
   if (!edition) notFound();
   return (
     <>
-      <PageHeading title={tr("Rules")} />
+      <PageHeading eyebrow={tr("Tournament rules")} title={tr("Rules")}>
+        {tr("Published rules and organizer updates for this edition.")}
+      </PageHeading>
 
       {hasEligibilityLimits(edition.automaticEligibility) && (
         <section className="panel">
