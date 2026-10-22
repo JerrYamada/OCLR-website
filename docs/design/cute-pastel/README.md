@@ -10,9 +10,9 @@ Reference supplied by the organizer as `osu! Cup 賽事官網.html` (a local pro
 | --- | --- | --- |
 | ![Rules desktop](preview/rules-1440.png) | ![Rules mobile](preview/rules-390.png) | ![Rules dark](preview/rules-dark-1440.png) |
 
-The overview screenshot uses the published S8 archive, which is completed, so every stage is pale pink. A live edition shows its current stage as the dark dot; an upcoming edition starts with white dots. The state illustration below overrides the classes only for design review (completed pale pink / current dark / upcoming white); it is not S8 status data. The rules screenshots use a disposable local preview database with the S11 rulebook as example content. They are references for the visual direction, not a new rules release or a claim about S11 dates.
+The overview screenshot uses the published S8 archive, which is completed, so every stage has a pale-pink check. A live edition shows its current stage as the dark dot with a halo; an upcoming edition starts with blank white dots. The state illustration below overrides the classes only for design review (completed / current / upcoming); it is not S8 status data. The rules screenshots use a disposable local preview database with the S11 rulebook as example content. They are references for the visual direction, not a new rules release or a claim about S11 dates.
 
-![Overview bar state illustration](preview/overview-states.png)
+![Stage tracker state illustration](preview/overview-states.png)
 
 ## Scope
 
@@ -27,7 +27,7 @@ The overview screenshot uses the published S8 archive, which is completed, so ev
 - Pastel yellow status chips; pink primary actions with dark text for contrast.
 - Light and dark variants share the same tokens. Dark uses a warm mauve paper rather than the old navy workspace palette.
 - Rules chapter cards pair a pink numbered bubble with the published heading/body text. The desktop index and mobile “On this page” disclosure, deep links and scroll-spy behavior are unchanged.
-- Tournament milestones stay on one horizontal row. A carousel-style overview bar above the rail shows one cell per stage; clicking a cell scrolls the rail to that stage. Dots are pale pink when completed, dark for the current stage and blank/white when upcoming. Cards size to their labels; a vertical mouse wheel, trackpad or keyboard scrolls the rail, and it yields to page scrolling at either end.
+- Tournament stages render as one connected row: numbered circles joined by a pale line, with the stage name and date below. Completed stages use a pale-pink fill and a check; the current stage uses the strongest foreground/background contrast with a halo; upcoming stages are blank with a soft outline. On narrow screens the row scrolls horizontally inside a focusable region rather than wrapping.
 
 ## Fonts
 
@@ -39,8 +39,7 @@ The overview screenshot uses the published S8 archive, which is completed, so ev
 - `src/app/layout.tsx` — imports the layer once.
 - `src/app/tournaments/[edition]/rules/page.tsx` — adds the existing translated rules eyebrow/summary to the page band.
 - `src/app/tournaments/[edition]/page.tsx` — moves the status badge above the title so status is separate from registration actions.
-- `src/components/milestone-rail.tsx` — horizontal wheel/trackpad/keyboard rail for the milestone row.
-- `src/components/milestone-overview.tsx` — carousel-style stage cells that jump the rail.
+- `src/components/milestone-stages.tsx` — reference-style connected stage tracker.
 - `src/lib/milestone-state.ts` — date/status derivation for completed, current and upcoming stages.
 - `tests/unit/milestone-state.test.ts` — completed/current/upcoming derivation cases.
 

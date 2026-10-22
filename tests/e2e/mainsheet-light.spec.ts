@@ -109,7 +109,7 @@ test.describe("MainSheet Light public experience", () => {
     const before = await (await context.request.get(poolUrl)).json();
     await page.goto(base);
     await expect(page.locator(".event-artwork img")).toBeVisible();
-    await expect(page.locator(".event-milestones")).toContainText(
+    await expect(page.locator(".event-stage-track")).toContainText(
       "To be announced",
     );
     await expect(page.locator(".event-intro")).toContainText("OCLR 公開測試賽");

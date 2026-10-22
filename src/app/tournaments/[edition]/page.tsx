@@ -8,8 +8,7 @@ import { publicCompetition } from "@/lib/public-competition";
 import { publicMappools } from "@/lib/mappools";
 import { publishedTeams } from "@/lib/teams";
 import { Action, Badge } from "@/components/ui";
-import { MilestoneRail } from "@/components/milestone-rail";
-import { MilestoneOverview } from "@/components/milestone-overview";
+import { MilestoneStages } from "@/components/milestone-stages";
 import { milestoneStates } from "@/lib/milestone-state";
 import { EventArtwork } from "@/components/event-artwork";
 import { MatchCard, GroupStandings } from "@/components/public-matches";
@@ -57,6 +56,24 @@ export default async function Overview({
     .slice(0, 4);
   const base = `/tournaments/${slug}`;
   const milestoneState = milestoneStates(edition.schedule, edition.status);
+  const stageLabels = {
+    completed: "Completed",
+    current: "Live",
+    upcoming: "Upcoming",
+  } as const;
+  const stages = edition.schedule.map((event, index) => {
+    const [name, ...rest] = event.label.split(" · ");
+    const inlineDate = rest.join(" · ");
+    const stageState = milestoneState[index] ?? "upcoming";
+    return {
+      name,
+      date: event.at
+        ? tr(formatDate(event.at, edition.timeZone, tr.locale))
+        : inlineDate || tr(formatDate(null, edition.timeZone, tr.locale)),
+      state: stageState,
+      statusLabel: tr(stageLabels[stageState]),
+    };
+  });
   return (
     <>
       <section
@@ -86,28 +103,13 @@ export default async function Overview({
           <EventArtwork src={edition.branding.keyVisual} name={edition.name} />
         )}
       </section>
-      {edition.schedule.length > 0 && (
-        <>
-          <MilestoneOverview
-            events={edition.schedule}
-            states={milestoneState}
-          />
-          <MilestoneRail label={tr("Tournament milestones")}>
-            {edition.schedule.map((event, i) => (
-              <li key={i} className={`is-${milestoneState[i]}`}>
-                <span className="event-step">
-                  {String(i + 1).padStart(2, "0")}
-                </span>
-                <div>
-                  <strong>{event.label}</strong>
-                  <p className="muted small">
-                    {tr(formatDate(event.at, edition.timeZone, tr.locale))}
-                  </p>
-                </div>
-              </li>
-            ))}
-          </MilestoneRail>
-        </>
+      {stages.length > 0 && (
+        <MilestoneStages
+          title={tr("Stages")}
+          subtitle={tr("Schedule progress")}
+          label={tr("Tournament milestones")}
+          stages={stages}
+        />
       )}
       {[competitionResult, poolsResult, teamsResult].some(
         (r) => r.status === "rejected",
