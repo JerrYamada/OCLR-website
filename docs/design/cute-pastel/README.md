@@ -2,13 +2,17 @@
 
 Reference supplied by the organizer as `osu! Cup 賽事官網.html` (a local prototype, not committed). This branch applies that soft pastel language to the public OCLR website while keeping the existing database, routes, permissions and rule releases authoritative.
 
-![Tournament overview, desktop](preview/overview-1440.png)
+| Overview, desktop | Overview, mobile |
+| --- | --- |
+| ![Overview desktop](preview/overview-1440.png) | ![Overview mobile](preview/overview-390.png) |
 
 | Rules, desktop | Rules, mobile | Rules, dark |
 | --- | --- | --- |
 | ![Rules desktop](preview/rules-1440.png) | ![Rules mobile](preview/rules-390.png) | ![Rules dark](preview/rules-dark-1440.png) |
 
-The overview screenshot uses the published S8 archive for milestone-card proportions; the rules screenshots use a disposable local preview database with the S11 rulebook as example content. They are references for the visual direction, not a new rules release or a claim about S11 dates.
+The overview screenshot uses the published S8 archive, which is completed, so every stage is pale pink. A live edition shows its current stage as the dark dot; an upcoming edition starts with white dots. The state illustration below overrides the classes only for design review (completed pale pink / current dark / upcoming white); it is not S8 status data. The rules screenshots use a disposable local preview database with the S11 rulebook as example content. They are references for the visual direction, not a new rules release or a claim about S11 dates.
+
+![Overview bar state illustration](preview/overview-states.png)
 
 ## Scope
 
@@ -23,7 +27,7 @@ The overview screenshot uses the published S8 archive for milestone-card proport
 - Pastel yellow status chips; pink primary actions with dark text for contrast.
 - Light and dark variants share the same tokens. Dark uses a warm mauve paper rather than the old navy workspace palette.
 - Rules chapter cards pair a pink numbered bubble with the published heading/body text. The desktop index and mobile “On this page” disclosure, deep links and scroll-spy behavior are unchanged.
-- Tournament milestones stay on one horizontal row. Cards size to their labels; a vertical mouse wheel, trackpad or keyboard scrolls the rail, and it yields to page scrolling at either end.
+- Tournament milestones stay on one horizontal row. A carousel-style overview bar above the rail shows one cell per stage; clicking a cell scrolls the rail to that stage. Dots are pale pink when completed, dark for the current stage and blank/white when upcoming. Cards size to their labels; a vertical mouse wheel, trackpad or keyboard scrolls the rail, and it yields to page scrolling at either end.
 
 ## Fonts
 
@@ -36,6 +40,9 @@ The overview screenshot uses the published S8 archive for milestone-card proport
 - `src/app/tournaments/[edition]/rules/page.tsx` — adds the existing translated rules eyebrow/summary to the page band.
 - `src/app/tournaments/[edition]/page.tsx` — moves the status badge above the title so status is separate from registration actions.
 - `src/components/milestone-rail.tsx` — horizontal wheel/trackpad/keyboard rail for the milestone row.
+- `src/components/milestone-overview.tsx` — carousel-style stage cells that jump the rail.
+- `src/lib/milestone-state.ts` — date/status derivation for completed, current and upcoming stages.
+- `tests/unit/milestone-state.test.ts` — completed/current/upcoming derivation cases.
 
 ## Data boundary
 

@@ -9,6 +9,8 @@ import { publicMappools } from "@/lib/mappools";
 import { publishedTeams } from "@/lib/teams";
 import { Action, Badge } from "@/components/ui";
 import { MilestoneRail } from "@/components/milestone-rail";
+import { MilestoneOverview } from "@/components/milestone-overview";
+import { milestoneStates } from "@/lib/milestone-state";
 import { EventArtwork } from "@/components/event-artwork";
 import { MatchCard, GroupStandings } from "@/components/public-matches";
 export async function generateMetadata({
@@ -54,6 +56,7 @@ export default async function Overview({
     .sort((a, b) => b.result!.updatedAt.localeCompare(a.result!.updatedAt))
     .slice(0, 4);
   const base = `/tournaments/${slug}`;
+  const milestoneState = milestoneStates(edition.schedule, edition.status);
   return (
     <>
       <section
@@ -84,21 +87,27 @@ export default async function Overview({
         )}
       </section>
       {edition.schedule.length > 0 && (
-        <MilestoneRail label={tr("Tournament milestones")}>
-          {edition.schedule.map((event, i) => (
-            <li key={i}>
-              <span className="event-step">
-                {String(i + 1).padStart(2, "0")}
-              </span>
-              <div>
-                <strong>{event.label}</strong>
-                <p className="muted small">
-                  {tr(formatDate(event.at, edition.timeZone, tr.locale))}
-                </p>
-              </div>
-            </li>
-          ))}
-        </MilestoneRail>
+        <>
+          <MilestoneOverview
+            events={edition.schedule}
+            states={milestoneState}
+          />
+          <MilestoneRail label={tr("Tournament milestones")}>
+            {edition.schedule.map((event, i) => (
+              <li key={i} className={`is-${milestoneState[i]}`}>
+                <span className="event-step">
+                  {String(i + 1).padStart(2, "0")}
+                </span>
+                <div>
+                  <strong>{event.label}</strong>
+                  <p className="muted small">
+                    {tr(formatDate(event.at, edition.timeZone, tr.locale))}
+                  </p>
+                </div>
+              </li>
+            ))}
+          </MilestoneRail>
+        </>
       )}
       {[competitionResult, poolsResult, teamsResult].some(
         (r) => r.status === "rejected",

@@ -52,7 +52,13 @@ export function MilestoneRail({
   }, []);
 
   return (
-    <ol ref={rail} className="event-milestones" aria-label={label} tabIndex={0}>
+    <ol
+      ref={rail}
+      className="event-milestones"
+      aria-label={label}
+      tabIndex={0}
+      data-milestone-rail=""
+    >
       {children}
     </ol>
   );

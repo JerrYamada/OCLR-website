@@ -512,6 +512,130 @@ html[data-theme="dark"] .themed-site.public-site .badge {
   letter-spacing: -0.03em;
 }
 
+/* Carousel-style overview above the detailed rail. Completed = pale pink,
+ * current = the strongest foreground/background contrast, upcoming = blank. */
+.themed-site.public-site .event-stage-overview {
+  display: flex;
+  overflow: hidden;
+  margin: 0 0 0.9rem;
+  padding: 0.3rem;
+  list-style: none;
+  border: 1.5px solid var(--site-border);
+  border-radius: 1.25rem;
+  background: var(--site-surface);
+  box-shadow: 0 12px 24px -20px var(--site-shadow);
+}
+
+.themed-site.public-site .event-stage-overview-cell {
+  position: relative;
+  flex: 1 1 0;
+  min-width: 0;
+}
+
+.themed-site.public-site
+  .event-stage-overview-cell
+  + .event-stage-overview-cell::before {
+  content: "";
+  position: absolute;
+  top: 22%;
+  bottom: 22%;
+  left: 0;
+  width: 1px;
+  background: var(--site-border);
+}
+
+.themed-site.public-site .event-stage-overview-button {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.3rem;
+  width: 100%;
+  min-height: 78px;
+  padding: 0.6rem 0.45rem;
+  border: 0;
+  border-radius: 1rem;
+  background: transparent;
+  box-shadow: none;
+  color: var(--site-foreground);
+  font: inherit;
+  text-align: center;
+  transform: none;
+}
+
+.themed-site.public-site .event-stage-overview-button:hover {
+  border: 0;
+  background: var(--site-tint);
+  box-shadow: none;
+  color: var(--site-foreground);
+  transform: none;
+}
+
+.themed-site.public-site
+  .event-stage-overview-cell.is-current
+  .event-stage-overview-button {
+  background: var(--site-raised);
+}
+
+.themed-site.public-site .event-stage-overview-dot {
+  display: grid;
+  flex: 0 0 2rem;
+  place-items: center;
+  width: 2rem;
+  height: 2rem;
+  border: 1.5px solid transparent;
+  border-radius: 50%;
+  font-size: 0.68rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.themed-site.public-site .is-completed .event-stage-overview-dot {
+  border-color: #ffc2d8;
+  background: var(--pastel-pink-soft);
+  color: #4a2c3a;
+}
+
+.themed-site.public-site .is-current .event-stage-overview-dot {
+  border-color: var(--site-foreground);
+  background: var(--site-foreground);
+  box-shadow: 0 0 0 4px
+    color-mix(in srgb, var(--site-foreground) 12%, transparent);
+  color: var(--site-surface);
+}
+
+.themed-site.public-site .is-upcoming .event-stage-overview-dot {
+  border-color: var(--site-control-border);
+  background: var(--site-surface);
+  color: var(--site-muted);
+}
+
+.themed-site.public-site .event-stage-overview-name {
+  max-width: 100%;
+  overflow-wrap: anywhere;
+  font-size: 0.76rem;
+  font-weight: 700;
+  line-height: 1.25;
+}
+
+.themed-site.public-site .event-stage-overview-state {
+  color: var(--site-muted);
+  font-size: 0.64rem;
+  font-weight: 600;
+}
+
+.themed-site.public-site
+  .event-stage-overview-cell.is-completed
+  .event-stage-overview-state {
+  color: var(--site-secondary-text);
+}
+
+.themed-site.public-site
+  .event-stage-overview-cell.is-current
+  .event-stage-overview-state {
+  color: var(--site-accent);
+}
+
 /* One timeline row at every width. Cards size to their label and the row
  * scrolls horizontally rather than wrapping into a multi-row grid. */
 .themed-site.public-site .event-milestones {
@@ -557,11 +681,37 @@ html[data-theme="dark"] .themed-site.public-site .badge {
   aspect-ratio: 1;
   box-sizing: border-box;
   padding: 0;
+  border: 1.5px solid transparent;
   border-radius: 50%;
-  background: var(--site-primary);
-  color: var(--site-on-primary);
+  background: var(--site-surface);
+  color: var(--site-muted);
   font-size: 0.8rem;
   line-height: 1;
+}
+
+.themed-site.public-site .event-milestones .is-completed .event-step {
+  border-color: #ffc2d8;
+  background: var(--pastel-pink-soft);
+  color: #4a2c3a;
+}
+
+.themed-site.public-site .event-milestones .is-current .event-step {
+  border-color: var(--site-foreground);
+  background: var(--site-foreground);
+  box-shadow: 0 0 0 4px
+    color-mix(in srgb, var(--site-foreground) 12%, transparent);
+  color: var(--site-surface);
+}
+
+.themed-site.public-site .event-milestones .is-upcoming .event-step {
+  border-color: var(--site-control-border);
+  background: var(--site-surface);
+  color: var(--site-muted);
+}
+
+.themed-site.public-site .event-milestones li.is-current {
+  background: var(--site-raised);
+  border-color: var(--site-primary);
 }
 
 .themed-site.public-site .event-pool-list a,
@@ -869,6 +1019,28 @@ html[data-theme="dark"] .themed-site.public-site .badge {
 
   .themed-site.public-site .event-hero {
     border-radius: 1.5rem;
+  }
+
+  .themed-site.public-site .event-stage-overview {
+    padding: 0.25rem;
+  }
+
+  .themed-site.public-site .event-stage-overview-button {
+    min-height: 54px;
+    gap: 0;
+    padding: 0.35rem 0.15rem;
+  }
+
+  .themed-site.public-site .event-stage-overview-dot {
+    flex-basis: 1.75rem;
+    width: 1.75rem;
+    height: 1.75rem;
+    font-size: 0.62rem;
+  }
+
+  .themed-site.public-site .event-stage-overview-name,
+  .themed-site.public-site .event-stage-overview-state {
+    display: none;
   }
 
   .themed-site.public-site .rules-article section {
