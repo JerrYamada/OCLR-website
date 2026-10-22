@@ -277,7 +277,7 @@ html[data-theme="dark"] .themed-site {
 .public-tournament
   :is(input:not([type="checkbox"]):not([type="radio"]), select, textarea) {
   color: var(--site-foreground);
-  background: var(--site-surface);
+  background-color: var(--site-surface);
   border-color: var(--site-control-border);
   min-height: 44px;
   border-radius: 0.75rem;
@@ -1307,7 +1307,7 @@ html[data-theme="dark"] .themed-site {
 }
 .themed-site
   :is(input:not([type="checkbox"]):not([type="radio"]), select, textarea) {
-  background: var(--site-surface);
+  background-color: var(--site-surface);
   color: var(--site-foreground);
   border-color: var(--site-control-border);
 }
