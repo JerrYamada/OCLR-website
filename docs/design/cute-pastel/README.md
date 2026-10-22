@@ -23,6 +23,7 @@ The overview screenshot uses the published S8 archive for milestone-card proport
 - Pastel yellow status chips; pink primary actions with dark text for contrast.
 - Light and dark variants share the same tokens. Dark uses a warm mauve paper rather than the old navy workspace palette.
 - Rules chapter cards pair a pink numbered bubble with the published heading/body text. The desktop index and mobile “On this page” disclosure, deep links and scroll-spy behavior are unchanged.
+- Tournament milestones stay on one horizontal row. Cards size to their labels; a vertical mouse wheel, trackpad or keyboard scrolls the rail, and it yields to page scrolling at either end.
 
 ## Fonts
 
@@ -34,6 +35,7 @@ The overview screenshot uses the published S8 archive for milestone-card proport
 - `src/app/layout.tsx` — imports the layer once.
 - `src/app/tournaments/[edition]/rules/page.tsx` — adds the existing translated rules eyebrow/summary to the page band.
 - `src/app/tournaments/[edition]/page.tsx` — moves the status badge above the title so status is separate from registration actions.
+- `src/components/milestone-rail.tsx` — horizontal wheel/trackpad/keyboard rail for the milestone row.
 
 ## Data boundary
 

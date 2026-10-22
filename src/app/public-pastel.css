@@ -512,6 +512,8 @@ html[data-theme="dark"] .themed-site.public-site .badge {
   letter-spacing: -0.03em;
 }
 
+/* One timeline row at every width. Cards size to their label and the row
+ * scrolls horizontally rather than wrapping into a multi-row grid. */
 .themed-site.public-site .event-milestones {
   gap: 0.8rem;
   padding: 0.25rem 0.25rem 0.9rem;
@@ -565,24 +567,6 @@ html[data-theme="dark"] .themed-site.public-site .badge {
 .themed-site.public-site .event-pool-list a,
 .themed-site.public-site .event-team-links li {
   border-color: var(--site-border);
-}
-
-/* Seven-stage events need room for the full label; give desktop a 4-up grid
- * instead of shrinking every card to a narrow strip. Tablets and phones keep
- * the content-sized, horizontally scrollable row. */
-@media (min-width: 1200px) {
-  .themed-site.public-site .event-milestones {
-    display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    overflow: visible;
-    padding-inline: 0;
-  }
-
-  .themed-site.public-site .event-milestones li {
-    flex: none;
-    min-width: 0;
-    max-width: none;
-  }
 }
 
 /* Shared surfaces, tables and forms. */

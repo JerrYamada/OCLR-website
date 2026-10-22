@@ -8,6 +8,7 @@ import { publicCompetition } from "@/lib/public-competition";
 import { publicMappools } from "@/lib/mappools";
 import { publishedTeams } from "@/lib/teams";
 import { Action, Badge } from "@/components/ui";
+import { MilestoneRail } from "@/components/milestone-rail";
 import { EventArtwork } from "@/components/event-artwork";
 import { MatchCard, GroupStandings } from "@/components/public-matches";
 export async function generateMetadata({
@@ -83,11 +84,7 @@ export default async function Overview({
         )}
       </section>
       {edition.schedule.length > 0 && (
-        <ol
-          className="event-milestones"
-          aria-label={tr("Tournament milestones")}
-          tabIndex={0}
-        >
+        <MilestoneRail label={tr("Tournament milestones")}>
           {edition.schedule.map((event, i) => (
             <li key={i}>
               <span className="event-step">
@@ -101,7 +98,7 @@ export default async function Overview({
               </div>
             </li>
           ))}
-        </ol>
+        </MilestoneRail>
       )}
       {[competitionResult, poolsResult, teamsResult].some(
         (r) => r.status === "rejected",
