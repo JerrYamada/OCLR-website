@@ -8,7 +8,7 @@ Reference supplied by the organizer as `osu! Cup 賽事官網.html` (a local pro
 | --- | --- | --- |
 | ![Rules desktop](preview/rules-1440.png) | ![Rules mobile](preview/rules-390.png) | ![Rules dark](preview/rules-dark-1440.png) |
 
-The screenshots use a disposable local preview database: S11 structure as example rules, synthetic milestone dates and a synthetic overview summary. They are references for the visual direction, not approved tournament data or published rules.
+The overview screenshot uses the published S8 archive for milestone-card proportions; the rules screenshots use a disposable local preview database with the S11 rulebook as example content. They are references for the visual direction, not a new rules release or a claim about S11 dates.
 
 ## Scope
 

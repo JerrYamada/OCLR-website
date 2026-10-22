@@ -86,6 +86,7 @@ export default async function Overview({
         <ol
           className="event-milestones"
           aria-label={tr("Tournament milestones")}
+          tabIndex={0}
         >
           {edition.schedule.map((event, i) => (
             <li key={i}>
