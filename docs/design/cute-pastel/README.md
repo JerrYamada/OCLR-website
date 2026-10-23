@@ -1,6 +1,6 @@
 # Cute pastel public UI · design branch
 
-Reference supplied by the organizer as `osu! Cup 賽事官網.html` (a local prototype, not committed). This branch applies that soft pastel language to the public OCLR website while keeping the existing database, routes, permissions and rule releases authoritative.
+Reference supplied by the organizer as `osu! Cup 賽事官網.html` (a local prototype, not committed). This branch applies that soft pastel language to selected public tournament editions while keeping the existing database, routes, permissions and rule releases authoritative.
 
 | Overview, desktop | Overview, mobile |
 | --- | --- |
@@ -16,7 +16,10 @@ The overview screenshot uses the published S8 archive, which is completed, so ev
 
 ## Scope
 
-- Public routes only: site header/footer, home, tournament index, tournament overview, schedule, mappools, teams, rules, results, bracket, players and public profiles.
+- Edition-scoped appearance: `s11` uses cute pastel, and `s8` is also enabled for organizer-requested historical-data testing without a preview parameter. Other editions, the home page, tournament index, news, About and global profiles retain the website default. An explicit `branding.theme` (`default` or `cute-pastel`) overrides the edition default through Admin → Artwork & branding → Tournament appearance.
+- The appearance activates only while a public tournament shell carries `data-edition-theme="cute-pastel"`. Header/footer follow that selected edition while it is open; leaving the edition restores the website appearance. Light/dark preference remains independent.
+- Historical-data preview: open `/tournaments/s8?appearance-preview=cute-pastel` (replace `s8` with any existing edition). A visible preview notice and Exit button distinguish it from the configured theme. A session cookie remembers the preview for that exact edition across its pages, including direct pool links, without changing PostgreSQL data. Home and other editions remain unaffected.
+- Milestone and round-navigation structure uses shared tournament styles, so it remains usable with either appearance.
 - Admin, Player/Captain workspaces and the broadcast overlay keep the existing lavender/workspace theme. The experiment intentionally does not reskin private tools yet.
 - No content, result, registration, mappool or rules data is changed. The rules page continues to render the edition's published `rules.sections` from PostgreSQL.
 
@@ -31,7 +34,7 @@ The overview screenshot uses the published S8 archive, which is completed, so ev
 
 ## Fonts
 
-`public/fonts/quicksand-latin-variable.woff2` is the Latin variable subset of [Quicksand](https://github.com/andrew-paglinawan/QuicksandFamily), licensed under the SIL Open Font License 1.1 (`Quicksand-OFL.txt`). It is applied only inside `.public-site`; Chinese text falls back to the platform's system CJK font. No remote font, image or UI-library request is added.
+`public/fonts/quicksand-latin-variable.woff2` is the Latin variable subset of [Quicksand](https://github.com/andrew-paglinawan/QuicksandFamily), licensed under the SIL Open Font License 1.1 (`Quicksand-OFL.txt`). It is applied only inside a public shell containing the selected cute-pastel edition; Chinese text falls back to the platform's system CJK font. No remote font, image or UI-library request is added.
 
 ## Files
 
@@ -47,7 +50,7 @@ The overview screenshot uses the published S8 archive, which is completed, so ev
 
 The S11 rulebook under `mainsheet/js/rules.js` is a preview/structure example, not an approved public rule release. It was used only in a disposable local preview database for visual review and is not seeded, committed or published by this branch. Real rules still require the organizer's normal Admin release and version consent flow.
 
-## Verification
+## Earlier visual-reference verification
 
 - `npm run check` and `npm run build` pass with `HOME` pointed at a writable directory.
 - `npm test` has unrelated environment failures in `health.test.ts` (a stale local `.oclr-release` marker) and `update-script.test.ts` (sandbox signal handling); the rules/public-navigation/edition/i18n units pass.

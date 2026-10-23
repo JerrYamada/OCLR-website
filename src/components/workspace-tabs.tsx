@@ -9,6 +9,7 @@ export function WorkspaceTabs<T extends string>({
   value,
   onChange,
   appearance = "segmented",
+  literalLabels = false,
 }: {
   id: string;
   label: string;
@@ -16,6 +17,7 @@ export function WorkspaceTabs<T extends string>({
   value: T;
   onChange: (value: T) => void;
   appearance?: "segmented" | "line";
+  literalLabels?: boolean;
 }) {
   const tr = useAppTranslations();
   // Reveal a restored/deep-linked tab horizontally without moving the page.
@@ -64,7 +66,7 @@ export function WorkspaceTabs<T extends string>({
             document.getElementById(`${id}-${items[next].value}`)?.focus();
           }}
         >
-          {tr(item.label)}
+          {literalLabels ? item.label : tr(item.label)}
         </button>
       ))}
     </div>

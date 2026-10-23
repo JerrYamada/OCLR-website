@@ -3,9 +3,15 @@
 import { useAppTranslations } from "@/i18n/shared";
 
 import Link from "next/link";
-import { usePathname, useSearchParams } from "next/navigation";
-import { useId, useRef, useState, type ReactNode } from "react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useId, useRef, useState, type ReactNode } from "react";
 import { publicTournamentSection } from "@/lib/public-navigation";
+import {
+  editionAppearancePreviewCookie,
+  editionAppearancePreviewParam,
+  readEditionAppearance,
+  type EditionAppearance,
+} from "@/lib/edition-appearance";
 
 function Navigation({
   slug,
@@ -89,23 +95,37 @@ export function TournamentShell({
   slug,
   name,
   liveDraft,
+  appearance = "default",
+  appearancePreview,
   children,
 }: {
   slug: string;
   name: string;
   liveDraft: boolean;
+  appearance?: EditionAppearance;
+  appearancePreview?: EditionAppearance;
   children: ReactNode;
 }) {
   const tr = useAppTranslations();
 
   const path = usePathname();
   const search = useSearchParams();
+  const router = useRouter();
+  const requestedPreview = readEditionAppearance(
+    search.get(editionAppearancePreviewParam),
+  );
+  const [preview, setPreview] = useState(requestedPreview ?? appearancePreview);
+  const activePreview = requestedPreview ?? preview;
   const base = `/tournaments/${slug}`;
   const privateView =
     (path === `${base}/draft` && search.get("presenter") === "1") ||
     path === `${base}/team` ||
     path.startsWith(`${base}/draft/captain`) ||
     path.includes("/draft/overlay");
+  useEffect(() => {
+    if (!requestedPreview || privateView) return;
+    document.cookie = `${editionAppearancePreviewCookie}=${slug}:${requestedPreview}; Path=/; SameSite=Lax${location.protocol === "https:" ? "; Secure" : ""}`;
+  }, [requestedPreview, slug, privateView]);
   if (privateView)
     return (
       <div className="container page workspace tournament-workspace">
@@ -120,7 +140,39 @@ export function TournamentShell({
       </div>
     );
   return (
-    <div className="public-tournament">
+    <div
+      className="public-tournament"
+      data-edition-theme={activePreview ?? appearance}
+    >
+      {activePreview && (
+        <div className="notice edition-appearance-preview" role="status">
+          <span>
+            {tr("Appearance preview: {value0}", {
+              value0: tr(
+                activePreview === "cute-pastel"
+                  ? "Cute pastel"
+                  : "Website default",
+              ),
+            })}
+            {" · "}
+            {tr("Tournament settings and data are unchanged.")}
+          </span>
+          <button
+            type="button"
+            className="secondary"
+            onClick={() => {
+              document.cookie = `${editionAppearancePreviewCookie}=; Path=/; Max-Age=0; SameSite=Lax${location.protocol === "https:" ? "; Secure" : ""}`;
+              setPreview(undefined);
+              const query = new URLSearchParams(search.toString());
+              query.delete(editionAppearancePreviewParam);
+              router.replace(`${path}${query.size ? `?${query}` : ""}`);
+              router.refresh();
+            }}
+          >
+            {tr("Exit appearance preview")}
+          </button>
+        </div>
+      )}
       <div className="event-context">
         <div className="event-identity">
           <Link href="/tournaments" className="context-link">

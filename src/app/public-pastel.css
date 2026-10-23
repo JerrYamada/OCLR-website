@@ -1,7 +1,7 @@
 /*
  * Cute pastel public theme (design branch).
- * Scoped to public routes only: Admin, Player/Captain workspaces and the
- * broadcast overlay keep the shared lavender workspace theme.
+ * Activated only by the selected public edition. Global pages, other editions,
+ * private workspaces and broadcast output retain their own appearance.
  */
 @font-face {
   font-family: "Quicksand";
@@ -11,23 +11,23 @@
   font-display: swap;
 }
 
-html:has(.public-site) {
+html:has(.public-site .public-tournament[data-edition-theme="cute-pastel"]) {
   background: #fff4f8;
 }
 
-html[data-theme="dark"]:has(.public-site) {
+html[data-theme="dark"]:has(.public-site .public-tournament[data-edition-theme="cute-pastel"]) {
   background: #241a20;
 }
 
-body:has(.public-site) {
+body:has(.public-site .public-tournament[data-edition-theme="cute-pastel"]) {
   background: #fff4f8;
 }
 
-html[data-theme="dark"] body:has(.public-site) {
+html[data-theme="dark"] body:has(.public-site .public-tournament[data-edition-theme="cute-pastel"]) {
   background: #241a20;
 }
 
-.themed-site.public-site {
+.themed-site.public-site:has(.public-tournament[data-edition-theme="cute-pastel"]) {
   --pastel-pink: #ff7aaf;
   --pastel-pink-soft: #ffd6e5;
   --pastel-blue: #7cb7ff;
@@ -35,6 +35,12 @@ html[data-theme="dark"] body:has(.public-site) {
   --pastel-red: #ff8f8f;
   --pastel-teal: #5fdcc8;
   --pastel-orange: #ffaa6b;
+  --site-mod-hd-background: #ffe6a3;
+  --site-mod-hd-foreground: #674b10;
+  --site-mod-hr-background: #ffc6cc;
+  --site-mod-hr-foreground: #812d3b;
+  --site-mod-dt-background: #e5d4ff;
+  --site-mod-dt-foreground: #573583;
   --font-sans:
     "Quicksand", "PingFang TC", "PingFang SC", "Hiragino Maru Gothic ProN",
     "Noto Sans TC", "Noto Sans SC", "Microsoft JhengHei", "Microsoft YaHei",
@@ -75,7 +81,7 @@ html[data-theme="dark"] body:has(.public-site) {
   line-height: 1.7;
 }
 
-html[data-theme="dark"] .themed-site.public-site {
+html[data-theme="dark"] .themed-site.public-site:has(.public-tournament[data-edition-theme="cute-pastel"]) {
   --site-background: #241a20;
   --site-surface: #2f2229;
   --site-raised: #382830;
@@ -106,48 +112,48 @@ html[data-theme="dark"] .themed-site.public-site {
   color-scheme: dark;
 }
 
-.themed-site.public-site :focus-visible {
+.themed-site.public-site:has(.public-tournament[data-edition-theme="cute-pastel"]) :focus-visible {
   outline-color: var(--site-focus);
   outline-offset: 3px;
 }
 
-.themed-site.public-site ::selection {
+.themed-site.public-site:has(.public-tournament[data-edition-theme="cute-pastel"]) ::selection {
   background: var(--site-selection);
   color: var(--site-foreground);
 }
 
-.themed-site.public-site h1,
-.themed-site.public-site h2,
-.themed-site.public-site h3 {
+.themed-site.public-site:has(.public-tournament[data-edition-theme="cute-pastel"]) h1,
+.themed-site.public-site:has(.public-tournament[data-edition-theme="cute-pastel"]) h2,
+.themed-site.public-site:has(.public-tournament[data-edition-theme="cute-pastel"]) h3 {
   letter-spacing: -0.02em;
 }
 
 /* Site header: soft bar with a pink active pill, no underline tabs. */
-.themed-site.public-site .site-header {
+.themed-site.public-site:has(.public-tournament[data-edition-theme="cute-pastel"]) .site-header {
   background: color-mix(in srgb, var(--site-header) 90%, transparent);
   border-bottom: 1.5px solid var(--site-border);
   backdrop-filter: blur(16px);
 }
 
-.themed-site.public-site .nav-wrap {
+.themed-site.public-site:has(.public-tournament[data-edition-theme="cute-pastel"]) .nav-wrap {
   max-width: 1240px;
   height: 74px;
   padding-inline: clamp(1.1rem, 3vw, 2.5rem);
   gap: 1rem;
 }
 
-.themed-site.public-site .brand {
+.themed-site.public-site:has(.public-tournament[data-edition-theme="cute-pastel"]) .brand {
   font-weight: 700;
   letter-spacing: -0.02em;
 }
 
-.themed-site.public-site .main-nav {
+.themed-site.public-site:has(.public-tournament[data-edition-theme="cute-pastel"]) .main-nav {
   align-self: center;
   gap: 0.15rem;
   margin-left: auto;
 }
 
-.themed-site.public-site .main-nav > a {
+.themed-site.public-site:has(.public-tournament[data-edition-theme="cute-pastel"]) .main-nav > a {
   display: inline-flex;
   align-items: center;
   min-height: 42px;
@@ -163,29 +169,29 @@ html[data-theme="dark"] .themed-site.public-site {
     color 0.16s;
 }
 
-.themed-site.public-site .main-nav > a:hover {
+.themed-site.public-site:has(.public-tournament[data-edition-theme="cute-pastel"]) .main-nav > a:hover {
   background: var(--site-tint);
   color: var(--site-accent);
   border: 0;
 }
 
-.themed-site.public-site .main-nav > a[aria-current] {
+.themed-site.public-site:has(.public-tournament[data-edition-theme="cute-pastel"]) .main-nav > a[aria-current] {
   background: var(--site-primary);
   color: var(--site-on-primary);
   border: 0;
   font-weight: 700;
 }
 
-.themed-site.public-site .site-preferences {
+.themed-site.public-site:has(.public-tournament[data-edition-theme="cute-pastel"]) .site-preferences {
   gap: 0.45rem;
 }
 
-.themed-site.public-site .theme-control {
+.themed-site.public-site:has(.public-tournament[data-edition-theme="cute-pastel"]) .theme-control {
   width: 44px;
   border-radius: 999px;
 }
 
-.themed-site.public-site .language-control select {
+.themed-site.public-site:has(.public-tournament[data-edition-theme="cute-pastel"]) .language-control select {
   min-height: 44px;
   border-radius: 999px;
   border: 1.5px solid var(--site-control-border);
@@ -194,30 +200,30 @@ html[data-theme="dark"] .themed-site.public-site {
   font-weight: 600;
 }
 
-.themed-site.public-site :is(button, .button) {
+.themed-site.public-site:has(.public-tournament[data-edition-theme="cute-pastel"]) :is(button, .button) {
   font-weight: 700;
   letter-spacing: 0.01em;
 }
 
-.themed-site.public-site :is(button, .button).secondary {
+.themed-site.public-site:has(.public-tournament[data-edition-theme="cute-pastel"]) :is(button, .button).secondary {
   background: var(--site-surface);
   color: var(--site-accent);
   border: 1.5px solid var(--site-control-border);
 }
 
-.themed-site.public-site .nav-login,
-.themed-site.public-site .account-control {
+.themed-site.public-site:has(.public-tournament[data-edition-theme="cute-pastel"]) .nav-login,
+.themed-site.public-site:has(.public-tournament[data-edition-theme="cute-pastel"]) .account-control {
   border-radius: 999px;
 }
 
-.themed-site.public-site .hero .actions .button,
-.themed-site.public-site .event-intro .actions .button,
-.themed-site.public-site .page-heading .actions .button {
+.themed-site.public-site:has(.public-tournament[data-edition-theme="cute-pastel"]) .hero .actions .button,
+.themed-site.public-site:has(.public-tournament[data-edition-theme="cute-pastel"]) .event-intro .actions .button,
+.themed-site.public-site:has(.public-tournament[data-edition-theme="cute-pastel"]) .page-heading .actions .button {
   box-shadow: 0 10px 22px -12px
     color-mix(in srgb, var(--site-primary) 80%, transparent);
 }
 
-.themed-site.public-site
+.themed-site.public-site:has(.public-tournament[data-edition-theme="cute-pastel"])
   :is(input:not([type="checkbox"]):not([type="radio"]), select, textarea) {
   border: 1.5px solid var(--site-control-border);
   border-radius: 1rem;
@@ -225,15 +231,15 @@ html[data-theme="dark"] .themed-site.public-site {
   color: var(--site-foreground);
 }
 
-.themed-site.public-site :is(input, textarea)::placeholder {
+.themed-site.public-site:has(.public-tournament[data-edition-theme="cute-pastel"]) :is(input, textarea)::placeholder {
   color: var(--site-muted);
   opacity: 1;
 }
 
 /* Replace the native select arrow, which otherwise floats in its own control
  * box at the far edge of the rounded field. */
-.themed-site.public-site select,
-.themed-site.public-site .public-tournament select {
+.themed-site.public-site:has(.public-tournament[data-edition-theme="cute-pastel"]) select,
+.themed-site.public-site:has(.public-tournament[data-edition-theme="cute-pastel"]) .public-tournament select {
   appearance: none;
   -webkit-appearance: none;
   padding-right: 2.75rem;
@@ -245,12 +251,12 @@ html[data-theme="dark"] .themed-site.public-site {
   cursor: pointer;
 }
 
-html[data-theme="dark"] .themed-site.public-site select,
-html[data-theme="dark"] .themed-site.public-site .public-tournament select {
+html[data-theme="dark"] .themed-site.public-site:has(.public-tournament[data-edition-theme="cute-pastel"]) select,
+html[data-theme="dark"] .themed-site.public-site:has(.public-tournament[data-edition-theme="cute-pastel"]) .public-tournament select {
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16' fill='none' stroke='%23ffb3d0' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m4 6 4 4 4-4'/%3E%3C/svg%3E");
 }
 
-.themed-site.public-site .badge {
+.themed-site.public-site:has(.public-tournament[data-edition-theme="cute-pastel"]) .badge {
   border: 0;
   border-radius: 999px;
   background: var(--pastel-yellow);
@@ -259,18 +265,18 @@ html[data-theme="dark"] .themed-site.public-site .public-tournament select {
   font-weight: 700;
 }
 
-html[data-theme="dark"] .themed-site.public-site .badge {
+html[data-theme="dark"] .themed-site.public-site:has(.public-tournament[data-edition-theme="cute-pastel"]) .badge {
   background: #4a3820;
   color: #ffe6a8;
 }
 
-.themed-site.public-site .eyebrow {
+.themed-site.public-site:has(.public-tournament[data-edition-theme="cute-pastel"]) .eyebrow {
   color: var(--site-accent);
   font-weight: 700;
   letter-spacing: 0.14em;
 }
 
-.themed-site.public-site :is(.text-link, .context-link, .prose a:not(.button)) {
+.themed-site.public-site:has(.public-tournament[data-edition-theme="cute-pastel"]) :is(.text-link, .context-link, .prose a:not(.button)) {
   color: var(--site-accent);
   text-decoration-color: color-mix(
     in srgb,
@@ -281,7 +287,7 @@ html[data-theme="dark"] .themed-site.public-site .badge {
 }
 
 /* Rounded page band used by Rules, Schedule, Mappools, Teams, Players, etc. */
-.themed-site.public-site .page-heading {
+.themed-site.public-site:has(.public-tournament[data-edition-theme="cute-pastel"]) .page-heading {
   position: relative;
   overflow: hidden;
   padding: clamp(1.6rem, 4vw, 2.6rem);
@@ -296,7 +302,7 @@ html[data-theme="dark"] .themed-site.public-site .badge {
   box-shadow: 0 22px 55px -42px var(--site-shadow);
 }
 
-.themed-site.public-site .page-heading::after {
+.themed-site.public-site:has(.public-tournament[data-edition-theme="cute-pastel"]) .page-heading::after {
   content: "";
   position: absolute;
   right: -3.5rem;
@@ -308,37 +314,37 @@ html[data-theme="dark"] .themed-site.public-site .badge {
   pointer-events: none;
 }
 
-.themed-site.public-site .page-heading > * {
+.themed-site.public-site:has(.public-tournament[data-edition-theme="cute-pastel"]) .page-heading > * {
   position: relative;
   z-index: 1;
 }
 
-.themed-site.public-site .page-heading h1 {
+.themed-site.public-site:has(.public-tournament[data-edition-theme="cute-pastel"]) .page-heading h1 {
   margin-bottom: 0.65rem;
   font-size: clamp(2.2rem, 5vw, 3.5rem);
   letter-spacing: -0.03em;
   line-height: 1.05;
 }
 
-.themed-site.public-site .page-heading .muted {
+.themed-site.public-site:has(.public-tournament[data-edition-theme="cute-pastel"]) .page-heading .muted {
   max-width: 62ch;
   margin-bottom: 0;
   color: var(--site-secondary-text);
 }
 
 /* Home hero: the S11 artwork stays, washed in the same soft pink paper. */
-.themed-site.public-site .hero {
+.themed-site.public-site:has(.public-tournament[data-edition-theme="cute-pastel"]) .hero {
   border-radius: 0 0 2.5rem 2.5rem;
   background: var(--site-tint);
   margin-bottom: 0;
   color: var(--site-foreground);
 }
 
-.themed-site.public-site .hero-art {
+.themed-site.public-site:has(.public-tournament[data-edition-theme="cute-pastel"]) .hero-art {
   opacity: 0.94;
 }
 
-.themed-site.public-site .hero-shade {
+.themed-site.public-site:has(.public-tournament[data-edition-theme="cute-pastel"]) .hero-shade {
   background:
     linear-gradient(
       90deg,
@@ -350,18 +356,18 @@ html[data-theme="dark"] .themed-site.public-site .badge {
     linear-gradient(0deg, var(--site-background), transparent 40%);
 }
 
-.themed-site.public-site .hero-content {
+.themed-site.public-site:has(.public-tournament[data-edition-theme="cute-pastel"]) .hero-content {
   min-height: clamp(22rem, 32vw, 29rem);
   padding-block: clamp(2rem, 5vw, 4rem);
 }
 
-.themed-site.public-site .hero-kicker {
+.themed-site.public-site:has(.public-tournament[data-edition-theme="cute-pastel"]) .hero-kicker {
   color: var(--site-accent);
   font-weight: 700;
   letter-spacing: 0.14em;
 }
 
-.themed-site.public-site .hero h1 {
+.themed-site.public-site:has(.public-tournament[data-edition-theme="cute-pastel"]) .hero h1 {
   margin-bottom: 1.15rem;
   color: var(--site-foreground);
   font-size: clamp(3rem, 6.5vw, 5.5rem);
@@ -370,83 +376,83 @@ html[data-theme="dark"] .themed-site.public-site .badge {
   letter-spacing: -0.035em;
 }
 
-.themed-site.public-site .hero-copy {
+.themed-site.public-site:has(.public-tournament[data-edition-theme="cute-pastel"]) .hero-copy {
   max-width: 34rem;
   color: var(--site-secondary-text);
   font-size: 1rem;
   line-height: 1.75;
 }
 
-.themed-site.public-site .hero .hero-enrollment {
+.themed-site.public-site:has(.public-tournament[data-edition-theme="cute-pastel"]) .hero .hero-enrollment {
   color: var(--site-secondary-text);
 }
 
-.themed-site.public-site .hero-status {
+.themed-site.public-site:has(.public-tournament[data-edition-theme="cute-pastel"]) .hero-status {
   border-inline-start-color: var(--site-border);
   color: var(--site-secondary-text);
 }
 
-.themed-site.public-site .hero-status::before {
+.themed-site.public-site:has(.public-tournament[data-edition-theme="cute-pastel"]) .hero-status::before {
   background: var(--site-primary);
 }
 
-.themed-site.public-site .hero-status[data-state="live"]::before {
+.themed-site.public-site:has(.public-tournament[data-edition-theme="cute-pastel"]) .hero-status[data-state="live"]::before {
   background: #35b98f;
 }
 
-.themed-site.public-site .hero-status[data-state="completed"]::before {
+.themed-site.public-site:has(.public-tournament[data-edition-theme="cute-pastel"]) .hero-status[data-state="completed"]::before {
   background: var(--site-muted);
 }
 
-.themed-site.public-site .hero .actions {
+.themed-site.public-site:has(.public-tournament[data-edition-theme="cute-pastel"]) .hero .actions {
   gap: 0.75rem;
 }
 
 /* Home sections and edition cards. */
-.themed-site.public-site .home-updates aside {
+.themed-site.public-site:has(.public-tournament[data-edition-theme="cute-pastel"]) .home-updates aside {
   border-left: 1.5px solid var(--site-border);
 }
 
-.themed-site.public-site .home-news li {
+.themed-site.public-site:has(.public-tournament[data-edition-theme="cute-pastel"]) .home-news li {
   border-top: 1.5px solid var(--site-border);
 }
 
-.themed-site.public-site .edition-card {
+.themed-site.public-site:has(.public-tournament[data-edition-theme="cute-pastel"]) .edition-card {
   border: 1.5px solid var(--site-border);
   border-radius: 1.5rem;
   background: var(--site-surface);
   box-shadow: 0 20px 48px -40px var(--site-shadow);
 }
 
-.themed-site.public-site .edition-art {
+.themed-site.public-site:has(.public-tournament[data-edition-theme="cute-pastel"]) .edition-art {
   border-radius: 1.1rem;
 }
 
-.themed-site.public-site .edition-facts {
+.themed-site.public-site:has(.public-tournament[data-edition-theme="cute-pastel"]) .edition-facts {
   border-left-color: var(--site-border);
 }
 
-.themed-site.public-site .edition-copy h2 {
+.themed-site.public-site:has(.public-tournament[data-edition-theme="cute-pastel"]) .edition-copy h2 {
   letter-spacing: -0.02em;
 }
 
 /* Public tournament shell and pill navigation. */
-.themed-site.public-site .public-tournament {
+.themed-site.public-site:has(.public-tournament[data-edition-theme="cute-pastel"]) .public-tournament {
   padding-top: 1.1rem;
 }
 
-.themed-site.public-site .public-tournament .event-context {
+.themed-site.public-site:has(.public-tournament[data-edition-theme="cute-pastel"]) .public-tournament .event-context {
   margin-bottom: 0.9rem;
 }
 
-.themed-site.public-site .public-tournament .tournament-navigation nav {
+.themed-site.public-site:has(.public-tournament[data-edition-theme="cute-pastel"]) .public-tournament .tournament-navigation nav {
   gap: 0.4rem;
   padding: 0;
   border-radius: 0;
   background: transparent;
 }
 
-.themed-site.public-site .public-tournament .tournament-navigation nav a {
+.themed-site.public-site:has(.public-tournament[data-edition-theme="cute-pastel"]) .public-tournament .tournament-navigation nav a {
   min-height: 44px;
   padding: 0.5rem 1rem;
   border: 1.5px solid var(--site-border);
@@ -457,13 +463,13 @@ html[data-theme="dark"] .themed-site.public-site .badge {
   box-shadow: 0 8px 18px -16px var(--site-shadow);
 }
 
-.themed-site.public-site .public-tournament .tournament-navigation nav a:hover {
+.themed-site.public-site:has(.public-tournament[data-edition-theme="cute-pastel"]) .public-tournament .tournament-navigation nav a:hover {
   background: var(--site-tint);
   color: var(--site-accent);
   text-decoration: none;
 }
 
-.themed-site.public-site
+.themed-site.public-site:has(.public-tournament[data-edition-theme="cute-pastel"])
   .public-tournament
   .tournament-navigation
   nav
@@ -475,7 +481,7 @@ html[data-theme="dark"] .themed-site.public-site .badge {
     color-mix(in srgb, var(--site-primary) 80%, transparent);
 }
 
-.themed-site.public-site
+.themed-site.public-site:has(.public-tournament[data-edition-theme="cute-pastel"])
   .public-tournament
   .tournament-navigation
   nav
@@ -483,20 +489,20 @@ html[data-theme="dark"] .themed-site.public-site .badge {
   content: none;
 }
 
-.themed-site.public-site .public-tournament .tournament-menu {
+.themed-site.public-site:has(.public-tournament[data-edition-theme="cute-pastel"]) .public-tournament .tournament-menu {
   border: 1.5px solid var(--site-control-border);
   border-radius: 999px;
 }
 
 /* Tournament overview hero and milestones. */
-.themed-site.public-site .event-hero {
+.themed-site.public-site:has(.public-tournament[data-edition-theme="cute-pastel"]) .event-hero {
   border: 1.5px solid var(--site-border);
   border-radius: 2rem;
   background: var(--site-tint);
   box-shadow: 0 24px 60px -46px var(--site-shadow);
 }
 
-.themed-site.public-site .event-intro {
+.themed-site.public-site:has(.public-tournament[data-edition-theme="cute-pastel"]) .event-intro {
   position: relative;
   background: linear-gradient(
     135deg,
@@ -505,7 +511,7 @@ html[data-theme="dark"] .themed-site.public-site .badge {
   );
 }
 
-.themed-site.public-site .event-intro::after {
+.themed-site.public-site:has(.public-tournament[data-edition-theme="cute-pastel"]) .event-intro::after {
   content: "";
   position: absolute;
   right: -2.5rem;
@@ -517,16 +523,16 @@ html[data-theme="dark"] .themed-site.public-site .badge {
   pointer-events: none;
 }
 
-.themed-site.public-site .event-intro > * {
+.themed-site.public-site:has(.public-tournament[data-edition-theme="cute-pastel"]) .event-intro > * {
   position: relative;
   z-index: 1;
 }
 
-.themed-site.public-site .event-intro > .badge {
+.themed-site.public-site:has(.public-tournament[data-edition-theme="cute-pastel"]) .event-intro > .badge {
   margin-bottom: 1rem;
 }
 
-.themed-site.public-site .event-intro h1 {
+.themed-site.public-site:has(.public-tournament[data-edition-theme="cute-pastel"]) .event-intro h1 {
   font-size: clamp(2.4rem, 5vw, 4.4rem);
   line-height: 1.02;
   letter-spacing: -0.03em;
@@ -534,11 +540,11 @@ html[data-theme="dark"] .themed-site.public-site .badge {
 
 /* Reference-style connected stage tracker. Completed = pale pink check,
  * current = strong foreground contrast with a halo, upcoming = blank. */
-.themed-site.public-site .event-stages {
+.themed-site.public-site:has(.public-tournament[data-edition-theme="cute-pastel"]) .event-stages {
   margin: 0 0 1.5rem;
 }
 
-.themed-site.public-site .event-stages-heading {
+.themed-site.public-site:has(.public-tournament[data-edition-theme="cute-pastel"]) .event-stages-heading {
   display: flex;
   flex-wrap: wrap;
   align-items: baseline;
@@ -546,19 +552,19 @@ html[data-theme="dark"] .themed-site.public-site .badge {
   margin: 0 0 1rem 0.25rem;
 }
 
-.themed-site.public-site .event-stages-heading h2 {
+.themed-site.public-site:has(.public-tournament[data-edition-theme="cute-pastel"]) .event-stages-heading h2 {
   margin: 0;
   font-size: clamp(1.7rem, 3vw, 2.4rem);
   line-height: 1.15;
 }
 
-.themed-site.public-site .event-stages-heading p {
+.themed-site.public-site:has(.public-tournament[data-edition-theme="cute-pastel"]) .event-stages-heading p {
   margin: 0;
   color: var(--site-muted);
   font-size: 0.85rem;
 }
 
-.themed-site.public-site .event-stages-scroll {
+.themed-site.public-site:has(.public-tournament[data-edition-theme="cute-pastel"]) .event-stages-scroll {
   overflow-x: auto;
   padding: 0.25rem 0.25rem 0.8rem;
   overscroll-behavior-inline: contain;
@@ -566,7 +572,7 @@ html[data-theme="dark"] .themed-site.public-site .badge {
   scrollbar-color: var(--site-control-border) transparent;
 }
 
-.themed-site.public-site .event-stage-track {
+.themed-site.public-site:has(.public-tournament[data-edition-theme="cute-pastel"]) .event-stage-track {
   position: relative;
   display: flex;
   min-width: 760px;
@@ -579,7 +585,7 @@ html[data-theme="dark"] .themed-site.public-site .badge {
   box-shadow: 0 20px 48px -42px var(--site-shadow);
 }
 
-.themed-site.public-site .event-stage-track::before {
+.themed-site.public-site:has(.public-tournament[data-edition-theme="cute-pastel"]) .event-stage-track::before {
   content: "";
   position: absolute;
   top: calc(1.25rem + 24px);
@@ -590,14 +596,14 @@ html[data-theme="dark"] .themed-site.public-site .badge {
   background: var(--site-border);
 }
 
-.themed-site.public-site .event-stage {
+.themed-site.public-site:has(.public-tournament[data-edition-theme="cute-pastel"]) .event-stage {
   position: relative;
   flex: 1 1 0;
   min-width: 0;
   text-align: center;
 }
 
-.themed-site.public-site .event-stage-dot {
+.themed-site.public-site:has(.public-tournament[data-edition-theme="cute-pastel"]) .event-stage-dot {
   position: relative;
   z-index: 1;
   display: grid;
@@ -615,13 +621,13 @@ html[data-theme="dark"] .themed-site.public-site .badge {
   line-height: 1;
 }
 
-.themed-site.public-site .event-stage.is-completed .event-stage-dot {
+.themed-site.public-site:has(.public-tournament[data-edition-theme="cute-pastel"]) .event-stage.is-completed .event-stage-dot {
   border-color: #ffc2d8;
   background: var(--pastel-pink-soft);
   color: #4a2c3a;
 }
 
-.themed-site.public-site .event-stage.is-current .event-stage-dot {
+.themed-site.public-site:has(.public-tournament[data-edition-theme="cute-pastel"]) .event-stage.is-current .event-stage-dot {
   border-color: var(--site-surface);
   background: var(--site-foreground);
   box-shadow:
@@ -630,13 +636,13 @@ html[data-theme="dark"] .themed-site.public-site .badge {
   color: var(--site-surface);
 }
 
-.themed-site.public-site .event-stage.is-upcoming .event-stage-dot {
+.themed-site.public-site:has(.public-tournament[data-edition-theme="cute-pastel"]) .event-stage.is-upcoming .event-stage-dot {
   border-color: var(--site-border);
   background: var(--site-surface);
   color: var(--site-muted);
 }
 
-.themed-site.public-site .event-stage-name {
+.themed-site.public-site:has(.public-tournament[data-edition-theme="cute-pastel"]) .event-stage-name {
   display: block;
   overflow-wrap: anywhere;
   font-size: 0.82rem;
@@ -644,7 +650,7 @@ html[data-theme="dark"] .themed-site.public-site .badge {
   line-height: 1.3;
 }
 
-.themed-site.public-site .event-stage-date {
+.themed-site.public-site:has(.public-tournament[data-edition-theme="cute-pastel"]) .event-stage-date {
   display: block;
   margin-top: 0.15rem;
   overflow-wrap: anywhere;
@@ -653,51 +659,51 @@ html[data-theme="dark"] .themed-site.public-site .badge {
   line-height: 1.4;
 }
 
-.themed-site.public-site .event-stage.is-completed .event-stage-name {
+.themed-site.public-site:has(.public-tournament[data-edition-theme="cute-pastel"]) .event-stage.is-completed .event-stage-name {
   color: var(--site-secondary-text);
 }
 
-.themed-site.public-site .event-stage.is-current .event-stage-name {
+.themed-site.public-site:has(.public-tournament[data-edition-theme="cute-pastel"]) .event-stage.is-current .event-stage-name {
   color: var(--site-accent);
 }
 
-.themed-site.public-site .event-pool-list a,
-.themed-site.public-site .event-team-links li {
+.themed-site.public-site:has(.public-tournament[data-edition-theme="cute-pastel"]) .event-pool-list a,
+.themed-site.public-site:has(.public-tournament[data-edition-theme="cute-pastel"]) .event-team-links li {
   border-color: var(--site-border);
 }
 
 /* Shared surfaces, tables and forms. */
-.themed-site.public-site :is(.panel, .directory-details, .about-aside) {
+.themed-site.public-site:has(.public-tournament[data-edition-theme="cute-pastel"]) :is(.panel, .directory-details, .about-aside) {
   border: 1.5px solid var(--site-border);
   border-radius: 1.5rem;
   background: var(--site-surface);
   box-shadow: 0 20px 48px -42px var(--site-shadow);
 }
 
-.themed-site.public-site :is(th, td) {
+.themed-site.public-site:has(.public-tournament[data-edition-theme="cute-pastel"]) :is(th, td) {
   border-color: var(--site-border);
 }
 
-.themed-site.public-site th {
+.themed-site.public-site:has(.public-tournament[data-edition-theme="cute-pastel"]) th {
   background: var(--site-raised);
   color: var(--site-secondary-text);
 }
 
-.themed-site.public-site .notice {
+.themed-site.public-site:has(.public-tournament[data-edition-theme="cute-pastel"]) .notice {
   border: 1.5px solid var(--site-border);
   border-radius: 1.25rem;
   background: var(--site-raised);
   color: var(--site-secondary-text);
 }
 
-.themed-site.public-site .empty-state {
+.themed-site.public-site:has(.public-tournament[data-edition-theme="cute-pastel"]) .empty-state {
   border: 1.5px dashed var(--site-control-border);
   border-radius: 1.5rem;
   background: var(--site-surface);
 }
 
 /* Rules handbook: compact index + soft cards per chapter. */
-.themed-site.public-site .rules-version {
+.themed-site.public-site:has(.public-tournament[data-edition-theme="cute-pastel"]) .rules-version {
   display: inline-flex;
   align-items: center;
   gap: 0.35rem;
@@ -708,12 +714,12 @@ html[data-theme="dark"] .themed-site.public-site .badge {
   color: var(--site-muted);
 }
 
-.themed-site.public-site .rules-handbook {
+.themed-site.public-site:has(.public-tournament[data-edition-theme="cute-pastel"]) .rules-handbook {
   grid-template-columns: 240px minmax(0, 1fr);
   gap: 1.5rem;
 }
 
-.themed-site.public-site .rules-desktop-contents {
+.themed-site.public-site:has(.public-tournament[data-edition-theme="cute-pastel"]) .rules-desktop-contents {
   top: 96px;
   padding: 1rem;
   border: 1.5px solid var(--site-border);
@@ -722,7 +728,7 @@ html[data-theme="dark"] .themed-site.public-site .badge {
   box-shadow: 0 20px 48px -42px var(--site-shadow);
 }
 
-.themed-site.public-site .rules-handbook nav a {
+.themed-site.public-site:has(.public-tournament[data-edition-theme="cute-pastel"]) .rules-handbook nav a {
   min-height: 44px;
   padding: 0.5rem 0.7rem;
   border-radius: 999px;
@@ -730,26 +736,26 @@ html[data-theme="dark"] .themed-site.public-site .badge {
   font-weight: 600;
 }
 
-.themed-site.public-site .rules-handbook nav a span {
+.themed-site.public-site:has(.public-tournament[data-edition-theme="cute-pastel"]) .rules-handbook nav a span {
   color: var(--site-accent);
   font-weight: 700;
 }
 
-.themed-site.public-site .rules-handbook nav a:hover {
+.themed-site.public-site:has(.public-tournament[data-edition-theme="cute-pastel"]) .rules-handbook nav a:hover {
   background: var(--site-tint);
   color: var(--site-accent);
 }
 
-.themed-site.public-site .rules-handbook nav a[aria-current] {
+.themed-site.public-site:has(.public-tournament[data-edition-theme="cute-pastel"]) .rules-handbook nav a[aria-current] {
   background: var(--site-primary);
   color: var(--site-on-primary);
 }
 
-.themed-site.public-site .rules-handbook nav a[aria-current] span {
+.themed-site.public-site:has(.public-tournament[data-edition-theme="cute-pastel"]) .rules-handbook nav a[aria-current] span {
   color: inherit;
 }
 
-.themed-site.public-site .rules-article {
+.themed-site.public-site:has(.public-tournament[data-edition-theme="cute-pastel"]) .rules-article {
   display: grid;
   gap: 1rem;
   padding: 0;
@@ -759,7 +765,7 @@ html[data-theme="dark"] .themed-site.public-site .badge {
   box-shadow: none;
 }
 
-.themed-site.public-site .rules-article section {
+.themed-site.public-site:has(.public-tournament[data-edition-theme="cute-pastel"]) .rules-article section {
   padding: clamp(1.25rem, 3vw, 2rem);
   border: 1.5px solid var(--site-border);
   border-radius: 1.5rem;
@@ -767,13 +773,13 @@ html[data-theme="dark"] .themed-site.public-site .badge {
   box-shadow: 0 20px 48px -42px var(--site-shadow);
 }
 
-.themed-site.public-site .rules-article section + section {
+.themed-site.public-site:has(.public-tournament[data-edition-theme="cute-pastel"]) .rules-article section + section {
   margin-top: 0;
   padding-top: clamp(1.25rem, 3vw, 2rem);
   border-top: 1.5px solid var(--site-border);
 }
 
-.themed-site.public-site .rules-article h2 {
+.themed-site.public-site:has(.public-tournament[data-edition-theme="cute-pastel"]) .rules-article h2 {
   display: flex;
   align-items: center;
   gap: 0.85rem;
@@ -781,7 +787,7 @@ html[data-theme="dark"] .themed-site.public-site .badge {
   font-size: clamp(1.2rem, 2vw, 1.5rem);
 }
 
-.themed-site.public-site .rules-article h2 span {
+.themed-site.public-site:has(.public-tournament[data-edition-theme="cute-pastel"]) .rules-article h2 span {
   display: grid;
   flex: 0 0 2.2rem;
   place-items: center;
@@ -794,12 +800,12 @@ html[data-theme="dark"] .themed-site.public-site .badge {
   line-height: 1;
 }
 
-.themed-site.public-site .rules-article p {
+.themed-site.public-site:has(.public-tournament[data-edition-theme="cute-pastel"]) .rules-article p {
   max-width: 74ch;
   line-height: 1.9;
 }
 
-.themed-site.public-site .rules-mobile-contents {
+.themed-site.public-site:has(.public-tournament[data-edition-theme="cute-pastel"]) .rules-mobile-contents {
   border: 1.5px solid var(--site-border);
   border-radius: 1.5rem;
   background: var(--site-surface);
@@ -807,14 +813,14 @@ html[data-theme="dark"] .themed-site.public-site .badge {
 }
 
 /* Match, pool and bracket surfaces inherit the same rounded language. */
-.themed-site.public-site .public-tournament .public-match-card {
+.themed-site.public-site:has(.public-tournament[data-edition-theme="cute-pastel"]) .public-tournament .public-match-card {
   border: 1.5px solid var(--site-border);
   border-radius: 1.35rem;
   background: var(--site-surface);
   box-shadow: 0 16px 36px -34px var(--site-shadow);
 }
 
-.themed-site.public-site
+.themed-site.public-site:has(.public-tournament[data-edition-theme="cute-pastel"])
   .public-match-list[data-view="compact"]
   .public-match-card {
   border: 0;
@@ -823,12 +829,12 @@ html[data-theme="dark"] .themed-site.public-site .badge {
   box-shadow: none;
 }
 
-.themed-site.public-site .public-tournament .event-pills {
+.themed-site.public-site:has(.public-tournament[data-edition-theme="cute-pastel"]) .public-tournament .event-pills {
   border: 1.5px solid var(--site-border);
   background: var(--site-surface);
 }
 
-.themed-site.public-site
+.themed-site.public-site:has(.public-tournament[data-edition-theme="cute-pastel"])
   .public-tournament
   .event-pills
   button[aria-pressed="true"] {
@@ -836,29 +842,123 @@ html[data-theme="dark"] .themed-site.public-site .badge {
   color: var(--site-on-primary);
 }
 
-.themed-site.public-site .public-tournament .mappool-public-round,
-.themed-site.public-site .public-tournament .map-browse-card {
+.themed-site.public-site:has(.public-tournament[data-edition-theme="cute-pastel"]) .public-tournament .mappool-public-round,
+.themed-site.public-site:has(.public-tournament[data-edition-theme="cute-pastel"]) .public-tournament .map-browse-card {
   border: 1.5px solid var(--site-border);
   border-radius: 1.5rem;
   background: var(--site-surface);
   box-shadow: 0 16px 36px -36px var(--site-shadow);
 }
 
-.themed-site.public-site .public-tournament .map-slot-badge {
+.themed-site.public-site:has(.public-tournament[data-edition-theme="cute-pastel"]) .public-tournament .map-slot-badge {
   background: var(--site-primary);
   color: var(--site-on-primary);
 }
 
-.themed-site.public-site .public-tournament .workspace-tabs {
+.themed-site.public-site:has(.public-tournament[data-edition-theme="cute-pastel"]) .map-browse-card[data-category="HD"] .map-slot-badge {
+  background: var(--site-mod-hd-background);
+  color: var(--site-mod-hd-foreground);
+}
+
+.themed-site.public-site:has(.public-tournament[data-edition-theme="cute-pastel"]) .map-browse-card[data-category="HR"] .map-slot-badge {
+  background: var(--site-mod-hr-background);
+  color: var(--site-mod-hr-foreground);
+}
+
+.themed-site.public-site:has(.public-tournament[data-edition-theme="cute-pastel"]) .map-browse-card[data-category="DT"] .map-slot-badge {
+  background: var(--site-mod-dt-background);
+  color: var(--site-mod-dt-foreground);
+}
+
+.themed-site.public-site:has(.public-tournament[data-edition-theme="cute-pastel"]) .mappool-category[data-category="HD"] {
+  --mappool-category-background: var(--site-mod-hd-background);
+  --mappool-category-foreground: var(--site-mod-hd-foreground);
+}
+
+.themed-site.public-site:has(.public-tournament[data-edition-theme="cute-pastel"]) .mappool-category[data-category="HR"] {
+  --mappool-category-background: var(--site-mod-hr-background);
+  --mappool-category-foreground: var(--site-mod-hr-foreground);
+}
+
+.themed-site.public-site:has(.public-tournament[data-edition-theme="cute-pastel"]) .mappool-category[data-category="DT"] {
+  --mappool-category-background: var(--site-mod-dt-background);
+  --mappool-category-foreground: var(--site-mod-dt-foreground);
+}
+
+.themed-site.public-site:has(.public-tournament[data-edition-theme="cute-pastel"])
+  .mappool-category:is([data-category="HD"], [data-category="HR"], [data-category="DT"])
+  .mappool-category-heading {
+  background: var(--mappool-category-background);
+  border-color: var(--mappool-category-foreground);
+}
+
+.themed-site.public-site:has(.public-tournament[data-edition-theme="cute-pastel"])
+  .mappool-category:is([data-category="HD"], [data-category="HR"], [data-category="DT"])
+  .mappool-category-heading :is(h2, h4, h5, strong, span) {
+  color: var(--mappool-category-foreground);
+}
+
+.themed-site.public-site:has(.public-tournament[data-edition-theme="cute-pastel"])
+  .mappool-category:is([data-category="HD"], [data-category="HR"], [data-category="DT"])
+  .mappool-slot {
+  display: inline-block;
+  padding: 0.2rem 0.6rem;
+  border-radius: 999px;
+  background: var(--mappool-category-background);
+  color: var(--mappool-category-foreground);
+}
+
+.themed-site.public-site:has(.public-tournament[data-edition-theme="cute-pastel"]) .public-tournament .workspace-tabs {
   background: var(--site-tint);
   border: 1.5px solid var(--site-border);
 }
 
-.themed-site.public-site
+.themed-site.public-site:has(.public-tournament[data-edition-theme="cute-pastel"]) .mappool-round-navigation {
+  position: sticky;
+  top: var(--mappool-header-height, 74px);
+  z-index: 20;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: 0.75rem;
+  padding-block: 0.5rem;
+  margin-block: 0.75rem 1rem;
+  background: var(--site-background);
+  border-bottom: 1.5px solid var(--site-border);
+}
+
+.themed-site.public-site:has(.public-tournament[data-edition-theme="cute-pastel"]) .mappool-round-navigation > span {
+  color: var(--site-muted);
+  font-weight: 700;
+}
+
+.themed-site.public-site:has(.public-tournament[data-edition-theme="cute-pastel"]) .mappool-round-navigation .workspace-tabs {
+  border: 0;
+  background: transparent;
+  padding: 0.25rem;
+}
+
+.themed-site.public-site:has(.public-tournament[data-edition-theme="cute-pastel"])
+  .mappool-round-browser
+  :is(.mappool-category, .map-browse-card) {
+  scroll-margin-top: calc(
+    var(--mappool-header-height, 74px) +
+    var(--mappool-navigation-height, 70px) + 16px
+  );
+}
+
+.themed-site.public-site:has(.public-tournament[data-edition-theme="cute-pastel"])
+  .public-tournament
+  .workspace-tabs[data-appearance="segmented"]
+  > button {
+  border-radius: 999px;
+}
+
+.themed-site.public-site:has(.public-tournament[data-edition-theme="cute-pastel"])
   .public-tournament
   .workspace-tabs
   button[aria-selected="true"],
-.themed-site.public-site
+.themed-site.public-site:has(.public-tournament[data-edition-theme="cute-pastel"])
   .public-tournament
   .bracket-tabs
   button[aria-pressed="true"] {
@@ -866,26 +966,26 @@ html[data-theme="dark"] .themed-site.public-site .badge {
   color: var(--site-on-primary);
 }
 
-.themed-site.public-site .public-tournament .bracket-tabs button {
+.themed-site.public-site:has(.public-tournament[data-edition-theme="cute-pastel"]) .public-tournament .bracket-tabs button {
   border: 1.5px solid var(--site-border);
   border-radius: 999px;
   background: var(--site-surface);
 }
 
-.themed-site.public-site .public-tournament .pool-summary {
+.themed-site.public-site:has(.public-tournament[data-edition-theme="cute-pastel"]) .public-tournament .pool-summary {
   border: 1.5px solid var(--site-border);
   border-radius: 1.25rem;
   background: var(--site-raised);
 }
 
-.themed-site.public-site .site-footer {
+.themed-site.public-site:has(.public-tournament[data-edition-theme="cute-pastel"]) .site-footer {
   border-top: 1.5px solid var(--site-border);
   background: transparent;
   color: var(--site-muted);
   padding-block: 1.5rem 2.5rem;
 }
 
-.themed-site.public-site .site-footer .footer-credit {
+.themed-site.public-site:has(.public-tournament[data-edition-theme="cute-pastel"]) .site-footer .footer-credit {
   color: var(--site-accent);
   text-decoration-color: color-mix(
     in srgb,
@@ -895,7 +995,7 @@ html[data-theme="dark"] .themed-site.public-site .badge {
 }
 
 @media (max-width: 950px) {
-  .themed-site.public-site .main-nav {
+  .themed-site.public-site:has(.public-tournament[data-edition-theme="cute-pastel"]) .main-nav {
     padding: 0.8rem;
     border: 1.5px solid var(--site-border);
     border-radius: 0 0 1.5rem 1.5rem;
@@ -903,34 +1003,34 @@ html[data-theme="dark"] .themed-site.public-site .badge {
     box-shadow: 0 22px 44px -28px var(--site-shadow);
   }
 
-  .themed-site.public-site .main-nav > a {
+  .themed-site.public-site:has(.public-tournament[data-edition-theme="cute-pastel"]) .main-nav > a {
     padding: 0.8rem 1rem;
     border-radius: 999px;
   }
 }
 
 @media (max-width: 980px) {
-  .themed-site.public-site .rules-handbook {
+  .themed-site.public-site:has(.public-tournament[data-edition-theme="cute-pastel"]) .rules-handbook {
     grid-template-columns: minmax(0, 1fr);
   }
 
-  .themed-site.public-site .event-intro::after {
+  .themed-site.public-site:has(.public-tournament[data-edition-theme="cute-pastel"]) .event-intro::after {
     display: none;
   }
 }
 
 @media (max-width: 760px) {
-  .themed-site.public-site .nav-wrap {
+  .themed-site.public-site:has(.public-tournament[data-edition-theme="cute-pastel"]) .nav-wrap {
     height: auto;
     min-height: 68px;
   }
 
-  .themed-site.public-site .page-heading {
+  .themed-site.public-site:has(.public-tournament[data-edition-theme="cute-pastel"]) .page-heading {
     padding: 1.5rem 1.25rem;
     border-radius: 1.5rem;
   }
 
-  .themed-site.public-site .page-heading::after {
+  .themed-site.public-site:has(.public-tournament[data-edition-theme="cute-pastel"]) .page-heading::after {
     right: -4.5rem;
     top: -4.5rem;
     width: 9rem;
@@ -938,15 +1038,15 @@ html[data-theme="dark"] .themed-site.public-site .badge {
     border-width: 0.9rem;
   }
 
-  .themed-site.public-site .hero {
+  .themed-site.public-site:has(.public-tournament[data-edition-theme="cute-pastel"]) .hero {
     border-radius: 0 0 1.75rem 1.75rem;
   }
 
-  .themed-site.public-site .hero-art::after {
+  .themed-site.public-site:has(.public-tournament[data-edition-theme="cute-pastel"]) .hero-art::after {
     background: linear-gradient(0deg, var(--site-background), transparent 55%);
   }
 
-  .themed-site.public-site .hero-shade {
+  .themed-site.public-site:has(.public-tournament[data-edition-theme="cute-pastel"]) .hero-shade {
     background: linear-gradient(
       0deg,
       var(--site-background) 2%,
@@ -955,44 +1055,44 @@ html[data-theme="dark"] .themed-site.public-site .badge {
     );
   }
 
-  .themed-site.public-site .hero-content {
+  .themed-site.public-site:has(.public-tournament[data-edition-theme="cute-pastel"]) .hero-content {
     min-height: 0;
     padding-block: 2rem 2.5rem;
   }
 
-  .themed-site.public-site .hero h1 {
+  .themed-site.public-site:has(.public-tournament[data-edition-theme="cute-pastel"]) .hero h1 {
     font-size: clamp(2.6rem, 11vw, 4rem);
   }
 
-  .themed-site.public-site .event-hero {
+  .themed-site.public-site:has(.public-tournament[data-edition-theme="cute-pastel"]) .event-hero {
     border-radius: 1.5rem;
   }
 
-  .themed-site.public-site .event-stages-heading {
+  .themed-site.public-site:has(.public-tournament[data-edition-theme="cute-pastel"]) .event-stages-heading {
     margin-left: 0;
   }
 
-  .themed-site.public-site .event-stage-track {
+  .themed-site.public-site:has(.public-tournament[data-edition-theme="cute-pastel"]) .event-stage-track {
     min-width: 680px;
     padding: 1rem 1rem 1.2rem;
   }
 
-  .themed-site.public-site .event-stage-track::before {
+  .themed-site.public-site:has(.public-tournament[data-edition-theme="cute-pastel"]) .event-stage-track::before {
     top: calc(1rem + 22px);
   }
 
-  .themed-site.public-site .event-stage-dot {
+  .themed-site.public-site:has(.public-tournament[data-edition-theme="cute-pastel"]) .event-stage-dot {
     width: 52px;
     height: 52px;
     font-size: 1rem;
   }
 
-  .themed-site.public-site .rules-article section {
+  .themed-site.public-site:has(.public-tournament[data-edition-theme="cute-pastel"]) .rules-article section {
     padding: 1.25rem;
     border-radius: 1.25rem;
   }
 
-  .themed-site.public-site .rules-article h2 span {
+  .themed-site.public-site:has(.public-tournament[data-edition-theme="cute-pastel"]) .rules-article h2 span {
     flex-basis: 2rem;
     width: 2rem;
     height: 2rem;
@@ -1000,9 +1100,9 @@ html[data-theme="dark"] .themed-site.public-site .badge {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .themed-site.public-site *,
-  .themed-site.public-site *::before,
-  .themed-site.public-site *::after {
+  .themed-site.public-site:has(.public-tournament[data-edition-theme="cute-pastel"]) *,
+  .themed-site.public-site:has(.public-tournament[data-edition-theme="cute-pastel"]) *::before,
+  .themed-site.public-site:has(.public-tournament[data-edition-theme="cute-pastel"]) *::after {
     animation: none;
     transition: none;
   }

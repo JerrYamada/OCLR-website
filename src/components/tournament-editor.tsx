@@ -19,6 +19,10 @@ import { WorkspaceTabs } from "./workspace-tabs";
 import { TimeZonePicker } from "./time-zone-picker";
 import { ApplicationQuestionEditor } from "./application-question-editor";
 import { ZonedDateInput } from "./zoned-date-input";
+import {
+  editionAppearance,
+  type EditionAppearance,
+} from "@/lib/edition-appearance";
 type Workspace = Pick<
   Awaited<ReturnType<typeof tournamentForAdmin>>,
   "edition" | "revision" | "applications" | "registrationPaused" | "readiness"
@@ -33,12 +37,14 @@ function IdentityFields({
   published,
   children,
   metadata,
+  slug,
 }: {
   published: boolean;
   value: Identity;
   onChange: (value: Identity) => void;
   children: ReactNode;
   metadata?: ReactNode;
+  slug: string;
 }) {
   const tr = useAppTranslations();
   const assets = [
@@ -107,6 +113,27 @@ function IdentityFields({
       </fieldset>
       <fieldset className="settings-card form-stack">
         <legend>{tr("Artwork & branding")}</legend>
+        <label className="field">
+          <span>{tr("Tournament appearance")}</span>
+          <select
+            value={editionAppearance(slug, value.branding.theme)}
+            onChange={(event) =>
+              onChange({
+                ...value,
+                branding: {
+                  ...value.branding,
+                  theme: event.target.value as EditionAppearance,
+                },
+              })
+            }
+          >
+            <option value="default">{tr("Website default")}</option>
+            <option value="cute-pastel">{tr("Cute pastel")}</option>
+          </select>
+          <span className="muted small">
+            {tr("Applies only to this tournament's public pages.")}
+          </span>
+        </label>
         <div className="settings-artwork-grid">
           {assets.map((asset) => (
             <div key={asset.key}>
@@ -308,6 +335,7 @@ function General({ data, saved }: EditorProps) {
   return (
     <section className="general-settings form-stack">
       <IdentityFields
+        slug={data.edition.slug}
         value={value}
         onChange={setValue}
         published={data.edition.published}

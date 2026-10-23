@@ -4,6 +4,7 @@ import { publicMappools } from "@/lib/mappools";
 import { EmptyState, PageHeading } from "@/components/ui";
 import { MappoolBrowser } from "@/components/mappool-browser";
 import { MappoolStages } from "@/components/mappool-stages";
+import { MappoolRounds } from "@/components/mappool-rounds";
 export async function generateMetadata() {
   const tr = await getAppTranslations();
   return { title: tr("Published mappools") };
@@ -26,65 +27,69 @@ export default async function MappoolsPage({
         value: stage,
         label,
         content: (
-          <div className="mappool-round-list">
-            {rounds.map((roundId) => {
+          <MappoolRounds
+            rounds={rounds.map((roundId) => {
               const round = released.filter((pool) => pool.roundId === roundId);
-              return (
-                <section
-                  key={roundId}
-                  className="mappool-round-group"
-                  aria-label={round[0].roundName}
-                >
-                  {round.length > 1 && <h3>{round[0].roundName}</h3>}
-                  {round.map((pool) => {
-                    // Preserve distinct authored names; flatten only redundant context.
-                    const names = [
-                      ...new Set([
-                        ...(pools.length === 1 ? [label] : []),
-                        ...(round.length === 1 ? [pool.roundName] : []),
-                        pool.name,
-                      ]),
-                    ];
-                    return (
-                      <article
-                        className="mappool-release"
-                        key={pool.id}
-                        aria-labelledby={`pool-${pool.id}-name`}
-                      >
-                        <header className="mappool-release-heading">
-                          <h3 id={`pool-${pool.id}-name`}>
-                            <Link
-                              href={`/tournaments/${edition}/mappools/${pool.id}`}
-                              className="context-link"
-                            >
-                              {names.join(" · ")}
-                            </Link>
-                          </h3>
-                          <p className="muted small">
-                            {tr("Released")} ·{" "}
-                            <time dateTime={pool.publishedAt!.toISOString()}>
-                              {new Intl.DateTimeFormat(tr.locale, {
-                                timeZone: "UTC",
-                                day: "numeric",
-                                month: "short",
-                                year: "numeric",
-                              }).format(pool.publishedAt!)}
-                            </time>{" "}
-                            {tr("(UTC)")}
-                          </p>
-                        </header>
-                        <MappoolBrowser
-                          slug={edition}
-                          pool={pool}
-                          headingLevel={4}
-                        />
-                      </article>
-                    );
-                  })}
-                </section>
-              );
+              return {
+                value: roundId,
+                label: round[0].roundName,
+                content: (
+                  <section
+                    key={roundId}
+                    className="mappool-round-group"
+                    aria-label={round[0].roundName}
+                  >
+                    {round.length > 1 && <h3>{round[0].roundName}</h3>}
+                    {round.map((pool) => {
+                      // Preserve distinct authored names; flatten only redundant context.
+                      const names = [
+                        ...new Set([
+                          ...(pools.length === 1 ? [label] : []),
+                          ...(round.length === 1 ? [pool.roundName] : []),
+                          pool.name,
+                        ]),
+                      ];
+                      return (
+                        <article
+                          className="mappool-release"
+                          key={pool.id}
+                          aria-labelledby={`pool-${pool.id}-name`}
+                        >
+                          <header className="mappool-release-heading">
+                            <h3 id={`pool-${pool.id}-name`}>
+                              <Link
+                                href={`/tournaments/${edition}/mappools/${pool.id}`}
+                                className="context-link"
+                              >
+                                {names.join(" · ")}
+                              </Link>
+                            </h3>
+                            <p className="muted small">
+                              {tr("Released")} ·{" "}
+                              <time dateTime={pool.publishedAt!.toISOString()}>
+                                {new Intl.DateTimeFormat(tr.locale, {
+                                  timeZone: "UTC",
+                                  day: "numeric",
+                                  month: "short",
+                                  year: "numeric",
+                                }).format(pool.publishedAt!)}
+                              </time>{" "}
+                              {tr("(UTC)")}
+                            </p>
+                          </header>
+                          <MappoolBrowser
+                            slug={edition}
+                            pool={pool}
+                            headingLevel={4}
+                          />
+                        </article>
+                      );
+                    })}
+                  </section>
+                ),
+              };
             })}
-          </div>
+          />
         ),
       },
     ];

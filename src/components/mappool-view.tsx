@@ -203,6 +203,7 @@ export function MappoolView({
         return (
           <section
             className="mappool-category"
+            data-category={category}
             id={`${prefix}-maps-${category}`}
             key={category}
             aria-labelledby={`${prefix}-maps-${category}-title`}
@@ -210,6 +211,7 @@ export function MappoolView({
             <div className="mappool-category-heading">
               <Heading id={`${prefix}-maps-${category}-title`}>
                 <strong>{category}</strong>
+                <span aria-hidden="true"> ｜ </span>
                 <span>{name}</span>
               </Heading>
               <span className="muted small">

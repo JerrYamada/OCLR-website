@@ -62,6 +62,7 @@ export const editionSchema = z
         logo: z.enum(["/oclr-s11-square-logo.webp"]).nullable(),
         background: z.enum(["/oclr-s11-website-background.webp"]).nullable(),
         keyVisual: z.enum(["/oclr-s11-key-visual.webp"]).nullable(),
+        theme: z.enum(["default", "cute-pastel"]).optional(),
       })
       .strict()
       .default({ logo: null, background: null, keyVisual: null }),

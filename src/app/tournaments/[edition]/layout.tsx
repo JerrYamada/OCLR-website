@@ -3,6 +3,12 @@ import { TournamentShell } from "@/components/tournament-navigation";
 import { notFound } from "next/navigation";
 import { publicDraft } from "@/lib/draft";
 import { getPublicEdition } from "@/lib/content";
+import { cookies } from "next/headers";
+import {
+  editionAppearance,
+  editionAppearancePreviewCookie,
+  readEditionAppearancePreview,
+} from "@/lib/edition-appearance";
 export const dynamic = "force-dynamic";
 export default async function EditionLayout({
   children,
@@ -19,8 +25,19 @@ export default async function EditionLayout({
   const [draftResult] = await Promise.allSettled([publicDraft(slug)]);
   const draft = draftResult.status === "fulfilled" ? draftResult.value : null;
   const liveUnavailable = draftResult.status === "rejected";
+  const preview = readEditionAppearancePreview(
+    (await cookies()).get(editionAppearancePreviewCookie)?.value,
+    slug,
+  );
   return (
-    <TournamentShell slug={slug} name={edition.name} liveDraft={Boolean(draft)}>
+    <TournamentShell
+      key={slug}
+      slug={slug}
+      name={edition.name}
+      liveDraft={Boolean(draft)}
+      appearance={editionAppearance(slug, edition.branding.theme)}
+      appearancePreview={preview}
+    >
       {liveUnavailable && (
         <p className="notice" role="status">
           {tr(
