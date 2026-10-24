@@ -239,6 +239,13 @@
       "when": 1792850706309,
       "tag": "0033_registration_deferred",
       "breakpoints": true
+    },
+    {
+      "idx": 34,
+      "version": "7",
+      "when": 1792853381978,
+      "tag": "0034_yumu_award_policy",
+      "breakpoints": true
     }
   ]
 }
