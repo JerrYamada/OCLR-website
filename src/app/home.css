@@ -71,15 +71,6 @@
   letter-spacing: -0.025em;
   margin: 0;
 }
-.home-painted-wordmark {
-  display: block;
-  flex: none;
-  width: 4.9em;
-  max-width: none;
-  height: auto;
-  margin-block: -0.12em;
-  margin-left: -0.25em;
-}
 .home-contact-bar {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -382,9 +373,6 @@ html[data-theme="dark"]
     padding-left: 0.4rem;
   }
 }
-.home-painted-wordmark {
-  filter: saturate(0.82);
-}
 .home-feature .home-entry-links :is(.home-contact, .home-registration-link) {
   position: relative;
   isolation: isolate;
@@ -453,4 +441,37 @@ html[data-theme="dark"]
     :is(.home-contact, .home-registration-link)::before {
     transform: skewX(-18deg);
   }
+}
+
+/* Reuse the site vector identity; season text is secondary to the tournament mark. */
+.home-wordmark.home-brand-lockup {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1rem;
+  margin-block: 1rem;
+  font-style: normal;
+  font-size: 1rem;
+  line-height: 1;
+  white-space: normal;
+}
+.home-brand-mark {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+.home-season-mark {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  color: var(--site-secondary-text);
+  font-size: clamp(1.25rem, 2vw, 2rem);
+  font-weight: 600;
+  letter-spacing: 0.16em;
+}
+.home-season-mark::before {
+  content: "";
+  width: 3rem;
+  height: 1px;
+  background: var(--site-accent);
 }

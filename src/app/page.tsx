@@ -137,16 +137,17 @@ export default async function Home() {
         <div className="container home-feature-inner">
           <div className="home-feature-left">
             <p className="home-full-name">{"osu! Chinese League Rookie"}</p>
-            <h1 id="hero-title" className="home-wordmark">
+            <h1 id="hero-title" className="home-wordmark home-brand-lockup">
               <Image
-                src="/oclr-s11-classic-wordmark-soft.png"
-                alt="OCLR S11"
-                width={2086}
-                height={754}
+                src="/branding/oclr-wordmark.svg"
+                alt="OCLR"
+                width={1460}
+                height={430}
                 unoptimized
                 preload
-                className="home-painted-wordmark"
+                className="home-brand-mark"
               />
+              <span className="home-season-mark">S11</span>
             </h1>
             <div className="home-entry-links">
               <div className="home-contact-bar" aria-label={tr("Contact")}>
