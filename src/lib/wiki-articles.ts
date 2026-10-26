@@ -11,6 +11,13 @@ export type WikiArticle = {
     paragraphs?: (string | (string | { label: string; href: string })[])[];
     items?: string[];
     table?: { headers: string[]; rows: string[][] };
+    figures?: {
+      src: string;
+      width: number;
+      height: number;
+      alt: string;
+      caption: string;
+    }[];
   }[];
   source?: { title: string; author: string; date: string; href: string };
 };
@@ -200,7 +207,183 @@ export function wikiArticles(tr: AppTranslator): WikiArticle[] {
         href: "https://www.bilibili.com/opus/640958207556059142",
       },
     },
+    liruArticle(tr),
   ];
+}
+
+// Official OCLR mascot, designed as a community proposal (#334); images and licence notes in
+// public/mascot/liru/.
+const LIRU_DESIGNER = "JerrYamada";
+
+function liruArticle(tr: AppTranslator): WikiArticle {
+  return {
+    slug: "liru",
+    title: tr("Liru (LR-chan): the OCLR mascot"),
+    category: tr("Community"),
+    intro: tr(
+      "Liru (LR-chan) is the official mascot of osu! Chinese League Rookie (OCLR), in the spirit of pippi and the other osu! mode mascots. Her design began as a community proposal by {designer}.",
+      { designer: LIRU_DESIGNER },
+    ),
+    sections: [
+      {
+        id: "profile",
+        title: tr("Profile"),
+        paragraphs: [
+          tr(
+            "A first-year university student who has just started playing osu! and is entering OCLR for the first time: a rookie, like the players the tournament is for.",
+          ),
+          tr(
+            "Cheerful and a little clumsy: after a miss she hits retry right away, and after a match she reviews her plays carefully. Her catchphrase is “One more round!”",
+          ),
+        ],
+        figures: [
+          {
+            src: "/mascot/liru/sheet-main.webp",
+            width: 1600,
+            height: 1453,
+            alt: tr(
+              "Liru character sheet: full-body front view, profile, design details and colour palette",
+            ),
+            caption: tr("Character sheet v1.2.1"),
+          },
+        ],
+      },
+      {
+        id: "design",
+        title: tr("Design elements"),
+        paragraphs: [
+          tr(
+            "Her lavender hair and track jacket echo the site's light purple, with a green sprout as the accent. Her side ponytail, bracelet and red shoe are on her right; the hairclips and badge are on her left.",
+          ),
+        ],
+        figures: [
+          {
+            src: "/mascot/liru/sheet-turnaround.webp",
+            width: 1600,
+            height: 1160,
+            alt: tr(
+              "Liru turnaround: front, side and back views at the same scale",
+            ),
+            caption: tr("Turnaround"),
+          },
+        ],
+        table: {
+          headers: [tr("Element"), tr("Meaning")],
+          rows: [
+            [tr("Sprout on her ahoge"), tr("A rookie is a new sprout")],
+            [
+              tr("Side ponytail with a pale lilac scrunchie"),
+              tr("The scrunchie echoes osu!'s hit circle"),
+            ],
+            [
+              tr("Green bracelet with six beads"),
+              tr("The six mappool categories: NM, HD, HR, DT, FM and TB"),
+            ],
+            [
+              tr("Crossed red and blue hairclips"),
+              tr("The red and blue teams of a match"),
+            ],
+            [
+              tr("Red and blue sneakers"),
+              tr("Red on her right foot, blue on her left"),
+            ],
+            [
+              tr("Tier badge on her left chest"),
+              tr("Shown as T4; can be T1–T4"),
+            ],
+            [
+              tr("Back print LIRU / 11"),
+              tr("Her name and the current season number, updated each season"),
+            ],
+          ],
+        },
+      },
+      {
+        id: "expressions",
+        title: tr("Expressions"),
+        paragraphs: [
+          tr(
+            "Only her face changes; the hairstyle, sprout, scrunchie and hairclips stay the same.",
+          ),
+        ],
+        figures: [
+          {
+            src: "/mascot/liru/sheet-expressions.webp",
+            width: 1600,
+            height: 1227,
+            alt: tr(
+              "Six Liru expressions: happy, surprised, determined, down after a miss, smug and shy",
+            ),
+            caption: tr("Expressions"),
+          },
+        ],
+      },
+      {
+        id: "palette",
+        title: tr("Colour palette"),
+        table: {
+          headers: [tr("Colour"), tr("Hex value")],
+          rows: [
+            [tr("Hair colour"), "#DED1F8"],
+            [tr("Hair shadow"), "#8D88C1"],
+            [tr("Eye colour"), "#806DC1"],
+            [tr("Scrunchie"), "#F4F1FF"],
+            [tr("Skin tone"), "#FEF5F6"],
+            [tr("Sprout"), "#A4C264"],
+            [tr("Bead bracelet"), "#CEF9B7"],
+            [tr("Track jacket"), "#E0DCFA"],
+            [tr("Ribbed cuffs"), "#7067B6"],
+            [tr("T-shirt"), "#FFFFFF"],
+            [tr("Pleated skirt"), "#C3CADC"],
+            [tr("Team red"), "#E8556A"],
+            [tr("Team blue"), "#4C7BE5"],
+          ],
+        },
+      },
+      {
+        id: "usage",
+        title: tr("Usage notes"),
+        items: [
+          tr(
+            "Keep the hair lavender, never pink, so she stays clearly distinct from the official osu! characters.",
+          ),
+          tr(
+            "The sprout grows from the tip of her ahoge. Ponytail on her right, hairclips on her left; red shoe on her right foot, blue on her left.",
+          ),
+          tr(
+            "Update the “11” on her back each season. Do not add osu!, QQ or other trademark graphics.",
+          ),
+          tr(
+            "She is an adult university student; keep all artwork suitable for all ages.",
+          ),
+        ],
+      },
+      {
+        id: "credits",
+        title: tr("Credits and licence"),
+        paragraphs: [
+          tr(
+            "Designed by community member {designer} as a community proposal and later adopted as the official mascot. The artwork was made with AI assistance (Animagine XL 4.0, CreativeML Open RAIL++-M) and retouched afterwards.",
+            { designer: LIRU_DESIGNER },
+          ),
+          [
+            tr("The character sheets on this page are licensed under "),
+            {
+              label: "CC BY 4.0",
+              href: "https://creativecommons.org/licenses/by/4.0/",
+            },
+            tr(
+              ": anyone may share and adapt them, including commercially, as long as the designer is credited. Discussion: ",
+            ),
+            {
+              label: "#334",
+              href: "https://github.com/OCLR-dev/OCLR-website/issues/334",
+            },
+          ],
+        ],
+      },
+    ],
+  };
 }
 
 export function wikiHref(slug: string) {

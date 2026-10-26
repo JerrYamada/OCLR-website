@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { getAppTranslations } from "@/i18n/server";
 import { wikiArticles, wikiHref, type WikiArticle } from "@/lib/wiki-articles";
@@ -50,6 +51,21 @@ export async function WikiDocument({ article }: { article: WikiArticle }) {
                         ),
                       )}
                 </p>
+              ))}
+              {section.figures?.map((figure) => (
+                <figure key={figure.src} className="wiki-figure">
+                  <a href={figure.src} target="_blank" rel="noreferrer">
+                    <Image
+                      src={figure.src}
+                      alt={figure.alt}
+                      width={figure.width}
+                      height={figure.height}
+                      sizes="(max-width: 760px) 100vw, 820px"
+                      unoptimized
+                    />
+                  </a>
+                  <figcaption>{figure.caption}</figcaption>
+                </figure>
               ))}
               {section.items && (
                 <ul>

@@ -27,6 +27,11 @@
   max-width: none;
   overflow-wrap: anywhere;
 }
+/* Links inside running text must not rely on colour alone (axe link-in-text-block). */
+.wiki-page .information-document p a {
+  text-decoration: underline;
+  text-underline-offset: 0.18em;
+}
 .wiki-page .information-document :is(th, td) {
   padding: 0.7rem 1rem;
   text-align: left;
@@ -41,6 +46,23 @@
 }
 .wiki-page .information-document td:first-child {
   width: 48%;
+}
+.wiki-figure {
+  margin: 1.5rem 0;
+}
+/* Character sheets keep their white paper in dark mode; artwork is never inverted. */
+.wiki-figure img {
+  display: block;
+  width: 100%;
+  height: auto;
+  background: #fff;
+  border: 1px solid var(--site-border);
+  border-radius: 12px;
+}
+.wiki-figure figcaption {
+  margin-top: 0.5rem;
+  font-size: 0.78rem;
+  color: var(--site-muted);
 }
 .wiki-source {
   margin-top: 3rem;
