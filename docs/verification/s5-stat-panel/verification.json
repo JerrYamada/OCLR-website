@@ -1,0 +1,1971 @@
+{
+  "date": "2026-10-29",
+  "base": "3ced64d645eccf43752bfa4bd01867aa3e249db0",
+  "buildId": "L3YvLToAKK4SHmoLRn5N1",
+  "stylesheetSha256": "bafba6c8ef5a4bae9067e8e4451c82984669d20765dec41e85084f246b1a2b1d",
+  "expectedValues": [
+    "12",
+    "85",
+    "0",
+    "5",
+    "77"
+  ],
+  "cases": [
+    {
+      "locale": "en",
+      "theme": "light",
+      "width": 320,
+      "radius": "12px",
+      "background": "linear-gradient(90deg, rgb(112, 189, 206), rgb(128, 96, 189) 58%, rgb(223, 140, 164)), none",
+      "clip": "border-box, border-box",
+      "origin": "border-box, padding-box",
+      "pseudo": "none",
+      "values": [
+        "12",
+        "85",
+        "0",
+        "5",
+        "77"
+      ],
+      "pageBackground": "rgb(247, 245, 252)",
+      "overflow": false,
+      "rect": {
+        "x": 16,
+        "y": 698.5625,
+        "width": 288,
+        "height": 100
+      },
+      "corners": {
+        "left": [
+          247,
+          245,
+          252
+        ],
+        "right": [
+          247,
+          245,
+          252
+        ],
+        "background": [
+          247,
+          245,
+          252
+        ],
+        "middle": [
+          247,
+          245,
+          252
+        ],
+        "accentSamples": [
+          [
+            247,
+            245,
+            252
+          ],
+          [
+            125,
+            108,
+            191
+          ],
+          [
+            126,
+            109,
+            191
+          ],
+          [
+            126,
+            108,
+            191
+          ],
+          [
+            126,
+            109,
+            192
+          ],
+          [
+            255,
+            255,
+            255
+          ]
+        ]
+      },
+      "axeViolations": 0
+    },
+    {
+      "locale": "en",
+      "theme": "light",
+      "width": 390,
+      "radius": "12px",
+      "background": "linear-gradient(90deg, rgb(112, 189, 206), rgb(128, 96, 189) 58%, rgb(223, 140, 164)), none",
+      "clip": "border-box, border-box",
+      "origin": "border-box, padding-box",
+      "pseudo": "none",
+      "values": [
+        "12",
+        "85",
+        "0",
+        "5",
+        "77"
+      ],
+      "pageBackground": "rgb(247, 245, 252)",
+      "overflow": false,
+      "rect": {
+        "x": 16,
+        "y": 708.859375,
+        "width": 358,
+        "height": 100
+      },
+      "corners": {
+        "left": [
+          247,
+          245,
+          252
+        ],
+        "right": [
+          247,
+          245,
+          252
+        ],
+        "background": [
+          247,
+          245,
+          252
+        ],
+        "middle": [
+          125,
+          108,
+          191
+        ],
+        "accentSamples": [
+          [
+            125,
+            108,
+            191
+          ],
+          [
+            126,
+            109,
+            191
+          ],
+          [
+            125,
+            108,
+            191
+          ],
+          [
+            126,
+            109,
+            191
+          ],
+          [
+            255,
+            255,
+            255
+          ],
+          [
+            255,
+            255,
+            255
+          ]
+        ]
+      },
+      "axeViolations": 0
+    },
+    {
+      "locale": "en",
+      "theme": "light",
+      "width": 768,
+      "radius": "12px",
+      "background": "linear-gradient(90deg, rgb(112, 189, 206), rgb(128, 96, 189) 58%, rgb(223, 140, 164)), none",
+      "clip": "border-box, border-box",
+      "origin": "border-box, padding-box",
+      "pseudo": "none",
+      "values": [
+        "12",
+        "85",
+        "0",
+        "5",
+        "77"
+      ],
+      "pageBackground": "rgb(247, 245, 252)",
+      "overflow": false,
+      "rect": {
+        "x": 395.984375,
+        "y": 381.09375,
+        "width": 345.125,
+        "height": 100
+      },
+      "corners": {
+        "left": [
+          247,
+          245,
+          252
+        ],
+        "right": [
+          247,
+          245,
+          252
+        ],
+        "background": [
+          247,
+          245,
+          252
+        ],
+        "middle": [
+          126,
+          109,
+          191
+        ],
+        "accentSamples": [
+          [
+            126,
+            109,
+            191
+          ],
+          [
+            126,
+            109,
+            192
+          ],
+          [
+            126,
+            109,
+            191
+          ],
+          [
+            126,
+            109,
+            192
+          ],
+          [
+            255,
+            255,
+            255
+          ],
+          [
+            255,
+            255,
+            255
+          ]
+        ]
+      },
+      "axeViolations": 0
+    },
+    {
+      "locale": "en",
+      "theme": "light",
+      "width": 1440,
+      "radius": "12px",
+      "background": "linear-gradient(90deg, rgb(112, 189, 206), rgb(128, 96, 189) 58%, rgb(223, 140, 164)), none",
+      "clip": "border-box, border-box",
+      "origin": "border-box, padding-box",
+      "pseudo": "none",
+      "values": [
+        "12",
+        "85",
+        "0",
+        "5",
+        "77"
+      ],
+      "pageBackground": "rgb(247, 245, 252)",
+      "overflow": false,
+      "rect": {
+        "x": 732,
+        "y": 404.65625,
+        "width": 660,
+        "height": 100
+      },
+      "corners": {
+        "left": [
+          247,
+          245,
+          252
+        ],
+        "right": [
+          247,
+          245,
+          252
+        ],
+        "background": [
+          247,
+          245,
+          252
+        ],
+        "middle": [
+          247,
+          245,
+          252
+        ],
+        "accentSamples": [
+          [
+            247,
+            245,
+            252
+          ],
+          [
+            125,
+            108,
+            191
+          ],
+          [
+            126,
+            109,
+            191
+          ],
+          [
+            125,
+            108,
+            191
+          ],
+          [
+            126,
+            109,
+            192
+          ],
+          [
+            255,
+            255,
+            255
+          ]
+        ]
+      },
+      "axeViolations": 0
+    },
+    {
+      "locale": "en",
+      "theme": "dark",
+      "width": 320,
+      "radius": "12px",
+      "background": "linear-gradient(90deg, rgb(135, 201, 218), rgb(188, 156, 232) 58%, rgb(241, 180, 188)), none",
+      "clip": "border-box, border-box",
+      "origin": "border-box, padding-box",
+      "pseudo": "none",
+      "values": [
+        "12",
+        "85",
+        "0",
+        "5",
+        "77"
+      ],
+      "pageBackground": "rgb(27, 23, 48)",
+      "overflow": false,
+      "rect": {
+        "x": 16,
+        "y": 698.5625,
+        "width": 288,
+        "height": 100
+      },
+      "corners": {
+        "left": [
+          27,
+          23,
+          48
+        ],
+        "right": [
+          27,
+          23,
+          48
+        ],
+        "background": [
+          27,
+          23,
+          48
+        ],
+        "middle": [
+          27,
+          23,
+          48
+        ],
+        "accentSamples": [
+          [
+            27,
+            23,
+            48
+          ],
+          [
+            180,
+            162,
+            230
+          ],
+          [
+            181,
+            162,
+            230
+          ],
+          [
+            180,
+            162,
+            230
+          ],
+          [
+            181,
+            162,
+            230
+          ],
+          [
+            38,
+            32,
+            62
+          ]
+        ]
+      },
+      "axeViolations": 0
+    },
+    {
+      "locale": "en",
+      "theme": "dark",
+      "width": 390,
+      "radius": "12px",
+      "background": "linear-gradient(90deg, rgb(135, 201, 218), rgb(188, 156, 232) 58%, rgb(241, 180, 188)), none",
+      "clip": "border-box, border-box",
+      "origin": "border-box, padding-box",
+      "pseudo": "none",
+      "values": [
+        "12",
+        "85",
+        "0",
+        "5",
+        "77"
+      ],
+      "pageBackground": "rgb(27, 23, 48)",
+      "overflow": false,
+      "rect": {
+        "x": 16,
+        "y": 708.859375,
+        "width": 358,
+        "height": 100
+      },
+      "corners": {
+        "left": [
+          27,
+          23,
+          48
+        ],
+        "right": [
+          27,
+          23,
+          48
+        ],
+        "background": [
+          27,
+          23,
+          48
+        ],
+        "middle": [
+          180,
+          162,
+          230
+        ],
+        "accentSamples": [
+          [
+            180,
+            162,
+            230
+          ],
+          [
+            181,
+            162,
+            230
+          ],
+          [
+            180,
+            162,
+            230
+          ],
+          [
+            181,
+            162,
+            230
+          ],
+          [
+            38,
+            32,
+            62
+          ],
+          [
+            38,
+            32,
+            62
+          ]
+        ]
+      },
+      "axeViolations": 0
+    },
+    {
+      "locale": "en",
+      "theme": "dark",
+      "width": 768,
+      "radius": "12px",
+      "background": "linear-gradient(90deg, rgb(135, 201, 218), rgb(188, 156, 232) 58%, rgb(241, 180, 188)), none",
+      "clip": "border-box, border-box",
+      "origin": "border-box, padding-box",
+      "pseudo": "none",
+      "values": [
+        "12",
+        "85",
+        "0",
+        "5",
+        "77"
+      ],
+      "pageBackground": "rgb(27, 23, 48)",
+      "overflow": false,
+      "rect": {
+        "x": 395.984375,
+        "y": 381.09375,
+        "width": 345.125,
+        "height": 100
+      },
+      "corners": {
+        "left": [
+          27,
+          23,
+          48
+        ],
+        "right": [
+          27,
+          23,
+          48
+        ],
+        "background": [
+          27,
+          23,
+          48
+        ],
+        "middle": [
+          181,
+          162,
+          230
+        ],
+        "accentSamples": [
+          [
+            181,
+            162,
+            230
+          ],
+          [
+            181,
+            162,
+            230
+          ],
+          [
+            181,
+            162,
+            230
+          ],
+          [
+            181,
+            163,
+            231
+          ],
+          [
+            38,
+            32,
+            62
+          ],
+          [
+            38,
+            32,
+            62
+          ]
+        ]
+      },
+      "axeViolations": 0
+    },
+    {
+      "locale": "en",
+      "theme": "dark",
+      "width": 1440,
+      "radius": "12px",
+      "background": "linear-gradient(90deg, rgb(135, 201, 218), rgb(188, 156, 232) 58%, rgb(241, 180, 188)), none",
+      "clip": "border-box, border-box",
+      "origin": "border-box, padding-box",
+      "pseudo": "none",
+      "values": [
+        "12",
+        "85",
+        "0",
+        "5",
+        "77"
+      ],
+      "pageBackground": "rgb(27, 23, 48)",
+      "overflow": false,
+      "rect": {
+        "x": 732,
+        "y": 404.65625,
+        "width": 660,
+        "height": 100
+      },
+      "corners": {
+        "left": [
+          27,
+          23,
+          48
+        ],
+        "right": [
+          27,
+          23,
+          48
+        ],
+        "background": [
+          27,
+          23,
+          48
+        ],
+        "middle": [
+          27,
+          23,
+          48
+        ],
+        "accentSamples": [
+          [
+            27,
+            23,
+            48
+          ],
+          [
+            180,
+            162,
+            230
+          ],
+          [
+            181,
+            162,
+            230
+          ],
+          [
+            180,
+            162,
+            230
+          ],
+          [
+            181,
+            162,
+            230
+          ],
+          [
+            38,
+            32,
+            62
+          ]
+        ]
+      },
+      "axeViolations": 0
+    },
+    {
+      "locale": "zh-Hans",
+      "theme": "light",
+      "width": 320,
+      "radius": "12px",
+      "background": "linear-gradient(90deg, rgb(112, 189, 206), rgb(128, 96, 189) 58%, rgb(223, 140, 164)), none",
+      "clip": "border-box, border-box",
+      "origin": "border-box, padding-box",
+      "pseudo": "none",
+      "values": [
+        "12",
+        "85",
+        "0",
+        "5",
+        "77"
+      ],
+      "pageBackground": "rgb(247, 245, 252)",
+      "overflow": false,
+      "rect": {
+        "x": 16,
+        "y": 621.484375,
+        "width": 288,
+        "height": 100
+      },
+      "corners": {
+        "left": [
+          247,
+          245,
+          252
+        ],
+        "right": [
+          247,
+          245,
+          252
+        ],
+        "background": [
+          247,
+          245,
+          252
+        ],
+        "middle": [
+          126,
+          109,
+          191
+        ],
+        "accentSamples": [
+          [
+            126,
+            109,
+            191
+          ],
+          [
+            126,
+            108,
+            191
+          ],
+          [
+            126,
+            109,
+            192
+          ],
+          [
+            255,
+            255,
+            255
+          ],
+          [
+            255,
+            255,
+            255
+          ],
+          [
+            255,
+            255,
+            255
+          ]
+        ]
+      },
+      "axeViolations": 0
+    },
+    {
+      "locale": "zh-Hans",
+      "theme": "light",
+      "width": 390,
+      "radius": "12px",
+      "background": "linear-gradient(90deg, rgb(112, 189, 206), rgb(128, 96, 189) 58%, rgb(223, 140, 164)), none",
+      "clip": "border-box, border-box",
+      "origin": "border-box, padding-box",
+      "pseudo": "none",
+      "values": [
+        "12",
+        "85",
+        "0",
+        "5",
+        "77"
+      ],
+      "pageBackground": "rgb(247, 245, 252)",
+      "overflow": false,
+      "rect": {
+        "x": 16,
+        "y": 660.859375,
+        "width": 358,
+        "height": 100
+      },
+      "corners": {
+        "left": [
+          247,
+          245,
+          252
+        ],
+        "right": [
+          247,
+          245,
+          252
+        ],
+        "background": [
+          247,
+          245,
+          252
+        ],
+        "middle": [
+          125,
+          108,
+          191
+        ],
+        "accentSamples": [
+          [
+            125,
+            108,
+            191
+          ],
+          [
+            126,
+            109,
+            191
+          ],
+          [
+            125,
+            108,
+            191
+          ],
+          [
+            126,
+            109,
+            191
+          ],
+          [
+            255,
+            255,
+            255
+          ],
+          [
+            255,
+            255,
+            255
+          ]
+        ]
+      },
+      "axeViolations": 0
+    },
+    {
+      "locale": "zh-Hans",
+      "theme": "light",
+      "width": 768,
+      "radius": "12px",
+      "background": "linear-gradient(90deg, rgb(112, 189, 206), rgb(128, 96, 189) 58%, rgb(223, 140, 164)), none",
+      "clip": "border-box, border-box",
+      "origin": "border-box, padding-box",
+      "pseudo": "none",
+      "values": [
+        "12",
+        "85",
+        "0",
+        "5",
+        "77"
+      ],
+      "pageBackground": "rgb(247, 245, 252)",
+      "overflow": false,
+      "rect": {
+        "x": 395.984375,
+        "y": 381.09375,
+        "width": 345.125,
+        "height": 100
+      },
+      "corners": {
+        "left": [
+          247,
+          245,
+          252
+        ],
+        "right": [
+          247,
+          245,
+          252
+        ],
+        "background": [
+          247,
+          245,
+          252
+        ],
+        "middle": [
+          126,
+          109,
+          191
+        ],
+        "accentSamples": [
+          [
+            126,
+            109,
+            191
+          ],
+          [
+            126,
+            109,
+            192
+          ],
+          [
+            126,
+            109,
+            191
+          ],
+          [
+            126,
+            109,
+            192
+          ],
+          [
+            255,
+            255,
+            255
+          ],
+          [
+            255,
+            255,
+            255
+          ]
+        ]
+      },
+      "axeViolations": 0
+    },
+    {
+      "locale": "zh-Hans",
+      "theme": "light",
+      "width": 1440,
+      "radius": "12px",
+      "background": "linear-gradient(90deg, rgb(112, 189, 206), rgb(128, 96, 189) 58%, rgb(223, 140, 164)), none",
+      "clip": "border-box, border-box",
+      "origin": "border-box, padding-box",
+      "pseudo": "none",
+      "values": [
+        "12",
+        "85",
+        "0",
+        "5",
+        "77"
+      ],
+      "pageBackground": "rgb(247, 245, 252)",
+      "overflow": false,
+      "rect": {
+        "x": 732,
+        "y": 404.65625,
+        "width": 660,
+        "height": 100
+      },
+      "corners": {
+        "left": [
+          247,
+          245,
+          252
+        ],
+        "right": [
+          247,
+          245,
+          252
+        ],
+        "background": [
+          247,
+          245,
+          252
+        ],
+        "middle": [
+          247,
+          245,
+          252
+        ],
+        "accentSamples": [
+          [
+            247,
+            245,
+            252
+          ],
+          [
+            125,
+            108,
+            191
+          ],
+          [
+            126,
+            109,
+            191
+          ],
+          [
+            125,
+            108,
+            191
+          ],
+          [
+            126,
+            109,
+            192
+          ],
+          [
+            255,
+            255,
+            255
+          ]
+        ]
+      },
+      "axeViolations": 0
+    },
+    {
+      "locale": "zh-Hans",
+      "theme": "dark",
+      "width": 320,
+      "radius": "12px",
+      "background": "linear-gradient(90deg, rgb(135, 201, 218), rgb(188, 156, 232) 58%, rgb(241, 180, 188)), none",
+      "clip": "border-box, border-box",
+      "origin": "border-box, padding-box",
+      "pseudo": "none",
+      "values": [
+        "12",
+        "85",
+        "0",
+        "5",
+        "77"
+      ],
+      "pageBackground": "rgb(27, 23, 48)",
+      "overflow": false,
+      "rect": {
+        "x": 16,
+        "y": 621.484375,
+        "width": 288,
+        "height": 100
+      },
+      "corners": {
+        "left": [
+          27,
+          23,
+          48
+        ],
+        "right": [
+          27,
+          23,
+          48
+        ],
+        "background": [
+          27,
+          23,
+          48
+        ],
+        "middle": [
+          181,
+          162,
+          230
+        ],
+        "accentSamples": [
+          [
+            181,
+            162,
+            230
+          ],
+          [
+            180,
+            162,
+            230
+          ],
+          [
+            181,
+            162,
+            230
+          ],
+          [
+            38,
+            32,
+            62
+          ],
+          [
+            38,
+            32,
+            62
+          ],
+          [
+            38,
+            32,
+            62
+          ]
+        ]
+      },
+      "axeViolations": 0
+    },
+    {
+      "locale": "zh-Hans",
+      "theme": "dark",
+      "width": 390,
+      "radius": "12px",
+      "background": "linear-gradient(90deg, rgb(135, 201, 218), rgb(188, 156, 232) 58%, rgb(241, 180, 188)), none",
+      "clip": "border-box, border-box",
+      "origin": "border-box, padding-box",
+      "pseudo": "none",
+      "values": [
+        "12",
+        "85",
+        "0",
+        "5",
+        "77"
+      ],
+      "pageBackground": "rgb(27, 23, 48)",
+      "overflow": false,
+      "rect": {
+        "x": 16,
+        "y": 660.859375,
+        "width": 358,
+        "height": 100
+      },
+      "corners": {
+        "left": [
+          27,
+          23,
+          48
+        ],
+        "right": [
+          27,
+          23,
+          48
+        ],
+        "background": [
+          27,
+          23,
+          48
+        ],
+        "middle": [
+          180,
+          162,
+          230
+        ],
+        "accentSamples": [
+          [
+            180,
+            162,
+            230
+          ],
+          [
+            181,
+            162,
+            230
+          ],
+          [
+            180,
+            162,
+            230
+          ],
+          [
+            181,
+            162,
+            230
+          ],
+          [
+            38,
+            32,
+            62
+          ],
+          [
+            38,
+            32,
+            62
+          ]
+        ]
+      },
+      "axeViolations": 0
+    },
+    {
+      "locale": "zh-Hans",
+      "theme": "dark",
+      "width": 768,
+      "radius": "12px",
+      "background": "linear-gradient(90deg, rgb(135, 201, 218), rgb(188, 156, 232) 58%, rgb(241, 180, 188)), none",
+      "clip": "border-box, border-box",
+      "origin": "border-box, padding-box",
+      "pseudo": "none",
+      "values": [
+        "12",
+        "85",
+        "0",
+        "5",
+        "77"
+      ],
+      "pageBackground": "rgb(27, 23, 48)",
+      "overflow": false,
+      "rect": {
+        "x": 395.984375,
+        "y": 381.09375,
+        "width": 345.125,
+        "height": 100
+      },
+      "corners": {
+        "left": [
+          27,
+          23,
+          48
+        ],
+        "right": [
+          27,
+          23,
+          48
+        ],
+        "background": [
+          27,
+          23,
+          48
+        ],
+        "middle": [
+          181,
+          162,
+          230
+        ],
+        "accentSamples": [
+          [
+            181,
+            162,
+            230
+          ],
+          [
+            181,
+            162,
+            230
+          ],
+          [
+            181,
+            162,
+            230
+          ],
+          [
+            181,
+            163,
+            231
+          ],
+          [
+            38,
+            32,
+            62
+          ],
+          [
+            38,
+            32,
+            62
+          ]
+        ]
+      },
+      "axeViolations": 0
+    },
+    {
+      "locale": "zh-Hans",
+      "theme": "dark",
+      "width": 1440,
+      "radius": "12px",
+      "background": "linear-gradient(90deg, rgb(135, 201, 218), rgb(188, 156, 232) 58%, rgb(241, 180, 188)), none",
+      "clip": "border-box, border-box",
+      "origin": "border-box, padding-box",
+      "pseudo": "none",
+      "values": [
+        "12",
+        "85",
+        "0",
+        "5",
+        "77"
+      ],
+      "pageBackground": "rgb(27, 23, 48)",
+      "overflow": false,
+      "rect": {
+        "x": 732,
+        "y": 404.65625,
+        "width": 660,
+        "height": 100
+      },
+      "corners": {
+        "left": [
+          27,
+          23,
+          48
+        ],
+        "right": [
+          27,
+          23,
+          48
+        ],
+        "background": [
+          27,
+          23,
+          48
+        ],
+        "middle": [
+          27,
+          23,
+          48
+        ],
+        "accentSamples": [
+          [
+            27,
+            23,
+            48
+          ],
+          [
+            180,
+            162,
+            230
+          ],
+          [
+            181,
+            162,
+            230
+          ],
+          [
+            180,
+            162,
+            230
+          ],
+          [
+            181,
+            162,
+            230
+          ],
+          [
+            38,
+            32,
+            62
+          ]
+        ]
+      },
+      "axeViolations": 0
+    },
+    {
+      "locale": "zh-Hant",
+      "theme": "light",
+      "width": 320,
+      "radius": "12px",
+      "background": "linear-gradient(90deg, rgb(112, 189, 206), rgb(128, 96, 189) 58%, rgb(223, 140, 164)), none",
+      "clip": "border-box, border-box",
+      "origin": "border-box, padding-box",
+      "pseudo": "none",
+      "values": [
+        "12",
+        "85",
+        "0",
+        "5",
+        "77"
+      ],
+      "pageBackground": "rgb(247, 245, 252)",
+      "overflow": false,
+      "rect": {
+        "x": 16,
+        "y": 621.484375,
+        "width": 288,
+        "height": 100
+      },
+      "corners": {
+        "left": [
+          247,
+          245,
+          252
+        ],
+        "right": [
+          247,
+          245,
+          252
+        ],
+        "background": [
+          247,
+          245,
+          252
+        ],
+        "middle": [
+          126,
+          109,
+          191
+        ],
+        "accentSamples": [
+          [
+            126,
+            109,
+            191
+          ],
+          [
+            126,
+            108,
+            191
+          ],
+          [
+            126,
+            109,
+            192
+          ],
+          [
+            255,
+            255,
+            255
+          ],
+          [
+            255,
+            255,
+            255
+          ],
+          [
+            255,
+            255,
+            255
+          ]
+        ]
+      },
+      "axeViolations": 0
+    },
+    {
+      "locale": "zh-Hant",
+      "theme": "light",
+      "width": 390,
+      "radius": "12px",
+      "background": "linear-gradient(90deg, rgb(112, 189, 206), rgb(128, 96, 189) 58%, rgb(223, 140, 164)), none",
+      "clip": "border-box, border-box",
+      "origin": "border-box, padding-box",
+      "pseudo": "none",
+      "values": [
+        "12",
+        "85",
+        "0",
+        "5",
+        "77"
+      ],
+      "pageBackground": "rgb(247, 245, 252)",
+      "overflow": false,
+      "rect": {
+        "x": 16,
+        "y": 660.859375,
+        "width": 358,
+        "height": 100
+      },
+      "corners": {
+        "left": [
+          247,
+          245,
+          252
+        ],
+        "right": [
+          247,
+          245,
+          252
+        ],
+        "background": [
+          247,
+          245,
+          252
+        ],
+        "middle": [
+          125,
+          108,
+          191
+        ],
+        "accentSamples": [
+          [
+            125,
+            108,
+            191
+          ],
+          [
+            126,
+            109,
+            191
+          ],
+          [
+            125,
+            108,
+            191
+          ],
+          [
+            126,
+            109,
+            191
+          ],
+          [
+            255,
+            255,
+            255
+          ],
+          [
+            255,
+            255,
+            255
+          ]
+        ]
+      },
+      "axeViolations": 0
+    },
+    {
+      "locale": "zh-Hant",
+      "theme": "light",
+      "width": 768,
+      "radius": "12px",
+      "background": "linear-gradient(90deg, rgb(112, 189, 206), rgb(128, 96, 189) 58%, rgb(223, 140, 164)), none",
+      "clip": "border-box, border-box",
+      "origin": "border-box, padding-box",
+      "pseudo": "none",
+      "values": [
+        "12",
+        "85",
+        "0",
+        "5",
+        "77"
+      ],
+      "pageBackground": "rgb(247, 245, 252)",
+      "overflow": false,
+      "rect": {
+        "x": 395.984375,
+        "y": 381.09375,
+        "width": 345.125,
+        "height": 100
+      },
+      "corners": {
+        "left": [
+          247,
+          245,
+          252
+        ],
+        "right": [
+          247,
+          245,
+          252
+        ],
+        "background": [
+          247,
+          245,
+          252
+        ],
+        "middle": [
+          126,
+          109,
+          191
+        ],
+        "accentSamples": [
+          [
+            126,
+            109,
+            191
+          ],
+          [
+            126,
+            109,
+            192
+          ],
+          [
+            126,
+            109,
+            191
+          ],
+          [
+            126,
+            109,
+            192
+          ],
+          [
+            255,
+            255,
+            255
+          ],
+          [
+            255,
+            255,
+            255
+          ]
+        ]
+      },
+      "axeViolations": 0
+    },
+    {
+      "locale": "zh-Hant",
+      "theme": "light",
+      "width": 1440,
+      "radius": "12px",
+      "background": "linear-gradient(90deg, rgb(112, 189, 206), rgb(128, 96, 189) 58%, rgb(223, 140, 164)), none",
+      "clip": "border-box, border-box",
+      "origin": "border-box, padding-box",
+      "pseudo": "none",
+      "values": [
+        "12",
+        "85",
+        "0",
+        "5",
+        "77"
+      ],
+      "pageBackground": "rgb(247, 245, 252)",
+      "overflow": false,
+      "rect": {
+        "x": 732,
+        "y": 404.65625,
+        "width": 660,
+        "height": 100
+      },
+      "corners": {
+        "left": [
+          247,
+          245,
+          252
+        ],
+        "right": [
+          247,
+          245,
+          252
+        ],
+        "background": [
+          247,
+          245,
+          252
+        ],
+        "middle": [
+          247,
+          245,
+          252
+        ],
+        "accentSamples": [
+          [
+            247,
+            245,
+            252
+          ],
+          [
+            125,
+            108,
+            191
+          ],
+          [
+            126,
+            109,
+            191
+          ],
+          [
+            125,
+            108,
+            191
+          ],
+          [
+            126,
+            109,
+            192
+          ],
+          [
+            255,
+            255,
+            255
+          ]
+        ]
+      },
+      "axeViolations": 0
+    },
+    {
+      "locale": "zh-Hant",
+      "theme": "dark",
+      "width": 320,
+      "radius": "12px",
+      "background": "linear-gradient(90deg, rgb(135, 201, 218), rgb(188, 156, 232) 58%, rgb(241, 180, 188)), none",
+      "clip": "border-box, border-box",
+      "origin": "border-box, padding-box",
+      "pseudo": "none",
+      "values": [
+        "12",
+        "85",
+        "0",
+        "5",
+        "77"
+      ],
+      "pageBackground": "rgb(27, 23, 48)",
+      "overflow": false,
+      "rect": {
+        "x": 16,
+        "y": 621.484375,
+        "width": 288,
+        "height": 100
+      },
+      "corners": {
+        "left": [
+          27,
+          23,
+          48
+        ],
+        "right": [
+          27,
+          23,
+          48
+        ],
+        "background": [
+          27,
+          23,
+          48
+        ],
+        "middle": [
+          181,
+          162,
+          230
+        ],
+        "accentSamples": [
+          [
+            181,
+            162,
+            230
+          ],
+          [
+            180,
+            162,
+            230
+          ],
+          [
+            181,
+            162,
+            230
+          ],
+          [
+            38,
+            32,
+            62
+          ],
+          [
+            38,
+            32,
+            62
+          ],
+          [
+            38,
+            32,
+            62
+          ]
+        ]
+      },
+      "axeViolations": 0
+    },
+    {
+      "locale": "zh-Hant",
+      "theme": "dark",
+      "width": 390,
+      "radius": "12px",
+      "background": "linear-gradient(90deg, rgb(135, 201, 218), rgb(188, 156, 232) 58%, rgb(241, 180, 188)), none",
+      "clip": "border-box, border-box",
+      "origin": "border-box, padding-box",
+      "pseudo": "none",
+      "values": [
+        "12",
+        "85",
+        "0",
+        "5",
+        "77"
+      ],
+      "pageBackground": "rgb(27, 23, 48)",
+      "overflow": false,
+      "rect": {
+        "x": 16,
+        "y": 660.859375,
+        "width": 358,
+        "height": 100
+      },
+      "corners": {
+        "left": [
+          27,
+          23,
+          48
+        ],
+        "right": [
+          27,
+          23,
+          48
+        ],
+        "background": [
+          27,
+          23,
+          48
+        ],
+        "middle": [
+          180,
+          162,
+          230
+        ],
+        "accentSamples": [
+          [
+            180,
+            162,
+            230
+          ],
+          [
+            181,
+            162,
+            230
+          ],
+          [
+            180,
+            162,
+            230
+          ],
+          [
+            181,
+            162,
+            230
+          ],
+          [
+            38,
+            32,
+            62
+          ],
+          [
+            38,
+            32,
+            62
+          ]
+        ]
+      },
+      "axeViolations": 0
+    },
+    {
+      "locale": "zh-Hant",
+      "theme": "dark",
+      "width": 768,
+      "radius": "12px",
+      "background": "linear-gradient(90deg, rgb(135, 201, 218), rgb(188, 156, 232) 58%, rgb(241, 180, 188)), none",
+      "clip": "border-box, border-box",
+      "origin": "border-box, padding-box",
+      "pseudo": "none",
+      "values": [
+        "12",
+        "85",
+        "0",
+        "5",
+        "77"
+      ],
+      "pageBackground": "rgb(27, 23, 48)",
+      "overflow": false,
+      "rect": {
+        "x": 395.984375,
+        "y": 381.09375,
+        "width": 345.125,
+        "height": 100
+      },
+      "corners": {
+        "left": [
+          27,
+          23,
+          48
+        ],
+        "right": [
+          27,
+          23,
+          48
+        ],
+        "background": [
+          27,
+          23,
+          48
+        ],
+        "middle": [
+          181,
+          162,
+          230
+        ],
+        "accentSamples": [
+          [
+            181,
+            162,
+            230
+          ],
+          [
+            181,
+            162,
+            230
+          ],
+          [
+            181,
+            162,
+            230
+          ],
+          [
+            181,
+            163,
+            231
+          ],
+          [
+            38,
+            32,
+            62
+          ],
+          [
+            38,
+            32,
+            62
+          ]
+        ]
+      },
+      "axeViolations": 0
+    },
+    {
+      "locale": "zh-Hant",
+      "theme": "dark",
+      "width": 1440,
+      "radius": "12px",
+      "background": "linear-gradient(90deg, rgb(135, 201, 218), rgb(188, 156, 232) 58%, rgb(241, 180, 188)), none",
+      "clip": "border-box, border-box",
+      "origin": "border-box, padding-box",
+      "pseudo": "none",
+      "values": [
+        "12",
+        "85",
+        "0",
+        "5",
+        "77"
+      ],
+      "pageBackground": "rgb(27, 23, 48)",
+      "overflow": false,
+      "rect": {
+        "x": 732,
+        "y": 404.65625,
+        "width": 660,
+        "height": 100
+      },
+      "corners": {
+        "left": [
+          27,
+          23,
+          48
+        ],
+        "right": [
+          27,
+          23,
+          48
+        ],
+        "background": [
+          27,
+          23,
+          48
+        ],
+        "middle": [
+          27,
+          23,
+          48
+        ],
+        "accentSamples": [
+          [
+            27,
+            23,
+            48
+          ],
+          [
+            180,
+            162,
+            230
+          ],
+          [
+            181,
+            162,
+            230
+          ],
+          [
+            180,
+            162,
+            230
+          ],
+          [
+            181,
+            162,
+            230
+          ],
+          [
+            38,
+            32,
+            62
+          ]
+        ]
+      },
+      "axeViolations": 0
+    }
+  ],
+  "forced": [
+    {
+      "theme": "light",
+      "width": 320,
+      "image": "none",
+      "topStyle": "solid",
+      "topWidth": "1px",
+      "topColor": "rgb(0, 0, 0)"
+    },
+    {
+      "theme": "light",
+      "width": 1440,
+      "image": "none",
+      "topStyle": "solid",
+      "topWidth": "1px",
+      "topColor": "rgb(0, 0, 0)"
+    },
+    {
+      "theme": "dark",
+      "width": 320,
+      "image": "none",
+      "topStyle": "solid",
+      "topWidth": "1px",
+      "topColor": "rgb(0, 0, 0)"
+    },
+    {
+      "theme": "dark",
+      "width": 1440,
+      "image": "none",
+      "topStyle": "solid",
+      "topWidth": "1px",
+      "topColor": "rgb(0, 0, 0)"
+    }
+  ],
+  "defaultBackground": "none",
+  "errors": []
+}

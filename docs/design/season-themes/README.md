@@ -1,6 +1,12 @@
-# S10 / S9 / S8 / S7 / S6 / S5 theme samples
+# S10 / S9 / S8 / S7 / S6 / S5 / S2 theme samples
+
+**2026-10-29 S2 正式接入樣本**：[青燕春序圖庫](s2.html)／[設計與資料限制](s2/DESIGN.md)。以註冊外觀 `verdant-prelude` 擷取實際 SSR 頁面，提供明暗、桌面／手機及 default 對照；合成隊伍、賽程與圖池不代表歷史統計，未部署。
+
+**2026-10-29 S3 正式接入**：依 [#343](https://github.com/OCLR-dev/OCLR-website/issues/343) 主辦方確認，接入 `frost-waltz`／雪花圓舞曲。晶瑩雪花、三段舞步光流與局部星芒，保留完整995×621原圖。圖庫更新為正式SSR外觀，合成計數不代表S3歷史資料；不自動修改預設。[圖庫](s3.html)／[設計](s3/DESIGN.md)／[驗證](s3/verification.json)。
 
 主辦方原始提案：[S10 #195](https://github.com/OCLR-dev/OCLR-website/issues/195)、[S9 #196](https://github.com/OCLR-dev/OCLR-website/issues/196)、[S8 #197](https://github.com/OCLR-dev/OCLR-website/issues/197)、[S7 #198](https://github.com/OCLR-dev/OCLR-website/issues/198)。S10／S9／S8／S7 已依主辦方要求接入正式外觀 `skyline-pop`／`glacier-blue`／`sakura-circuit`／`graphite-arena`，各自的視覺審閱／合併證據以對應 issue 為準。
+
+**2026-10-29 S4開發預覽**：[#344](https://github.com/OCLR-dev/OCLR-website/issues/344) 的 Azure Brush／蒼藍筆鋒，以蒼藍水墨筆鋒、飛白及墨色暈染延伸原圖，資料區維持紙白／墨藍和清楚層級。依主辦方本輪設計開發要求實作 `azure-brush`，交付實際頁面明暗／手機圖庫及本機控制項預覽；視覺與中文名稱供審閱。[圖庫](s4.html)／[Design](s4/DESIGN.md)／[檢查](s4/verification.json)。
 
 **2026-10-29 S5正式接入**：[#345](https://github.com/OCLR-dev/OCLR-website/issues/345) 的 Prism Overture／稜光序曲已依主辦方確認接入 `prism-overture`，以110片青紫稜面與古典斜體β壓印呈現 OCLR β (S5)，保留完整原圖與歷史β識別。圖庫擷取正式SSR外觀的實際頁面，本輪PR供審閱。[圖庫](s5.html)／[Design](s5/DESIGN.md)／[檢查](s5/verification.json)。
 
@@ -59,3 +65,9 @@ S10 正式接入重用現有元件和 next-intl（zh-Hans／zh-Hant／en），�
 這些檢查不等同完整應用回歸、三語整合、CI 或部署驗收；正式接入另跑專案要求的完整驗證。
 
 **2026-10-27 S7**：依 #198 本輪要求接入 Graphite Arena；拉絲銀色／深鋼金屬、方向反射與倒角亮邊、六角金屬嵌件、競技黃與透明導覽選取，未自動修改任何預設。四季已各自接入，圖庫仍只作 review 證據。
+
+## S1 彩墨初章候選（#417）
+
+[實際頁面對照圖庫](s1.html) · [設計與資料限制](s1/DESIGN.md) · [候選 CSS](s1.css)。參考最新 S5／S6 正式主題，以彩墨套印與彩墨浸染延伸 S1 原圖；尚未註冊外觀或修改預設。圖庫使用隔離 fixture，合成隊伍與 Captain 不代表歷史統計。
+
+S1 彩墨初章已依主辦方確認接入 `chromatic-origins`；[圖庫](s1.html) 以正式 SSR 與素材擷取，既有預設不變。前述候選說明保留為歷史。

@@ -65,6 +65,10 @@ describe.skipIf(!url)("global site appearance settings", () => {
     "graphite-arena",
     "orbital-pulse",
     "prism-overture",
+    "azure-brush",
+    "verdant-prelude",
+    "chromatic-origins",
+    "frost-waltz",
   ])("saves %s with an authoritative audit event", async (appearance) => {
     expect(await siteSettingsForAdmin(admin)).toMatchObject({
       defaultAppearance: "default",

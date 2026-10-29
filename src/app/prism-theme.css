@@ -168,25 +168,17 @@ html[data-appearance="prism-overture"]
   position: relative;
   max-width: none;
   border: 1px solid var(--site-border);
-  border-top-color: var(--prism-violet);
+  border-top-color: transparent;
   border-radius: 12px;
-  background: var(--site-surface);
-}
-html[data-appearance="prism-overture"]
-  .themed-site
-  .archive-overview-summary
-  .archive-counts::before {
-  content: "";
-  position: absolute;
-  inset: -1px -1px auto;
-  height: 2px;
-  background: linear-gradient(
-    90deg,
-    var(--prism-cyan),
-    var(--prism-violet) 58%,
-    var(--prism-peach)
-  );
-  pointer-events: none;
+  background:
+    linear-gradient(
+        90deg,
+        var(--prism-cyan),
+        var(--prism-violet) 58%,
+        var(--prism-peach)
+      )
+      top / 100% 2px no-repeat border-box,
+    var(--site-surface);
 }
 html[data-appearance="prism-overture"] .themed-site .archive-counts > div {
   min-width: 0;
@@ -434,9 +426,15 @@ html[data-appearance="prism-overture"]
     box-shadow: none;
   }
   html[data-appearance="prism-overture"] .themed-site .page-heading::before,
-  html[data-appearance="prism-overture"] .themed-site .page-heading::after,
-  html[data-appearance="prism-overture"] .themed-site .archive-counts::before {
+  html[data-appearance="prism-overture"] .themed-site .page-heading::after {
     display: none;
+  }
+  html[data-appearance="prism-overture"]
+    .themed-site
+    .archive-overview-summary
+    .archive-counts {
+    background-image: none;
+    border-top-color: CanvasText;
   }
   html[data-appearance="prism-overture"]
     .themed-site

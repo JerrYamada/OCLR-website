@@ -12,7 +12,7 @@ import { readTournament } from "../../src/lib/tournaments";
 import { seedEditions } from "../fixtures/editions";
 import { appearances } from "../../src/lib/preferences";
 import { chooseTheme } from "./theme";
-const origin = "http://127.0.0.1:3100",
+const origin = process.env.OCLR_E2E_ORIGIN ?? "http://127.0.0.1:3100",
   base = "/tournaments/test-cup";
 async function preferences(
   context: BrowserContext,
@@ -58,6 +58,26 @@ async function accessible(page: Page) {
   ).toEqual([]);
 }
 const optional = {
+  "chromatic-origins": {
+    label: "S1 · Chromatic Origins",
+    lightBackground: "rgb(246, 244, 247)",
+    darkBackground: "rgb(33, 28, 41)",
+  },
+  "frost-waltz": {
+    label: "S3 · Frost Waltz",
+    lightBackground: "rgb(242, 250, 255)",
+    darkBackground: "rgb(16, 30, 42)",
+  },
+  "verdant-prelude": {
+    label: "S2 · Verdant Prelude",
+    lightBackground: "rgb(245, 250, 247)",
+    darkBackground: "rgb(18, 35, 31)",
+  },
+  "azure-brush": {
+    label: "S4 · Azure Brush",
+    lightBackground: "rgb(242, 248, 250)",
+    darkBackground: "rgb(15, 33, 50)",
+  },
   "prism-overture": {
     label: "S5 · Prism Overture",
     lightBackground: "rgb(247, 245, 252)",

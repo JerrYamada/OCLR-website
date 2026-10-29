@@ -1,0 +1,35 @@
+{
+  "base": "5032b947814fbcfc7315894639ede81c36fe013b",
+  "cases": [
+    {
+      "width": 390,
+      "theme": "light",
+      "radius": "12px",
+      "background": "none",
+      "pseudo": "\"\"",
+      "pseudoInset": "-1px -1px 271.828px",
+      "labels": "隊伍\n1\n選手與教練\n1\n已記錄賽果\n0\n圖池\n0\n譜面\n0",
+      "rect": {
+        "x": 16,
+        "y": 683.234375,
+        "width": 358,
+        "height": 100
+      }
+    },
+    {
+      "width": 1440,
+      "theme": "dark",
+      "radius": "12px",
+      "background": "none",
+      "pseudo": "\"\"",
+      "pseudoInset": "-1px -1px 409.5px",
+      "labels": "隊伍\n1\n選手與教練\n1\n已記錄賽果\n0\n圖池\n0\n譜面\n0",
+      "rect": {
+        "x": 732,
+        "y": 404.65625,
+        "width": 660,
+        "height": 100
+      }
+    }
+  ]
+}
