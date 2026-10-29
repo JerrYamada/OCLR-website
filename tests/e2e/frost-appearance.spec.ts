@@ -1,4 +1,3 @@
-import { appearances } from "../../src/lib/preferences";
 import { test, expect } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
 import { sql } from "drizzle-orm";
@@ -19,7 +18,7 @@ test.describe("S3 Frost Waltz appearance", () => {
       sql`TRUNCATE edition_state, site_settings, site_setting_events CASCADE`,
     );
     await seedBrowserEditions();
-    await seedEditions([frostPreview]);
+    await seedEditions([{ ...frostPreview, defaultAppearance: "frost-waltz" }]);
   });
   test.afterEach(async () => {
     await db().execute(sql`TRUNCATE edition_state CASCADE`);
@@ -27,14 +26,14 @@ test.describe("S3 Frost Waltz appearance", () => {
   });
   test.afterAll(closeDb);
 
-  test("selects all three labels with keyboard, persists SSR and preserves complete artwork", async ({
+  test("inherits configured S3 with a public-only menu, persists SSR and preserves complete artwork", async ({
     page,
     context,
   }, info) => {
     test.setTimeout(180000);
     const errors: string[] = [];
     page.on("pageerror", (e) => errors.push(e.message));
-    for (const [locale, label] of [
+    for (const [locale] of [
       ["en", "S3 · Frost Waltz"],
       ["zh-Hans", "S3 · 雪花圆舞曲"],
       ["zh-Hant", "S3 · 雪花圓舞曲"],
@@ -44,29 +43,19 @@ test.describe("S3 Frost Waltz appearance", () => {
           [
             ["oclr-locale", locale],
             ["oclr-theme", theme],
-            ["oclr-appearance", "default"],
           ].map(([name, value]) => ({ name, value, url: origin })),
         );
         await page.goto("/tournaments/s3");
         await page.waitForLoadState("networkidle");
         const trigger = page.locator(".appearance-trigger");
         await trigger.click();
-        const menu = page.getByRole("menu").filter({
-          has: page.locator('[data-appearance-option="frost-waltz"]'),
-        });
-        await expect(menu.getByRole("menuitemradio")).toHaveCount(
-          appearances.length + 1,
-        );
-        await page.keyboard.press("End");
-        for (
-          let step = appearances.indexOf("frost-waltz");
-          step < appearances.length - 1;
-          step++
-        )
-          await page.keyboard.press("ArrowUp");
+        const menu = page.locator('.appearance-control [role="menu"]');
+        await expect(menu.getByRole("menuitemradio")).toHaveCount(10);
         await expect(
-          menu.getByRole("menuitemradio", { name: label, exact: true }),
-        ).toBeFocused();
+          menu.locator('[data-appearance-option="frost-waltz"]'),
+        ).toHaveCount(0);
+        await page.keyboard.press("Home");
+        await expect(menu.getByRole("menuitemradio").first()).toBeFocused();
         const box = (await menu.boundingBox())!;
         expect(box.y).toBeGreaterThanOrEqual(0);
         expect(box.y + box.height).toBeLessThanOrEqual(
@@ -140,7 +129,7 @@ test.describe("S3 Frost Waltz appearance", () => {
   }) => {
     test.setTimeout(180000);
     await seedEditions([
-      { ...frostPreview, name: "S3 · 合成長名稱外觀測試 ".repeat(5) },
+      { ...frostPreview, defaultAppearance: "frost-waltz", name: "S3 · 合成長名稱外觀測試 ".repeat(5) },
     ]);
     await page.emulateMedia({ reducedMotion: "reduce" });
     for (const theme of ["light", "dark"])
@@ -149,7 +138,6 @@ test.describe("S3 Frost Waltz appearance", () => {
           [
             ["oclr-locale", "zh-Hant"],
             ["oclr-theme", theme],
-            ["oclr-appearance", "frost-waltz"],
           ].map(([name, value]) => ({ name, value, url: origin })),
         );
         await page.setViewportSize({ width, height: 844 });

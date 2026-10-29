@@ -26,9 +26,10 @@ test.describe("S1 Chromatic Origins appearance", () => {
     await seedEditions([
       {
         ...edition,
+        defaultAppearance: "chromatic-origins",
         slug: "s1",
-        season: "4",
-        name: "OCLR Season 4",
+        season: "1",
+        name: "OCLR Season 1",
         status: "completed",
         summary: "Synthetic presentation of the committed S1 archive.",
         registration: null,
@@ -51,14 +52,14 @@ test.describe("S1 Chromatic Origins appearance", () => {
   });
   test.afterAll(closeDb);
 
-  test("selects all three labels with keyboard, persists SSR and preserves complete artwork", async ({
+  test("inherits configured S1 with a public-only menu and renders SSR and preserves complete artwork", async ({
     page,
     context,
   }, info) => {
     test.setTimeout(180000);
     const errors: string[] = [];
     page.on("pageerror", (e) => errors.push(e.message));
-    for (const [locale, label] of [
+    for (const [locale] of [
       ["en", "S1 · Chromatic Origins"],
       ["zh-Hans", "S1 · 彩墨初章"],
       ["zh-Hant", "S1 · 彩墨初章"],
@@ -68,29 +69,19 @@ test.describe("S1 Chromatic Origins appearance", () => {
           [
             ["oclr-locale", locale],
             ["oclr-theme", theme],
-            ["oclr-appearance", "default"],
           ].map(([name, value]) => ({ name, value, url: origin })),
         );
         await page.goto("/tournaments/s1");
         await page.waitForLoadState("networkidle");
         const trigger = page.locator(".appearance-trigger");
         await trigger.click();
-        const menu = page.getByRole("menu").filter({
-          has: page.locator('[data-appearance-option="chromatic-origins"]'),
-        });
-        await expect(menu.getByRole("menuitemradio")).toHaveCount(
-          appearances.length + 1,
-        );
-        await page.keyboard.press("End");
-        for (
-          let step = appearances.indexOf("chromatic-origins");
-          step < appearances.length - 1;
-          step++
-        )
-          await page.keyboard.press("ArrowUp");
+        const menu = page.locator('.appearance-control [role="menu"]');
+        await expect(menu.getByRole("menuitemradio")).toHaveCount(10);
         await expect(
-          menu.getByRole("menuitemradio", { name: label, exact: true }),
-        ).toBeFocused();
+          menu.locator('[data-appearance-option="chromatic-origins"]'),
+        ).toHaveCount(0);
+        await page.keyboard.press("Home");
+        await expect(menu.getByRole("menuitemradio").first()).toBeFocused();
         const box = (await menu.boundingBox())!;
         expect(box.y).toBeGreaterThanOrEqual(0);
         expect(box.y + box.height).toBeLessThanOrEqual(
@@ -170,7 +161,6 @@ test.describe("S1 Chromatic Origins appearance", () => {
           [
             ["oclr-locale", "zh-Hant"],
             ["oclr-theme", theme],
-            ["oclr-appearance", "chromatic-origins"],
           ].map(([name, value]) => ({ name, value, url: origin })),
         );
         await page.setViewportSize({ width, height: 844 });

@@ -19,7 +19,9 @@ test.describe("S2 Verdant Prelude appearance", () => {
       sql`TRUNCATE edition_state, site_settings, site_setting_events CASCADE`,
     );
     await seedBrowserEditions();
-    await seedEditions([verdantPreview]);
+    await seedEditions([
+      { ...verdantPreview, defaultAppearance: "verdant-prelude" },
+    ]);
   });
   test.afterEach(async () => {
     await db().execute(sql`TRUNCATE edition_state CASCADE`);
@@ -27,14 +29,14 @@ test.describe("S2 Verdant Prelude appearance", () => {
   });
   test.afterAll(closeDb);
 
-  test("selects all three labels with keyboard, persists SSR and preserves complete artwork", async ({
+  test("inherits configured S2 with a public-only menu and renders SSR and preserves complete artwork", async ({
     page,
     context,
   }, info) => {
     test.setTimeout(180000);
     const errors: string[] = [];
     page.on("pageerror", (e) => errors.push(e.message));
-    for (const [locale, label] of [
+    for (const [locale] of [
       ["en", "S2 · Verdant Prelude"],
       ["zh-Hans", "S2 · 青燕春序"],
       ["zh-Hant", "S2 · 青燕春序"],
@@ -44,29 +46,19 @@ test.describe("S2 Verdant Prelude appearance", () => {
           [
             ["oclr-locale", locale],
             ["oclr-theme", theme],
-            ["oclr-appearance", "default"],
           ].map(([name, value]) => ({ name, value, url: origin })),
         );
         await page.goto("/tournaments/s2");
         await page.waitForLoadState("networkidle");
         const trigger = page.locator(".appearance-trigger");
         await trigger.click();
-        const menu = page.getByRole("menu").filter({
-          has: page.locator('[data-appearance-option="verdant-prelude"]'),
-        });
-        await expect(menu.getByRole("menuitemradio")).toHaveCount(
-          appearances.length + 1,
-        );
-        await page.keyboard.press("End");
-        for (
-          let step = appearances.indexOf("verdant-prelude");
-          step < appearances.length - 1;
-          step++
-        )
-          await page.keyboard.press("ArrowUp");
+        const menu = page.locator('.appearance-control [role="menu"]');
+        await expect(menu.getByRole("menuitemradio")).toHaveCount(10);
         await expect(
-          menu.getByRole("menuitemradio", { name: label, exact: true }),
-        ).toBeFocused();
+          menu.locator('[data-appearance-option="verdant-prelude"]'),
+        ).toHaveCount(0);
+        await page.keyboard.press("Home");
+        await expect(menu.getByRole("menuitemradio").first()).toBeFocused();
         const box = (await menu.boundingBox())!;
         expect(box.y).toBeGreaterThanOrEqual(0);
         expect(box.y + box.height).toBeLessThanOrEqual(
@@ -146,7 +138,6 @@ test.describe("S2 Verdant Prelude appearance", () => {
           [
             ["oclr-locale", "zh-Hant"],
             ["oclr-theme", theme],
-            ["oclr-appearance", "verdant-prelude"],
           ].map(([name, value]) => ({ name, value, url: origin })),
         );
         await page.setViewportSize({ width, height: 844 });

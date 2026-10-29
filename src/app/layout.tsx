@@ -49,9 +49,10 @@ import {
   themeCookie,
   systemThemeCookie,
   themeScript,
-  readAppearance,
+  readVisitorAppearance,
+  readSiteAppearance,
   appearanceCookie,
-  isAppearance,
+  isPublicAppearance,
 } from "@/lib/preferences";
 import { defaultSiteAppearance } from "@/lib/site-settings";
 import { NextIntlClientProvider } from "next-intl";
@@ -124,7 +125,7 @@ export default async function RootLayout({
   let defaultAppearance: Appearance = "default";
   if (!remote) defaultAppearance = await defaultSiteAppearance();
   const appearanceValue = preferences.get(appearanceCookie)?.value;
-  const appearancePreference = isAppearance(appearanceValue)
+  const appearancePreference = isPublicAppearance(appearanceValue)
     ? appearanceValue
     : undefined;
   const locale = await getLocale();
@@ -142,7 +143,7 @@ export default async function RootLayout({
         frontendSite(),
         frontendTournaments(),
       ]);
-      defaultAppearance = site.defaultAppearance;
+      defaultAppearance = readSiteAppearance(site.defaultAppearance);
       editions = summaries;
       scopes = summaries.map((e) => ({
         slug: e.slug,
@@ -194,7 +195,10 @@ export default async function RootLayout({
     scopes,
     defaultAppearance,
   );
-  const appearance = readAppearance(appearanceValue, inherited.appearance);
+  const appearance = readVisitorAppearance(
+    appearanceValue,
+    inherited.appearance,
+  );
   return (
     // The head script may correct data-theme from the visitor's system before paint.
     <html

@@ -9,8 +9,8 @@ import {
 } from "../../src/db/schema";
 import { assertTestDatabase } from "../database";
 import { seedSession } from "./session";
-import { appearances } from "../../src/lib/preferences";
-const origin = process.env.OCLR_E2E_ORIGIN ?? "http://127.0.0.1:3100";
+import { publicAppearances } from "../../src/lib/preferences";
+const origin = "http://127.0.0.1:3100";
 const headers = { Origin: origin };
 
 test.describe("Admin default and visitor appearance overrides", () => {
@@ -131,16 +131,6 @@ test.describe("Admin default and visitor appearance overrides", () => {
       );
       // Repeated saves exercise the form's refreshed revision, without a redeploy.
       for (const value of [
-        "skyline-pop",
-        "glacier-blue",
-        "sakura-circuit",
-        "graphite-arena",
-        "orbital-pulse",
-        "prism-overture",
-        "azure-brush",
-        "verdant-prelude",
-        "chromatic-origins",
-        "frost-waltz",
         "frutiger-aero",
         "retro-arcade",
         "manga-halftone",
@@ -218,10 +208,10 @@ test.describe("Admin default and visitor appearance overrides", () => {
       await guest.close();
     }
     expect(await db().select().from(siteSettingEvents)).toHaveLength(
-      appearances.length + 2,
+      publicAppearances.length + 2,
     );
     expect((await db().select().from(siteSettings))[0].revision).toBe(
-      appearances.length + 2,
+      publicAppearances.length + 2,
     );
     expect(errors).toEqual([]);
   });

@@ -23,6 +23,7 @@ test.describe("S9 Glacier Blue appearance", () => {
     await seedEditions([
       {
         ...edition,
+        defaultAppearance: "glacier-blue",
         slug: "s9",
         season: "9",
         name: "OCLR Season 9",
@@ -60,7 +61,6 @@ test.describe("S9 Glacier Blue appearance", () => {
             [
               ["oclr-locale", locale],
               ["oclr-theme", theme],
-              ["oclr-appearance", "glacier-blue"],
             ].map(([name, value]) => ({ name, value, url: origin })),
           );
           expect((await page.goto("/tournaments/s9"))?.status()).toBe(200);
@@ -128,7 +128,7 @@ test.describe("S9 Glacier Blue appearance", () => {
     expect(errors).toEqual([]);
   });
 
-  test("selects S9 from the real menu in all locales and persists the shipped light/dark design", async ({
+  test("inherits configured S9 in all locales and renders the shipped light/dark design", async ({
     page,
     context,
     isMobile,
@@ -151,7 +151,7 @@ test.describe("S9 Glacier Blue appearance", () => {
         (await context.request.get(`/themes/glacier-blue/${name}`)).status(),
       ).toBe(200);
     }
-    for (const [locale, label, credit] of [
+    for (const [locale, , credit] of [
       [
         "en",
         "S9 · Glacier Blue",
@@ -173,30 +173,19 @@ test.describe("S9 Glacier Blue appearance", () => {
           [
             ["oclr-locale", locale],
             ["oclr-theme", theme],
-            ["oclr-appearance", "default"],
           ].map(([name, value]) => ({ name, value, url: origin })),
         );
         expect((await page.goto("/tournaments/s9"))?.status()).toBe(200);
-        await expect(page.locator(".glacier-attribution")).toBeHidden();
+        await expect(page.locator(".glacier-attribution")).toBeVisible();
         const trigger = page.locator(".appearance-trigger");
         await trigger.click();
-        const menu = page.getByRole("menu").filter({
-          has: page.locator('[data-appearance-option="glacier-blue"]'),
-        });
-        await expect(menu.getByRole("menuitemradio")).toHaveCount(
-          appearances.length + 1,
-        );
-        await page.keyboard.press("End");
-        for (
-          let step = appearances.indexOf("glacier-blue");
-          step < appearances.length - 1;
-          step++
-        )
-          await page.keyboard.press("ArrowUp");
-        const option = menu.getByRole("menuitemradio", {
-          name: label,
-          exact: true,
-        });
+        const menu = page.locator('.appearance-control [role="menu"]');
+        await expect(menu.getByRole("menuitemradio")).toHaveCount(10);
+        await expect(
+          menu.locator('[data-appearance-option="glacier-blue"]'),
+        ).toHaveCount(0);
+        await page.keyboard.press("Home");
+        const option = menu.getByRole("menuitemradio").first();
         await expect(option).toBeFocused();
         const box = (await menu.boundingBox())!;
         expect(box.y).toBeGreaterThanOrEqual(0);
@@ -250,7 +239,7 @@ test.describe("S9 Glacier Blue appearance", () => {
         await page.goto("/privacy");
         await expect(page.locator("html")).toHaveAttribute(
           "data-appearance",
-          "glacier-blue",
+          "default",
         );
         await expect(page.locator("html")).toHaveAttribute("data-theme", theme);
       }

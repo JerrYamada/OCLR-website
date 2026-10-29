@@ -26,6 +26,7 @@ test.describe("S4 Azure Brush appearance", () => {
     await seedEditions([
       {
         ...edition,
+        defaultAppearance: "azure-brush",
         slug: "s4",
         season: "4",
         name: "OCLR Season 4",
@@ -51,14 +52,14 @@ test.describe("S4 Azure Brush appearance", () => {
   });
   test.afterAll(closeDb);
 
-  test("selects all three labels with keyboard, persists SSR and preserves complete artwork", async ({
+  test("inherits configured S4 with a public-only menu and renders SSR and preserves complete artwork", async ({
     page,
     context,
   }, info) => {
     test.setTimeout(180000);
     const errors: string[] = [];
     page.on("pageerror", (e) => errors.push(e.message));
-    for (const [locale, label] of [
+    for (const [locale] of [
       ["en", "S4 · Azure Brush"],
       ["zh-Hans", "S4 · 苍蓝笔锋"],
       ["zh-Hant", "S4 · 蒼藍筆鋒"],
@@ -68,29 +69,19 @@ test.describe("S4 Azure Brush appearance", () => {
           [
             ["oclr-locale", locale],
             ["oclr-theme", theme],
-            ["oclr-appearance", "default"],
           ].map(([name, value]) => ({ name, value, url: origin })),
         );
         await page.goto("/tournaments/s4");
         await page.waitForLoadState("networkidle");
         const trigger = page.locator(".appearance-trigger");
         await trigger.click();
-        const menu = page.getByRole("menu").filter({
-          has: page.locator('[data-appearance-option="azure-brush"]'),
-        });
-        await expect(menu.getByRole("menuitemradio")).toHaveCount(
-          appearances.length + 1,
-        );
-        await page.keyboard.press("End");
-        for (
-          let step = appearances.indexOf("azure-brush");
-          step < appearances.length - 1;
-          step++
-        )
-          await page.keyboard.press("ArrowUp");
+        const menu = page.locator('.appearance-control [role="menu"]');
+        await expect(menu.getByRole("menuitemradio")).toHaveCount(10);
         await expect(
-          menu.getByRole("menuitemradio", { name: label, exact: true }),
-        ).toBeFocused();
+          menu.locator('[data-appearance-option="azure-brush"]'),
+        ).toHaveCount(0);
+        await page.keyboard.press("Home");
+        await expect(menu.getByRole("menuitemradio").first()).toBeFocused();
         const box = (await menu.boundingBox())!;
         expect(box.y).toBeGreaterThanOrEqual(0);
         expect(box.y + box.height).toBeLessThanOrEqual(
@@ -168,7 +159,6 @@ test.describe("S4 Azure Brush appearance", () => {
           [
             ["oclr-locale", "zh-Hant"],
             ["oclr-theme", theme],
-            ["oclr-appearance", "azure-brush"],
           ].map(([name, value]) => ({ name, value, url: origin })),
         );
         await page.setViewportSize({ width, height: 844 });
