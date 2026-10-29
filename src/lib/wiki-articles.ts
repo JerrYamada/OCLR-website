@@ -211,7 +211,7 @@ export function wikiArticles(tr: AppTranslator): WikiArticle[] {
   ];
 }
 
-// Official OCLR mascot, designed as a community proposal (#334); Chinese-style outfit added in #442.
+// Official OCLR mascot, designed as a community proposal (#334); Chinese-style outfit added in #442, stickers in #536.
 // Images and licence notes in public/mascot/liru/.
 const LIRU_DESIGNER = "JerrYamada";
 
@@ -389,6 +389,58 @@ function liruArticle(tr: AppTranslator): WikiArticle {
             [tr("Embroidered boots"), "#C9CEDA"],
           ],
         },
+      },
+      {
+        id: "stickers",
+        title: tr("Stickers"),
+        paragraphs: [
+          tr(
+            "Chibi stickers of Liru in her Chinese-style outfit, free for the website, stream overlays and other interface designs: a pick and a ban marker for the mappool, and one for each mappool category.",
+          ),
+          [
+            tr("File names, sizes and alt text are listed in "),
+            {
+              label: "manifest.json",
+              href: "/mascot/liru/stickers/manifest.json",
+            },
+            tr("."),
+          ],
+        ],
+        figures: [
+          {
+            src: "/mascot/liru/sheet-stickers.webp",
+            width: 1600,
+            height: 509,
+            alt: tr(
+              "Eight Liru chibi stickers on light and dark backgrounds: pick, ban, NM, HD, HR, DT, FM and TB",
+            ),
+            caption: tr("Chibi stickers v1.0.0"),
+          },
+        ],
+        table: {
+          headers: [tr("Sticker"), tr("Pose")],
+          rows: [
+            ["pick", tr("Holds up a white board with a green check mark")],
+            ["ban", tr("Pouts behind a white board with a red cross")],
+            ["mod-nm", tr("Sips a cup of tea")],
+            ["mod-hd", tr("Gropes her way forward in sunglasses")],
+            ["mod-hr", tr("Strikes a rock pose with an electric guitar")],
+            ["mod-dt", tr("Dashes forward with speed lines")],
+            ["mod-fm", tr("Wonders which card to take")],
+            ["mod-tb", tr("Hides half her face behind an open fan")],
+          ],
+        },
+        items: [
+          tr(
+            "Every sticker sits on the same transparent square canvas with a white rim, so one can replace another in a fixed-size slot. PNG and WebP are provided at 512, 256, 128 and 64 px.",
+          ),
+          tr(
+            "The stickers carry no team colour or text; show the team with the interface's existing red and blue borders.",
+          ),
+          tr(
+            "Scale them proportionally; do not stretch, recolour, crop the rim or flip them horizontally.",
+          ),
+        ],
       },
       {
         id: "palette",

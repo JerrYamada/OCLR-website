@@ -1,0 +1,242 @@
+{
+  "name": "Liru chibi stickers (Chinese-style outfit)",
+  "version": "1.0.0",
+  "date": "2026-10-29",
+  "canvas": "square, transparent, white sticker rim, feet on a shared baseline",
+  "license": "CC BY 4.0",
+  "credit": "Liru by JerrYamada",
+  "stickers": [
+    {
+      "id": "pick",
+      "name": {
+        "zh-Hans": "选图",
+        "en": "Pick"
+      },
+      "alt": {
+        "zh-Hans": "莉露举着画有绿色对勾的白板，开心地笑",
+        "en": "Liru happily holds up a white board with a green check mark"
+      },
+      "files": {
+        "512": {
+          "png": "png/liru-pick-512.png",
+          "webp": "webp/liru-pick-512.webp"
+        },
+        "256": {
+          "png": "png/liru-pick-256.png",
+          "webp": "webp/liru-pick-256.webp"
+        },
+        "128": {
+          "png": "png/liru-pick-128.png",
+          "webp": "webp/liru-pick-128.webp"
+        },
+        "64": {
+          "png": "png/liru-pick-64.png",
+          "webp": "webp/liru-pick-64.webp"
+        }
+      }
+    },
+    {
+      "id": "ban",
+      "name": {
+        "zh-Hans": "禁图",
+        "en": "Ban"
+      },
+      "alt": {
+        "zh-Hans": "莉露鼓着脸举着画有红色叉的白板",
+        "en": "Liru pouts and holds up a white board with a red cross"
+      },
+      "files": {
+        "512": {
+          "png": "png/liru-ban-512.png",
+          "webp": "webp/liru-ban-512.webp"
+        },
+        "256": {
+          "png": "png/liru-ban-256.png",
+          "webp": "webp/liru-ban-256.webp"
+        },
+        "128": {
+          "png": "png/liru-ban-128.png",
+          "webp": "webp/liru-ban-128.webp"
+        },
+        "64": {
+          "png": "png/liru-ban-64.png",
+          "webp": "webp/liru-ban-64.webp"
+        }
+      }
+    },
+    {
+      "id": "mod-nm",
+      "name": {
+        "zh-Hans": "NM 喝茶",
+        "en": "NM: tea time"
+      },
+      "alt": {
+        "zh-Hans": "莉露坐着捧着茶杯，悠闲地喝茶",
+        "en": "Liru sits and sips a cup of tea, relaxed"
+      },
+      "files": {
+        "512": {
+          "png": "png/liru-mod-nm-512.png",
+          "webp": "webp/liru-mod-nm-512.webp"
+        },
+        "256": {
+          "png": "png/liru-mod-nm-256.png",
+          "webp": "webp/liru-mod-nm-256.webp"
+        },
+        "128": {
+          "png": "png/liru-mod-nm-128.png",
+          "webp": "webp/liru-mod-nm-128.webp"
+        },
+        "64": {
+          "png": "png/liru-mod-nm-64.png",
+          "webp": "webp/liru-mod-nm-64.webp"
+        }
+      }
+    },
+    {
+      "id": "mod-hd",
+      "name": {
+        "zh-Hans": "HD 摸黑",
+        "en": "HD: in the dark"
+      },
+      "alt": {
+        "zh-Hans": "莉露戴着墨镜伸手摸索着往前走",
+        "en": "Liru wears sunglasses and gropes her way forward"
+      },
+      "files": {
+        "512": {
+          "png": "png/liru-mod-hd-512.png",
+          "webp": "webp/liru-mod-hd-512.webp"
+        },
+        "256": {
+          "png": "png/liru-mod-hd-256.png",
+          "webp": "webp/liru-mod-hd-256.webp"
+        },
+        "128": {
+          "png": "png/liru-mod-hd-128.png",
+          "webp": "webp/liru-mod-hd-128.webp"
+        },
+        "64": {
+          "png": "png/liru-mod-hd-64.png",
+          "webp": "webp/liru-mod-hd-64.webp"
+        }
+      }
+    },
+    {
+      "id": "mod-hr",
+      "name": {
+        "zh-Hans": "HR 摇滚",
+        "en": "HR: rock out"
+      },
+      "alt": {
+        "zh-Hans": "莉露抱着电吉他摆出摇滚姿势",
+        "en": "Liru strikes a rock pose with an electric guitar"
+      },
+      "files": {
+        "512": {
+          "png": "png/liru-mod-hr-512.png",
+          "webp": "webp/liru-mod-hr-512.webp"
+        },
+        "256": {
+          "png": "png/liru-mod-hr-256.png",
+          "webp": "webp/liru-mod-hr-256.webp"
+        },
+        "128": {
+          "png": "png/liru-mod-hr-128.png",
+          "webp": "webp/liru-mod-hr-128.webp"
+        },
+        "64": {
+          "png": "png/liru-mod-hr-64.png",
+          "webp": "webp/liru-mod-hr-64.webp"
+        }
+      }
+    },
+    {
+      "id": "mod-dt",
+      "name": {
+        "zh-Hans": "DT 冲刺",
+        "en": "DT: dash"
+      },
+      "alt": {
+        "zh-Hans": "莉露带着速度线向前冲刺",
+        "en": "Liru dashes forward with speed lines"
+      },
+      "files": {
+        "512": {
+          "png": "png/liru-mod-dt-512.png",
+          "webp": "webp/liru-mod-dt-512.webp"
+        },
+        "256": {
+          "png": "png/liru-mod-dt-256.png",
+          "webp": "webp/liru-mod-dt-256.webp"
+        },
+        "128": {
+          "png": "png/liru-mod-dt-128.png",
+          "webp": "webp/liru-mod-dt-128.webp"
+        },
+        "64": {
+          "png": "png/liru-mod-dt-64.png",
+          "webp": "webp/liru-mod-dt-64.webp"
+        }
+      }
+    },
+    {
+      "id": "mod-fm",
+      "name": {
+        "zh-Hans": "FM 选卡",
+        "en": "FM: pick a card"
+      },
+      "alt": {
+        "zh-Hans": "莉露头冒问号，身边是黄色和红色两张卡",
+        "en": "Liru wonders which card to take, a yellow and a red card beside her"
+      },
+      "files": {
+        "512": {
+          "png": "png/liru-mod-fm-512.png",
+          "webp": "webp/liru-mod-fm-512.webp"
+        },
+        "256": {
+          "png": "png/liru-mod-fm-256.png",
+          "webp": "webp/liru-mod-fm-256.webp"
+        },
+        "128": {
+          "png": "png/liru-mod-fm-128.png",
+          "webp": "webp/liru-mod-fm-128.webp"
+        },
+        "64": {
+          "png": "png/liru-mod-fm-64.png",
+          "webp": "webp/liru-mod-fm-64.webp"
+        }
+      }
+    },
+    {
+      "id": "mod-tb",
+      "name": {
+        "zh-Hans": "TB 决胜",
+        "en": "TB: showdown"
+      },
+      "alt": {
+        "zh-Hans": "莉露用展开的折扇遮住半张脸，眼神锐利",
+        "en": "Liru hides half her face behind an open folding fan, eyes sharp"
+      },
+      "files": {
+        "512": {
+          "png": "png/liru-mod-tb-512.png",
+          "webp": "webp/liru-mod-tb-512.webp"
+        },
+        "256": {
+          "png": "png/liru-mod-tb-256.png",
+          "webp": "webp/liru-mod-tb-256.webp"
+        },
+        "128": {
+          "png": "png/liru-mod-tb-128.png",
+          "webp": "webp/liru-mod-tb-128.webp"
+        },
+        "64": {
+          "png": "png/liru-mod-tb-64.png",
+          "webp": "webp/liru-mod-tb-64.webp"
+        }
+      }
+    }
+  ]
+}
