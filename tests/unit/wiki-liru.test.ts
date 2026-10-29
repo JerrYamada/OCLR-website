@@ -25,7 +25,7 @@ function webpSize(path: string) {
   };
 }
 
-describe("Liru Wiki article (#334)", () => {
+describe("Liru Wiki article (#334, #442)", () => {
   it.each([
     ["en", en],
     ["zh-Hans", hans],
@@ -50,6 +50,8 @@ describe("Liru Wiki article (#334)", () => {
         "profile",
         "design",
         "expressions",
+        "outfit-chinese",
+        "outfit-chinese-palette",
         "palette",
         "usage",
         "credits",
@@ -66,6 +68,7 @@ describe("Liru Wiki article (#334)", () => {
         "/mascot/liru/sheet-main.webp",
         "/mascot/liru/sheet-turnaround.webp",
         "/mascot/liru/sheet-expressions.webp",
+        "/mascot/liru/sheet-outfit-chinese.webp",
       ]);
       for (const figure of figures) {
         expect(figure.alt.length).toBeGreaterThan(10);
@@ -93,6 +96,19 @@ describe("Liru Wiki article (#334)", () => {
         "#C3CADC",
         "#E8556A",
         "#4C7BE5",
+      ]);
+      const outfitPalette = article.sections.find(
+        (section) => section.id === "outfit-chinese-palette",
+      )!.table!.rows;
+      expect(outfitPalette.map((row) => row[1])).toEqual([
+        "#D4CFE5",
+        "#899E5E",
+        "#BBB6D3",
+        "#809275",
+        "#F3F3F3",
+        "#675C68",
+        "#FAF1EB",
+        "#C9CEDA",
       ]);
       const credits = article.sections.find(
         (section) => section.id === "credits",

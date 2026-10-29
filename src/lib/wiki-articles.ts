@@ -211,8 +211,8 @@ export function wikiArticles(tr: AppTranslator): WikiArticle[] {
   ];
 }
 
-// Official OCLR mascot, designed as a community proposal (#334); images and licence notes in
-// public/mascot/liru/.
+// Official OCLR mascot, designed as a community proposal (#334); Chinese-style outfit added in #442.
+// Images and licence notes in public/mascot/liru/.
 const LIRU_DESIGNER = "JerrYamada";
 
 function liruArticle(tr: AppTranslator): WikiArticle {
@@ -317,6 +317,78 @@ function liruArticle(tr: AppTranslator): WikiArticle {
             caption: tr("Expressions"),
           },
         ],
+      },
+      {
+        id: "outfit-chinese",
+        title: tr("Outfit: Chinese style"),
+        paragraphs: [
+          tr(
+            "An alternate outfit for Chinese-style and festive artwork. She is quieter in it: eyes open, a light smile, head slightly tilted. The track-jacket design remains her main look.",
+          ),
+        ],
+        figures: [
+          {
+            src: "/mascot/liru/sheet-outfit-chinese.webp",
+            width: 1600,
+            height: 1453,
+            alt: tr(
+              "Liru in her Chinese-style outfit: full-body front view, design details and colour palette",
+            ),
+            caption: tr("Chinese-style outfit v1.2"),
+          },
+        ],
+        table: {
+          headers: [tr("Element"), tr("Description")],
+          rows: [
+            [
+              tr("Sprout, leaf hairclip, white headphones and bead bracelet"),
+              tr("Kept from her main design"),
+            ],
+            [
+              tr("Hairpins with a jade tassel"),
+              tr("Worn on her left, next to the leaf hairclip"),
+            ],
+            [
+              tr("Fitted mandarin-collar jacket"),
+              tr("Short and close-fitting, with jade-green frog buttons"),
+            ],
+            [
+              tr("Open folding fan"),
+              tr(
+                "Jade-green leaf and lavender edge, with a jade tassel on the handle",
+              ),
+            ],
+            [
+              tr("White embroidered ankle boots"),
+              tr("Jade-green embroidery; they replace the sneakers"),
+            ],
+          ],
+        },
+        items: [
+          tr(
+            "This outfit drops the side ponytail, the red and blue hairclips, the Tier badge and the back print.",
+          ),
+          tr(
+            "The sprout still grows from the tip of her ahoge, and her hair stays lavender.",
+          ),
+        ],
+      },
+      {
+        id: "outfit-chinese-palette",
+        title: tr("Chinese-style outfit: colour palette"),
+        table: {
+          headers: [tr("Colour"), tr("Hex value")],
+          rows: [
+            [tr("Hair colour"), "#D4CFE5"],
+            [tr("Sprout"), "#899E5E"],
+            [tr("Mandarin-collar jacket"), "#BBB6D3"],
+            [tr("Frog buttons"), "#809275"],
+            [tr("Pleated skirt"), "#F3F3F3"],
+            [tr("Tights"), "#675C68"],
+            [tr("Skin tone"), "#FAF1EB"],
+            [tr("Embroidered boots"), "#C9CEDA"],
+          ],
+        },
       },
       {
         id: "palette",
