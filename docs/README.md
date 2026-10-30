@@ -10,6 +10,7 @@ The repository root README ([English](../README.md) / [简体中文](../README.z
 | [Mappools](mappools.md)                                          | Beatmap metadata, slot/order management, publication rules and private staff Replays         |
 | [Public features](public-features.md)                            | News, About, players, published profiles, bracket and standings                              |
 | [Rating model](yumu-rating.md)                                   | yumu-bot attribution, formulas and OCLR adaptations                                          |
+| [Rating issue research](yumu-rating-issues.md)                   | Issue status, existing rating implementation and the #400 season-series gap analysis         |
 | [Localization and appearance](localization.md)                   | Locale messages, Simplified/Traditional Chinese and appearance preferences                   |
 | [Deployment and operations](deployment.md)                       | Host setup, release scripts, database migrations, backup and rollback                        |
 | [Design references](design/)                                     | Artwork and UI references (illustrative only)                                                |

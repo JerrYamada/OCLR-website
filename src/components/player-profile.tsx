@@ -2,13 +2,16 @@ import { useAppTranslations } from "@/i18n/shared";
 import { BwsSummary } from "./bws-summary";
 import type { BwsSummary as BwsData } from "@/lib/bws-model";
 import Image from "next/image";
+import type { ReactNode } from "react";
 import type { ProfileSnapshot } from "@/lib/osu-profile-model";
 export function PlayerProfile({
   snapshot,
   bws,
+  heading,
 }: {
   snapshot: ProfileSnapshot;
   bws?: BwsData | null;
+  heading?: ReactNode;
 }) {
   const tr = useAppTranslations();
   const number = (v: number | null, decimals = 0) =>
@@ -51,7 +54,7 @@ export function PlayerProfile({
         value0: "osu!",
       })}
     >
-      {p.coverUrl && (
+      {p.coverUrl ? (
         <div className="profile-cover">
           <Image
             src={p.coverUrl}
@@ -60,7 +63,10 @@ export function PlayerProfile({
             height={300}
             unoptimized
           />
+          {heading && <div className="profile-cover-content">{heading}</div>}
         </div>
+      ) : (
+        heading
       )}
       {bws && <BwsSummary value={bws} />}
       <dl className="profile-statistics">

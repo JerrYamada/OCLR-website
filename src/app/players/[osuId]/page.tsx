@@ -58,6 +58,47 @@ async function ProfileContent({
             },
           }))
       : [];
+  const heading = (
+    <header className={styles.heading}>
+      <a
+        href={data.identity.canonicalUrl}
+        target="_blank"
+        rel="noopener noreferrer"
+        className={`${styles.identityLink} ${styles.avatarLink}`}
+        aria-label={tr("View on osu! ↗")}
+      >
+        <Avatar
+          osuId={data.identity.osuId}
+          username={data.identity.username}
+          avatarUrl={profile?.avatarUrl ?? undefined}
+        />
+      </a>
+      <div className={styles.headingText}>
+        <h1>
+          <a
+            href={data.identity.canonicalUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className={styles.identityLink}
+          >
+            {data.identity.username}
+          </a>
+        </h1>
+        <p className="muted">
+          {country && (
+            <>
+              {country}
+              {profile?.countryName && profile.countryCode
+                ? ` (${profile.countryCode})`
+                : ""}
+              {" · "}
+            </>
+          )}
+          ID: {data.identity.osuId}
+        </p>
+      </div>
+    </header>
+  );
   return (
     <div
       className={
@@ -76,47 +117,9 @@ async function ProfileContent({
       >
         {query.edition ? tr("← Tournament players") : tr("← Tournaments")}
       </Link>
-      <header className={styles.heading}>
-        <a
-          href={data.identity.canonicalUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          className={`${styles.identityLink} ${styles.avatarLink}`}
-          aria-label={tr("View on osu! ↗")}
-        >
-          <Avatar
-            osuId={data.identity.osuId}
-            username={data.identity.username}
-            avatarUrl={profile?.avatarUrl ?? undefined}
-          />
-        </a>
-        <div className={styles.headingText}>
-          <h1>
-            <a
-              href={data.identity.canonicalUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className={styles.identityLink}
-            >
-              {data.identity.username}
-            </a>
-          </h1>
-          <p className="muted">
-            {country && (
-              <>
-                {country}
-                {profile?.countryName && profile.countryCode
-                  ? ` (${profile.countryCode})`
-                  : ""}
-                {" · "}
-              </>
-            )}
-            ID: {data.identity.osuId}
-          </p>
-        </div>
-      </header>
       {data.snapshot ? (
         <PlayerProfile
+          heading={heading}
           snapshot={{
             ...data.snapshot,
             profile: {
@@ -134,9 +137,12 @@ async function ProfileContent({
           bws={data.bws}
         />
       ) : (
-        <p className="notice" role="status">
-          {tr("osu! statistics are temporarily unavailable.")}
-        </p>
+        <>
+          {heading}
+          <p className="notice" role="status">
+            {tr("osu! statistics are temporarily unavailable.")}
+          </p>
+        </>
       )}
       {typeof query.edition === "string" && (
         <RoundRatings data={ratingHistory} slug={query.edition} />

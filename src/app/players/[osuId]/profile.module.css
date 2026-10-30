@@ -37,6 +37,25 @@
   cursor: pointer;
 }
 
+/* The heading is overlaid on the cover image, where the left scrim keeps it readable. */
+:global(.profile-cover-content) .heading {
+  margin: 0;
+}
+
+:global(.profile-cover-content) .headingText h1 {
+  color: #fff;
+  text-shadow: 0 1px 4px rgb(0 0 0 / 65%);
+}
+
+:global(.profile-cover-content) .headingText p {
+  color: rgb(255 255 255 / 88%);
+  text-shadow: 0 1px 3px rgb(0 0 0 / 65%);
+}
+
+:global(.profile-cover-content) .heading :global(.avatar) {
+  box-shadow: 0 0 0 2px rgb(255 255 255 / 35%);
+}
+
 .avatarLink {
   display: block;
   flex-shrink: 0;
