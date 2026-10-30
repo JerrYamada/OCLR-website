@@ -31,6 +31,7 @@ import {
   sql,
 } from "drizzle-orm";
 import { randomUUID } from "node:crypto";
+import { forceDeleteFixtureRecords } from "./fixture-force-delete";
 import { isDeepStrictEqual } from "node:util";
 import { z } from "zod";
 import { assertOperationalEdition } from "./archive-guard";
@@ -78,6 +79,18 @@ const refereeIdsSchema = z
   .max(50)
   .refine((ids) => new Set(ids).size === ids.length);
 const commandSchema = z.discriminatedUnion("action", [
+  z
+    .object({
+      ...confirmation,
+      action: z.literal("force_delete"),
+      fixtureId: z.uuid(),
+      expectedVersion: z.number().int().nonnegative(),
+      expectedAssignmentRevision: z.number().int().nonnegative(),
+      expectedDeletionFingerprint: z.string().regex(/^[a-f0-9]{64}$/),
+      confirmationLabel: z.string().min(1).max(100),
+      testFixtureConfirmed: z.literal(true),
+    })
+    .strict(),
   z
     .object({
       ...confirmation,
@@ -691,6 +704,8 @@ export async function fixtureCommand(
   const c = parsed.data;
   try {
     await db().transaction(async (tx) => {
+      if (c.action === "force_delete")
+        await tx.execute(sql`SELECT pg_advisory_xact_lock(17301)`);
       await tx.insert(editionState).values({ slug }).onConflictDoNothing();
       await tx
         .select()
@@ -864,7 +879,7 @@ export async function fixtureCommand(
               )
               .for("update");
       if (c.action !== "create" && !before) {
-        if (c.action === "delete") {
+        if (c.action === "delete" || c.action === "force_delete") {
           const [deleted] = await tx
             .select({ id: editionEvents.id })
             .from(editionEvents)
@@ -876,6 +891,9 @@ export async function fixtureCommand(
                 sql`${editionEvents.detail}->'entity'->>'id' = ${c.fixtureId}`,
                 sql`${editionEvents.detail}->'before'->>'version' = ${String(c.expectedVersion)}`,
                 sql`${editionEvents.detail}->'before'->>'assignmentRevision' = ${String(c.expectedAssignmentRevision)}`,
+                c.action === "force_delete"
+                  ? sql`${editionEvents.detail}->>'deletionFingerprint' = ${c.expectedDeletionFingerprint} AND ${editionEvents.detail}->>'force' = 'true' AND ${editionEvents.detail}->'before'->>'label' = ${c.confirmationLabel}`
+                  : sql`COALESCE(${editionEvents.detail}->>'force','false') = 'false'`,
               ),
             )
             .limit(1);
@@ -885,13 +903,13 @@ export async function fixtureCommand(
       }
       if (c.action !== "create" && before!.version !== c.expectedVersion)
         throw new HttpError(409, "Fixture changed. Refresh before continuing.");
-      if (c.action === "delete") {
-        if (before!.publishedAt)
+      if (c.action === "delete" || c.action === "force_delete") {
+        if (c.action === "delete" && before!.publishedAt)
           throw new HttpError(
             409,
             "Unpublish this fixture before deleting it from the schedule.",
           );
-        if (before!.status === "in_progress")
+        if (c.action === "delete" && before!.status === "in_progress")
           throw new HttpError(
             409,
             "An in-progress fixture cannot be deleted. Use the established match correction workflow.",
@@ -916,32 +934,50 @@ export async function fixtureCommand(
             409,
             "Another fixture uses this match for bracket progression. Clear that fixture's source selection first.",
           );
-        const [stream] = await tx
-          .select()
-          .from(fixtureStreams)
-          .where(eq(fixtureStreams.fixtureId, before!.id));
-        if (stream)
+        if (
+          c.action === "force_delete" &&
+          c.confirmationLabel !== before!.label
+        )
           throw new HttpError(
-            409,
-            "Cancel the streaming task before deleting this fixture.",
+            400,
+            "Type the exact fixture label to confirm force deletion.",
           );
-        const [refereeRecord] = await tx
-          .select({ id: refereeSessions.fixtureId })
-          .from(refereeSessions)
-          .where(eq(refereeSessions.fixtureId, before!.id));
-        if (refereeRecord)
-          throw new HttpError(
-            409,
-            "This fixture has saved referee records and cannot be deleted.",
+        const forced =
+          c.action === "force_delete"
+            ? await forceDeleteFixtureRecords(
+                tx,
+                before!,
+                c.expectedDeletionFingerprint,
+              )
+            : null;
+        if (c.action === "delete") {
+          const [stream] = await tx
+            .select()
+            .from(fixtureStreams)
+            .where(eq(fixtureStreams.fixtureId, before!.id));
+          if (stream)
+            throw new HttpError(
+              409,
+              "Cancel the streaming task before deleting this fixture.",
+            );
+          const [refereeRecord] = await tx
+            .select({ id: refereeSessions.fixtureId })
+            .from(refereeSessions)
+            .where(eq(refereeSessions.fixtureId, before!.id));
+          if (refereeRecord)
+            throw new HttpError(
+              409,
+              "This fixture has saved referee records and cannot be deleted.",
+            );
+          const protectedRows = await tx.execute(
+            sql`SELECT 1 FROM match_imports WHERE fixture_id = ${before!.id} UNION ALL SELECT 1 FROM match_results WHERE fixture_id = ${before!.id} UNION ALL SELECT 1 FROM result_revisions WHERE fixture_id = ${before!.id} UNION ALL SELECT 1 FROM result_game_claims WHERE fixture_id = ${before!.id} LIMIT 1`,
           );
-        const protectedRows = await tx.execute(
-          sql`SELECT 1 FROM match_imports WHERE fixture_id = ${before!.id} UNION ALL SELECT 1 FROM match_results WHERE fixture_id = ${before!.id} UNION ALL SELECT 1 FROM result_revisions WHERE fixture_id = ${before!.id} UNION ALL SELECT 1 FROM result_game_claims WHERE fixture_id = ${before!.id} LIMIT 1`,
-        );
-        if (protectedRows.rows.length)
-          throw new HttpError(
-            409,
-            "This fixture has match records or result history. Use result review or cancellation; these records cannot be deleted.",
-          );
+          if (protectedRows.rows.length)
+            throw new HttpError(
+              409,
+              "This fixture has match records or result history. Use result review or cancellation; these records cannot be deleted.",
+            );
+        }
         const history = await tx
           .select()
           .from(resultAuditEvents)
@@ -953,7 +989,10 @@ export async function fixtureCommand(
           "fixture_unpublish",
           "fixture_referees",
         ];
-        if (history.some((event) => !setupActions.includes(event.action)))
+        if (
+          c.action === "delete" &&
+          history.some((event) => !setupActions.includes(event.action))
+        )
           throw new HttpError(
             409,
             "This fixture has protected competition history and cannot be deleted.",
@@ -1003,6 +1042,14 @@ export async function fixtureCommand(
             before,
             after: null,
             referees,
+            ...(forced
+              ? {
+                  force: true,
+                  deletionFingerprint: forced.preview.fingerprint,
+                  counts: forced.preview.counts,
+                  archivedRecords: forced.snapshot,
+                }
+              : {}),
           },
         });
         await tx

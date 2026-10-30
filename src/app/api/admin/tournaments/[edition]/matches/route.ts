@@ -3,6 +3,7 @@ import { revalidatePath } from "next/cache";
 import { NextResponse } from "next/server";
 import { requireUser } from "@/lib/auth/user";
 import { staffFixtures, fixtureCommand } from "@/lib/fixtures";
+import { previewFixtureForceDelete } from "@/lib/fixture-force-delete";
 import { apiError, readJson, requireSameOrigin } from "@/lib/http";
 async function readGET(
   _request: Request,
@@ -26,7 +27,19 @@ export async function POST(
     requireSameOrigin(request);
     const user = await requireUser();
     const { edition } = await context.params;
-    const result = await fixtureCommand(user, edition, await readJson(request));
+    const input = await readJson(request);
+    if (
+      input &&
+      typeof input === "object" &&
+      "action" in input &&
+      input.action === "preview_force_delete"
+    )
+      return NextResponse.json(
+        await previewFixtureForceDelete(user, edition, input),
+        { headers: { "Cache-Control": "no-store" } },
+      );
+    const result = await fixtureCommand(user, edition, input);
+    revalidatePath(`/admin/tournaments/${edition}`, "layout");
     revalidatePath(`/tournaments/${edition}`, "layout");
     return NextResponse.json(result, {
       headers: { "Cache-Control": "no-store" },

@@ -276,7 +276,38 @@ If a save's network outcome is unknown, retry the same request before editing.
 If another operator changed state, refresh and review the new state. Changed
 fixture/round/pool/roster dependencies require explicit rechecking; prior steps
 are never silently interpreted using new data. Workspaces with saved history
-cannot be erased by deleting their fixture.
+cannot be erased through ordinary fixture deletion.
+
+### Admin cleanup of unapproved test fixtures (#571)
+
+**Fixtures & results → Edit fixture → Force delete test fixture** is a separate
+Admin-only flow. It first loads a consistent preview of fixture-owned record
+counts, then requires the exact fixture label and a test-data acknowledgement.
+Approved/published result state, any historical result approval or official game
+claim, downstream bracket references and published statistics block this action.
+It does not identify test data by a guessed label: Admin explicitly confirms it.
+
+For an eligible fixture, one transaction archives its execution/source evidence
+and original audit records to the edition audit stream, then removes unapproved
+imports/games/results/revisions, referee sessions/events/reconciliations, website
+IRC bindings/commands, assignments and statistics drafts before the fixture row.
+Shared teams, pools, round policies and desktop credentials remain unchanged.
+An active or published schedule alone does not make an unapproved test result
+official; the explicit force flow may remove it. Ordinary deletion keeps its
+existing restrictions.
+
+The force command shares the referee advisory → edition → fixture lock order,
+rechecks current Admin authority and requires matching fixture/assignment versions
+and the preview fingerprint. New records invalidate confirmation; heartbeat-only
+connection sequence/time updates do not. An exact same-actor retry can confirm
+the deletion tombstone without another audit/write. Stale IRC callbacks cannot
+recreate the deleted fixture. Previously sent IRC commands cannot be recalled.
+
+Both preview and deletion use the existing same-origin POST channel; this is not
+a new Developer saved-read capability. Remote/Developer business writes remain
+denied. The UI cannot undo a force deletion; retained private audit evidence is
+separate from an application restore workflow. No migration or automatic cleanup
+of existing fixtures is performed.
 
 All demonstration policies, identities and games are synthetic. The S9 reference
 sheet does not establish defaults for another edition. First-version Chinese
