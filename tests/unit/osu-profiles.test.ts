@@ -149,6 +149,59 @@ describe("official osu! user profiles", () => {
       ),
     ).toThrow(/unavailable/);
   });
+  it("keeps the reported global rank percentage for tier colours", () => {
+    const withPercent = {
+      ...profileResponse,
+      statistics: {
+        ...profileResponse.statistics,
+        global_rank: 44981,
+        global_rank_percent: 0.014208208485188478,
+      },
+    };
+    expect(
+      normalizeOsuProfile(withPercent, 260001, "osu").statistics
+        .globalRankPercent,
+    ).toBeCloseTo(0.0142, 4);
+    expect(
+      normalizeOsuProfile(profileResponse, 260001, "osu").statistics
+        .globalRankPercent,
+    ).toBeNull();
+    expect(
+      normalizeOsuProfile(
+        {
+          ...profileResponse,
+          statistics: {
+            ...profileResponse.statistics,
+            global_rank_percent: 3,
+          },
+        },
+        260001,
+        "osu",
+      ).statistics.globalRankPercent,
+    ).toBeNull();
+  });
+
+  it("keeps the requested ruleset's daily rank history and drops unranked days", () => {
+    const p = normalizeOsuProfile(profileResponse, 260001, "osu");
+    expect(p.rankHistory).toEqual({ mode: "osu", data: [16200, 15500, 15000] });
+    expect(
+      normalizeOsuProfile(profileResponse, 260001, "mania").rankHistory,
+    ).toBeNull();
+    expect(
+      normalizeOsuProfile(
+        { ...profileResponse, rank_history: { mode: "osu", data: "nope" } },
+        260001,
+        "osu",
+      ).rankHistory,
+    ).toBeNull();
+    expect(
+      normalizeOsuProfile(
+        { ...profileResponse, rank_history: undefined },
+        260001,
+        "osu",
+      ).rankHistory,
+    ).toBeNull();
+  });
   it("limits remote images to approved HTTPS osu! image services", () => {
     const p = normalizeOsuProfile(
       {
@@ -208,19 +261,17 @@ describe("explicit username provider transport", () => {
     vi.resetModules();
     vi.stubEnv("OSU_CLIENT_ID", "123");
     vi.stubEnv("OSU_CLIENT_SECRET", "synthetic-secret");
-    const fetch = vi
-      .fn()
-      .mockImplementation(async (url: string) =>
-        Response.json(
-          url.endsWith("/oauth/token")
-            ? {
-                access_token: "synthetic-token",
-                token_type: "Bearer",
-                expires_in: 3600,
-              }
-            : profileResponse,
-        ),
-      );
+    const fetch = vi.fn().mockImplementation(async (url: string) =>
+      Response.json(
+        url.endsWith("/oauth/token")
+          ? {
+              access_token: "synthetic-token",
+              token_type: "Bearer",
+              expires_in: 3600,
+            }
+          : profileResponse,
+      ),
+    );
     vi.stubGlobal("fetch", fetch);
     const { osuApi } = await import("../../src/lib/osu-api");
     await osuApi("/users/@%5BSpace%20Name%5D/osu");

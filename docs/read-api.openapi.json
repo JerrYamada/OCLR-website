@@ -15326,6 +15326,32 @@
                           { "type": "null" }
                         ]
                       },
+                      "rankHistory": {
+                        "default": null,
+                        "anyOf": [
+                          {
+                            "type": "object",
+                            "properties": {
+                              "mode": {
+                                "type": "string",
+                                "enum": ["osu", "taiko", "fruits", "mania"]
+                              },
+                              "data": {
+                                "maxItems": 1000,
+                                "type": "array",
+                                "items": {
+                                  "type": "integer",
+                                  "exclusiveMinimum": 0,
+                                  "maximum": 9007199254740991
+                                }
+                              }
+                            },
+                            "required": ["mode", "data"],
+                            "additionalProperties": false
+                          },
+                          { "type": "null" }
+                        ]
+                      },
                       "statistics": {
                         "type": "object",
                         "properties": {
@@ -15337,6 +15363,13 @@
                                 "minimum": 0,
                                 "maximum": 9007199254740991
                               },
+                              { "type": "null" }
+                            ]
+                          },
+                          "globalRankPercent": {
+                            "default": null,
+                            "anyOf": [
+                              { "type": "number", "minimum": 0 },
                               { "type": "null" }
                             ]
                           },
@@ -15460,6 +15493,7 @@
                         },
                         "required": [
                           "globalRank",
+                          "globalRankPercent",
                           "countryRank",
                           "pp",
                           "accuracy",
@@ -15492,6 +15526,7 @@
                       "active",
                       "bot",
                       "badges",
+                      "rankHistory",
                       "statistics"
                     ],
                     "additionalProperties": false
@@ -15709,6 +15744,32 @@
                   { "type": "null" }
                 ]
               },
+              "rankHistory": {
+                "default": null,
+                "anyOf": [
+                  {
+                    "type": "object",
+                    "properties": {
+                      "mode": {
+                        "type": "string",
+                        "enum": ["osu", "taiko", "fruits", "mania"]
+                      },
+                      "data": {
+                        "maxItems": 1000,
+                        "type": "array",
+                        "items": {
+                          "type": "integer",
+                          "exclusiveMinimum": 0,
+                          "maximum": 9007199254740991
+                        }
+                      }
+                    },
+                    "required": ["mode", "data"],
+                    "additionalProperties": false
+                  },
+                  { "type": "null" }
+                ]
+              },
               "statistics": {
                 "type": "object",
                 "properties": {
@@ -15720,6 +15781,13 @@
                         "minimum": 0,
                         "maximum": 9007199254740991
                       },
+                      { "type": "null" }
+                    ]
+                  },
+                  "globalRankPercent": {
+                    "default": null,
+                    "anyOf": [
+                      { "type": "number", "minimum": 0 },
                       { "type": "null" }
                     ]
                   },
@@ -15840,6 +15908,7 @@
                 },
                 "required": [
                   "globalRank",
+                  "globalRankPercent",
                   "countryRank",
                   "pp",
                   "accuracy",
@@ -15872,6 +15941,7 @@
               "active",
               "bot",
               "badges",
+              "rankHistory",
               "statistics"
             ],
             "additionalProperties": false
@@ -16326,6 +16396,32 @@
                           { "type": "null" }
                         ]
                       },
+                      "rankHistory": {
+                        "default": null,
+                        "anyOf": [
+                          {
+                            "type": "object",
+                            "properties": {
+                              "mode": {
+                                "type": "string",
+                                "enum": ["osu", "taiko", "fruits", "mania"]
+                              },
+                              "data": {
+                                "maxItems": 1000,
+                                "type": "array",
+                                "items": {
+                                  "type": "integer",
+                                  "exclusiveMinimum": 0,
+                                  "maximum": 9007199254740991
+                                }
+                              }
+                            },
+                            "required": ["mode", "data"],
+                            "additionalProperties": false
+                          },
+                          { "type": "null" }
+                        ]
+                      },
                       "statistics": {
                         "type": "object",
                         "properties": {
@@ -16337,6 +16433,13 @@
                                 "minimum": 0,
                                 "maximum": 9007199254740991
                               },
+                              { "type": "null" }
+                            ]
+                          },
+                          "globalRankPercent": {
+                            "default": null,
+                            "anyOf": [
+                              { "type": "number", "minimum": 0 },
                               { "type": "null" }
                             ]
                           },
@@ -16460,6 +16563,7 @@
                         },
                         "required": [
                           "globalRank",
+                          "globalRankPercent",
                           "countryRank",
                           "pp",
                           "accuracy",
@@ -16492,6 +16596,7 @@
                       "active",
                       "bot",
                       "badges",
+                      "rankHistory",
                       "statistics"
                     ],
                     "additionalProperties": false

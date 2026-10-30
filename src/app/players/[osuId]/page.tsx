@@ -1,5 +1,6 @@
 import { PlayerProfile } from "@/components/player-profile";
 import { Avatar } from "@/components/avatar";
+import { collapseAliases, previousUsernames } from "@/lib/player-aliases";
 import { RoundRatings } from "@/components/round-ratings";
 import { getAppTranslations } from "@/i18n/server";
 import { frontendProfile } from "@/lib/frontend-data";
@@ -58,6 +59,95 @@ async function ProfileContent({
             },
           }))
       : [];
+  // osu! supplies the aliases on the fetched profile; roster/archive names add to them.
+  const aliases = previousUsernames(
+    profile?.previousUsernames ?? [],
+    data.identity.names.map((name) => name.username),
+    data.identity.currentUsername ?? data.identity.username,
+  );
+  const aliasesInline = aliases.join(", ");
+  const collapsedAliases = collapseAliases(aliases);
+  const heading = (
+    <header className={styles.heading}>
+      <a
+        href={data.identity.canonicalUrl}
+        target="_blank"
+        rel="noopener noreferrer"
+        className={`${styles.identityLink} ${styles.avatarLink}`}
+        aria-label={tr("View on osu! ↗")}
+      >
+        <Avatar
+          osuId={data.identity.osuId}
+          username={data.identity.username}
+          avatarUrl={profile?.avatarUrl ?? undefined}
+        />
+      </a>
+      <div className={styles.headingText}>
+        <div className={styles.nameRow}>
+          <h1>
+            <a
+              href={data.identity.canonicalUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className={styles.identityLink}
+            >
+              {data.identity.username}
+            </a>
+          </h1>
+          {aliases.length > 0 &&
+            (collapsedAliases ? (
+              <span className={styles.previousNames}>
+                <button
+                  type="button"
+                  className={styles.previousNamesTrigger}
+                  aria-label={tr("Previous usernames")}
+                >
+                  {tr("Previous usernames")} (+{aliases.length})
+                  <svg
+                    className={styles.previousNamesIcon}
+                    viewBox="0 0 16 16"
+                    aria-hidden="true"
+                    focusable="false"
+                  >
+                    <circle
+                      cx="8"
+                      cy="8"
+                      r="6.4"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="1.2"
+                    />
+                    <circle cx="8" cy="4.9" r="0.95" fill="currentColor" />
+                    <path
+                      d="M8 7.1v4.2"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="1.2"
+                      strokeLinecap="round"
+                    />
+                  </svg>
+                </button>
+                <ul className={styles.previousNamesList}>
+                  {aliases.map((name) => (
+                    <li key={name}>{name}</li>
+                  ))}
+                </ul>
+              </span>
+            ) : (
+              <span className={styles.previousNames}>
+                {tr("Previous usernames")}: {aliasesInline}
+              </span>
+            ))}
+        </div>
+        <p className="muted">
+          {country}
+          {profile?.countryName && profile.countryCode
+            ? ` (${profile.countryCode})`
+            : ""}
+        </p>
+      </div>
+    </header>
+  );
   return (
     <div
       className={
@@ -76,67 +166,26 @@ async function ProfileContent({
       >
         {query.edition ? tr("← Tournament players") : tr("← Tournaments")}
       </Link>
-      <header className={styles.heading}>
-        <a
-          href={data.identity.canonicalUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          className={`${styles.identityLink} ${styles.avatarLink}`}
-          aria-label={tr("View on osu! ↗")}
-        >
-          <Avatar
-            osuId={data.identity.osuId}
-            username={data.identity.username}
-            avatarUrl={profile?.avatarUrl ?? undefined}
-          />
-        </a>
-        <div className={styles.headingText}>
-          <h1>
-            <a
-              href={data.identity.canonicalUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className={styles.identityLink}
-            >
-              {data.identity.username}
-            </a>
-          </h1>
-          <p className="muted">
-            {country && (
-              <>
-                {country}
-                {profile?.countryName && profile.countryCode
-                  ? ` (${profile.countryCode})`
-                  : ""}
-                {" · "}
-              </>
-            )}
-            ID: {data.identity.osuId}
-          </p>
-        </div>
-      </header>
       {data.snapshot ? (
         <PlayerProfile
+          heading={heading}
           snapshot={{
             ...data.snapshot,
             profile: {
               ...data.snapshot.profile,
               username: data.identity.username,
-              previousUsernames: data.identity.names
-                .map((n) => n.username)
-                .filter(
-                  (name) =>
-                    name.toLowerCase() !==
-                    data.identity.currentUsername?.toLowerCase(),
-                ),
+              previousUsernames: aliases,
             },
           }}
           bws={data.bws}
         />
       ) : (
-        <p className="notice" role="status">
-          {tr("osu! statistics are temporarily unavailable.")}
-        </p>
+        <>
+          {heading}
+          <p className="notice" role="status">
+            {tr("osu! statistics are temporarily unavailable.")}
+          </p>
+        </>
       )}
       {typeof query.edition === "string" && (
         <RoundRatings data={ratingHistory} slug={query.edition} />
