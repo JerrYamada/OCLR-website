@@ -1,6 +1,8 @@
+import { PlayerCompetition } from "@/components/player-competition";
 import { PlayerProfile } from "@/components/player-profile";
 import { Avatar } from "@/components/avatar";
 import { collapseAliases, previousUsernames } from "@/lib/player-aliases";
+import { playerCompetitionRecord } from "@/lib/player-competition";
 import { RoundRatings } from "@/components/round-ratings";
 import { getAppTranslations } from "@/i18n/server";
 import { frontendProfile } from "@/lib/frontend-data";
@@ -148,6 +150,9 @@ async function ProfileContent({
       </div>
     </header>
   );
+  const competition = data.participation.length
+    ? await playerCompetitionRecord(data.participation)
+    : null;
   return (
     <div
       className={
@@ -190,6 +195,7 @@ async function ProfileContent({
       {typeof query.edition === "string" && (
         <RoundRatings data={ratingHistory} slug={query.edition} />
       )}
+      {competition && <PlayerCompetition record={competition} />}
       <section className="spaced" aria-labelledby="participation">
         <h2 id="participation">{tr("Published participation")}</h2>
         {!data.participation.length && (

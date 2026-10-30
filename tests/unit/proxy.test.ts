@@ -36,7 +36,7 @@ it("lets a private development host reach pages when APP_URL stays loopback", ()
   expect(response.status).toBe(200);
   expect(response.headers.get("location")).toBeNull();
 });
-it("keeps the canonical redirect for non-private hosts in development", () => {
+it("keeps a temporary, uncached canonical redirect for non-private hosts in development", () => {
   vi.stubEnv("NODE_ENV", "development");
   vi.stubEnv("APP_URL", "http://localhost:3000");
   const response = proxy(
@@ -44,10 +44,13 @@ it("keeps the canonical redirect for non-private hosts in development", () => {
       headers: { host: "attacker.test" },
     }),
   );
-  expect(response.status).toBe(308);
+  // A 308 would stay in the browser after the developer changes APP_URL or
+  // returns to localhost, so development redirects must not be permanent.
+  expect(response.status).toBe(307);
   expect(response.headers.get("location")).toBe(
     "http://localhost:3000/tournaments",
   );
+  expect(response.headers.get("cache-control")).toBe("no-store");
 });
 it("does not exempt private hosts from production canonical redirects", () => {
   vi.stubEnv("NODE_ENV", "production");

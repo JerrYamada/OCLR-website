@@ -81,6 +81,15 @@ export function proxy(request: NextRequest) {
   ) {
     canonical.pathname = request.nextUrl.pathname;
     canonical.search = request.nextUrl.search;
+    // A development origin can change between runs (localhost, a LAN address,
+    // a tunnel). A permanent redirect would stay in the browser and keep
+    // replaying an old target after the configuration changes, so keep dev
+    // redirects temporary and uncached. Production remains permanent.
+    if (process.env.NODE_ENV === "development") {
+      const response = NextResponse.redirect(canonical, 307);
+      response.headers.set("Cache-Control", "no-store");
+      return response;
+    }
     return NextResponse.redirect(canonical, 308);
   }
   const nonce = Buffer.from(crypto.randomUUID()).toString("base64");
