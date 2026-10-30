@@ -5,6 +5,7 @@ import { authorizedPage } from "@/lib/auth/page";
 import { hasCapability } from "@/lib/auth/staff";
 import { requireUser } from "@/lib/auth/user";
 import { selectionWorkspace } from "@/lib/mappool-workbench";
+import { mappoolWorkspace } from "@/lib/mappools";
 import { remotePage } from "@/lib/remote-page";
 export async function generateMetadata() {
   const tr = await getAppTranslations();
@@ -23,6 +24,10 @@ export default function Page({
       const writable =
         !data.archived &&
         (await hasCapability(actor, "select_mappools", edition));
+      const officialPools =
+        writable && (await hasCapability(actor, "manage_mappools", edition))
+          ? await mappoolWorkspace(actor, edition)
+          : null;
       const tr = await getAppTranslations();
       return (
         <>
@@ -34,6 +39,7 @@ export default function Page({
             slug={edition}
             initialData={data}
             writable={writable}
+            officialPools={officialPools}
           />
         </>
       );

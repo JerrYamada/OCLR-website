@@ -46,7 +46,10 @@ test.describe("private Pooler/Tester selection workbench", () => {
     await context.route("https://assets.ppy.sh/**", (route) => route.abort());
     const guest = await browser.newContext({ baseURL: origin });
     const pooler = await browser.newContext({ baseURL: origin });
-    await pooler.addCookies([poolerCookie]);
+    await pooler.addCookies([
+      poolerCookie,
+      { name: "oclr-locale", value: "en", url: origin },
+    ]);
     try {
       expect((await guest.request.get(endpoint)).status()).toBe(401);
       expect(
@@ -116,7 +119,8 @@ test.describe("private Pooler/Tester selection workbench", () => {
       expect(
         (await guest.request.get(`${endpoint}/${id}/comments`)).status(),
       ).toBe(401);
-      await candidate.getByText("Comments (0)", { exact: true }).click();
+      await expect(candidate.getByLabel("Your comment")).toBeVisible();
+      await candidate.getByRole("button", { name: "Refresh comments" }).click();
       await expect(
         candidate.getByText("Synthetic Pooler feedback"),
       ).toBeVisible();
@@ -158,13 +162,156 @@ test.describe("private Pooler/Tester selection workbench", () => {
           .from(mappoolCandidateComments)
           .where(eq(mappoolCandidateComments.candidateId, id)),
       ).toHaveLength(2);
+      // Drafts stay mounted while switching Mod tabs; comments are always visible.
+      await candidate.getByLabel("Your comment").fill("Unsaved draft");
+      await page.getByRole("tab", { name: "HD (0)", exact: true }).click();
+      await expect(candidate).not.toBeVisible();
+      await page
+        .getByRole("tab", { name: "Unassigned (2)", exact: true })
+        .click();
+      await expect(candidate.getByLabel("Your comment")).toHaveValue(
+        "Unsaved draft",
+      );
+      await candidate.getByLabel("Your comment").fill("");
+      await candidate
+        .getByRole("combobox", { name: "Mod category" })
+        .selectOption("HD");
+      await page.getByRole("tab", { name: "HD (1)", exact: true }).click();
+      await expect(
+        candidate.getByText(feedback, { exact: true }),
+      ).toBeVisible();
+      await candidate
+        .getByRole("combobox", { name: "Mod category" })
+        .selectOption("unassigned");
+      await page
+        .getByRole("tab", { name: "Unassigned (2)", exact: true })
+        .click();
+      const left = await candidate
+        .locator("a[href='https://osu.ppy.sh/beatmaps/123']")
+        .boundingBox();
+      const right = await candidate.getByLabel("Your comment").boundingBox();
+      if (!isMobile) expect(right!.x).toBeGreaterThan(left!.x + left!.width);
+      else expect(right!.y).toBeGreaterThan(left!.y);
+      await expect(
+        candidate.getByRole("button", {
+          name: "Add to official pool",
+          exact: true,
+        }),
+      ).toHaveCount(0);
+
+      // The Pooler selects the official pool and slot through the existing guarded editor.
+      const formalEndpoint = "/api/admin/tournaments/test-cup/mappools";
+      const roundName = `Workbench round ${testerId}-${Date.now()}`;
+      const currentPools = await (
+        await pooler.request.get(formalEndpoint)
+      ).json();
+      const nextRound =
+        Math.max(
+          0,
+          ...currentPools.rounds
+            .filter((r: { stage: string }) => r.stage === "group")
+            .map((r: { position: number }) => r.position),
+        ) + 1;
+      let response = await pooler.request.post(formalEndpoint, {
+        headers: { Origin: origin },
+        data: {
+          action: "round_create",
+          stage: "group",
+          name: roundName,
+          position: nextRound,
+          confirmed: true,
+        },
+      });
+      expect(response.status()).toBe(200);
+      let formal = await response.json();
+      const roundId = formal.rounds.find(
+        (r: { name: string }) => r.name === roundName,
+      ).id;
+      response = await pooler.request.post(formalEndpoint, {
+        headers: { Origin: origin },
+        data: {
+          action: "pool_create",
+          roundId,
+          name: "Candidate destination",
+          confirmed: true,
+        },
+      });
+      expect(response.status()).toBe(200);
+      formal = await response.json();
+      const targetPool = formal.pools.find(
+        (p: { roundId: string }) => p.roundId === roundId,
+      );
+      const poolerPage = await pooler.newPage();
+      await poolerPage.goto("/admin/tournaments/test-cup/mappool-workbench");
+      const poolerRow = poolerPage.getByRole("article", {
+        name: "BID 123",
+        exact: true,
+      });
+      await poolerRow
+        .getByRole("button", { name: "Add to official pool", exact: true })
+        .click();
+      await poolerRow.getByLabel("Target pool").selectOption(targetPool.id);
+      await expect(poolerRow.getByLabel("Beatmap URL or ID")).toHaveValue(
+        "123",
+      );
+      await expect(poolerRow.getByLabel("Beatmap URL or ID")).toHaveAttribute(
+        "readonly",
+        "",
+      );
+      await poolerRow
+        .getByRole("button", { name: "Add beatmap", exact: true })
+        .click();
+      await expect(
+        poolerRow
+          .getByRole("status")
+          .filter({ hasText: "Candidate added to the official pool." }),
+      ).toBeVisible();
+      formal = await (await pooler.request.get(formalEndpoint)).json();
+      expect(
+        formal.entries.filter(
+          (e: { poolId: string; beatmapId: number }) =>
+            e.poolId === targetPool.id && e.beatmapId === 123,
+        ),
+      ).toHaveLength(1);
+      expect(
+        await (await pooler.request.get(`${endpoint}/${id}/comments`)).json(),
+      ).toHaveLength(2);
+      // A stale replay cannot insert another slot, and Tester cannot use the same endpoint.
+      const replay = {
+        action: "entry_save",
+        confirmed: true,
+        poolId: targetPool.id,
+        expectedVersion: targetPool.version,
+        entryId: null,
+        beatmap: "123",
+        category: "NM",
+        position: 2,
+      };
+      expect(
+        (
+          await pooler.request.post(formalEndpoint, {
+            headers: { Origin: origin },
+            data: replay,
+          })
+        ).status(),
+      ).toBe(409);
+      expect(
+        (
+          await context.request.post(formalEndpoint, {
+            headers: { Origin: origin },
+            data: replay,
+          })
+        ).status(),
+      ).toBe(403);
+      await poolerPage.close();
       for (const theme of ["light", "dark"]) {
         await context.addCookies([
           { name: "oclr-theme", value: theme, url: origin },
         ]);
         await page.reload();
         const row = page.getByRole("article", { name: "BID 123", exact: true });
-        await row.getByText("Comments (2)", { exact: true }).click();
+        await row.getByLabel("Your comment").scrollIntoViewIfNeeded();
+        await expect(row.getByLabel("Your comment")).toBeVisible();
         await expect(row.getByText(feedback, { exact: true })).toBeVisible();
         expect(
           await page.evaluate(

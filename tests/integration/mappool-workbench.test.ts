@@ -153,6 +153,103 @@ describe.skipIf(!url)("private selection collaboration", () => {
     expect(fetchBeatmaps).not.toHaveBeenCalled();
     expect(await db().select().from(mappoolEvents)).toHaveLength(3);
   });
+  it("separates Mod candidates, deduplicates within a category and preserves comments when reclassifying", async () => {
+    await selectionCommand(pooler, slug, add());
+    await selectionCommand(tester, slug, { ...add(), category: "HD" });
+    expect(
+      (await previewCandidates(tester, slug, { text: "75", category: "HD" }))
+        .rows[0].status,
+    ).toBe("duplicate");
+    expect(
+      (await previewCandidates(tester, slug, { text: "75", category: "HR" }))
+        .rows[0].status,
+    ).toBe("ready");
+    expect(
+      await selectionCommand(pooler, slug, { ...add(), category: "HD" }),
+    ).toEqual({ added: 0, skipped: 1 });
+    const candidate = (await selectionWorkspace(tester, slug)).candidates.find(
+      (c) => c.category === "unassigned",
+    )!;
+    await selectionCommand(tester, slug, {
+      action: "comment",
+      candidateId: candidate.id,
+      requestId: randomUUID(),
+      body: "Keep this discussion",
+    });
+    const change = {
+      action: "classify",
+      candidateId: candidate.id,
+      expectedCategory: "unassigned",
+      category: "HR",
+    };
+    await selectionCommand(pooler, slug, change);
+    expect(await selectionCommand(pooler, slug, change)).toEqual({
+      added: 0,
+      skipped: 1,
+    });
+    await expect(
+      selectionCommand(pooler, slug, { ...change, category: "DT" }),
+    ).rejects.toMatchObject({ status: 409 });
+    await expect(
+      selectionCommand(pooler, slug, {
+        ...change,
+        expectedCategory: "HR",
+        category: "HD",
+      }),
+    ).rejects.toMatchObject({ status: 409 });
+    await expect(
+      selectionCommand(pooler, "other-test-cup", {
+        ...change,
+        expectedCategory: "HR",
+      }),
+    ).rejects.toMatchObject({ status: 403 });
+    expect((await candidateComments(tester, slug, candidate.id))[0].body).toBe(
+      "Keep this discussion",
+    );
+    expect((await selectionWorkspace(tester, slug)).candidates).toHaveLength(2);
+    expect(
+      (await db().select().from(mappoolEvents)).filter(
+        (e) => e.action === "candidate_classify",
+      ),
+    ).toHaveLength(1);
+    await expect(
+      selectionCommand(tester, slug, { ...add(), category: "XX" }),
+    ).rejects.toMatchObject({ status: 400 });
+  });
+  it("rejects a batch whose previously known candidate moves during provider lookup without partial writes", async () => {
+    await selectionCommand(pooler, slug, add());
+    const candidate = (await selectionWorkspace(pooler, slug)).candidates[0];
+    let release!: () => void;
+    let entered!: () => void;
+    const started = new Promise<void>((resolve) => {
+      entered = resolve;
+    });
+    const gate = new Promise<void>((resolve) => {
+      release = resolve;
+    });
+    vi.mocked(fetchBeatmaps).mockImplementationOnce(async (ids) => {
+      entered();
+      await gate;
+      return new Map(ids.map((id) => [id, snapshot(id)]));
+    });
+    const batch = selectionCommand(pooler, slug, add([75, 76]));
+    const rejected = expect(batch).rejects.toMatchObject({ status: 409 });
+    await started;
+    await selectionCommand(tester, slug, {
+      action: "classify",
+      candidateId: candidate.id,
+      expectedCategory: "unassigned",
+      category: "HD",
+    });
+    release();
+    await rejected;
+    expect(
+      (await selectionWorkspace(pooler, slug)).candidates.map((c) => [
+        c.beatmapId,
+        c.category,
+      ]),
+    ).toEqual([[75, "HD"]]);
+  });
   it("keeps two authors' comments and safely replays a lost response without duplicating or replacing text", async () => {
     await selectionCommand(pooler, slug, add());
     const id = (await selectionWorkspace(tester, slug)).candidates[0].id;

@@ -147,12 +147,13 @@ function PoolSettings({ change, pool }: { change: Change; pool: Pool }) {
     </ReadOnlyFields>
   );
 }
-function EntryForm({
+export function EntryForm({
   change,
   pool,
   category,
   entry,
   entries = [],
+  candidateBeatmapId,
   onSuccess,
 }: {
   change: Change;
@@ -160,6 +161,7 @@ function EntryForm({
   category: string;
   entry?: Entry;
   entries?: Entry[];
+  candidateBeatmapId?: number;
   onSuccess?: () => void;
 }) {
   const readOnly = useStaffReadOnly();
@@ -173,7 +175,13 @@ function EntryForm({
   useEffect(() => {
     input.current?.focus();
   }, []);
-  const [beatmap, setBeatmap] = useState(entry ? String(entry.beatmapId) : "");
+  const [beatmap, setBeatmap] = useState(
+    entry
+      ? String(entry.beatmapId)
+      : candidateBeatmapId
+        ? String(candidateBeatmapId)
+        : "",
+  );
   const id = parseBeatmapId(beatmap);
   const [preview, setPreview] = useState<BeatmapSnapshot | null>(null);
   const [mod, setMod] = useState(entry?.category ?? category);
@@ -198,6 +206,7 @@ function EntryForm({
           <input
             ref={input}
             value={beatmap}
+            readOnly={candidateBeatmapId !== undefined}
             onChange={(e) => {
               const next = e.target.value;
               if (parseBeatmapId(next) !== id) setPreview(null);

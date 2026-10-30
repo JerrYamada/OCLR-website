@@ -72,7 +72,7 @@
 }
 .mapRow {
   display: grid;
-  grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr) minmax(0, 0.8fr);
+  grid-template-columns: minmax(0, 1fr);
   gap: 1rem;
   align-items: start;
 }
@@ -116,18 +116,19 @@
 .snapshot {
   margin-top: 0.5rem;
 }
-.snapshot summary,
-.discussion summary {
+.snapshot summary {
   cursor: pointer;
 }
 .discussion {
-  margin-top: 0.75rem;
+  min-width: 0;
+  border-inline-start: 1px solid var(--color-border);
+  padding-inline-start: 1.5rem;
 }
 .thread {
   max-width: 50rem;
-  margin-top: 1rem;
+  margin-top: 0.5rem;
   display: grid;
-  gap: 1rem;
+  gap: 0.75rem;
 }
 .thread > button {
   justify-self: start;
@@ -170,5 +171,58 @@
   .thread form button,
   .importer button {
     width: 100%;
+  }
+}
+
+.candidateRow {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  align-items: start;
+  gap: 1.5rem;
+}
+.candidateRow > div {
+  min-width: 0;
+}
+.discussion h3 {
+  margin: 0;
+}
+.comments {
+  max-height: 12rem;
+  overflow-y: auto;
+  scrollbar-width: thin;
+}
+.comments:empty {
+  display: none;
+}
+.thread textarea {
+  resize: vertical;
+  min-height: 5rem;
+}
+.thread button,
+.promotion > button {
+  min-height: 32px;
+  padding: 0.25rem 0.5rem;
+  font-size: 0.875rem;
+}
+.categoryField {
+  margin-top: 0.75rem;
+  max-width: 12rem;
+}
+.promotion {
+  margin-top: 0.75rem;
+}
+.promotionForm {
+  display: grid;
+  gap: 0.75rem;
+  margin-top: 0.75rem;
+}
+@media (max-width: 800px) {
+  .candidateRow {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 1rem;
+  }
+  .discussion {
+    border-inline-start: 0;
+    padding-inline-start: 0;
   }
 }

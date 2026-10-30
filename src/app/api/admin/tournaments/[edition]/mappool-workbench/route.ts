@@ -38,6 +38,7 @@ export async function POST(request: Request, context: Context) {
     const result = preview
       ? await previewCandidates(actor, edition, {
           text: "text" in input ? input.text : null,
+          category: "category" in input ? input.category : undefined,
         })
       : await selectionCommand(actor, edition, input);
     if (!preview)

@@ -3449,6 +3449,14 @@
     "m6d732abae6d3": "This comment request was already used. Reload the comments.",
     "m4c6f3a3d99c7": "This candidate has reached its comment limit.",
     "m6be9db106e64": "Map selection workbench",
-    "mad9785b4473c": "BID"
+    "mad9785b4473c": "BID",
+    "mc080285ccdd8": "Add to official pool",
+    "m9700f7c42bb9": "Candidate added to the official pool.",
+    "m492bd7e91e41": "Target pool",
+    "m19a9bd75a78c": "Choose a pool",
+    "mc5c7c2bb8ce3": "No editable pools. Create a pool in mappool management first.",
+    "m2c3062520291": "This pool is public. Added maps will be visible immediately.",
+    "m2fb863294365": "Candidate category changed. Refresh the list.",
+    "md492453f11de": "This map already exists in that Mod category."
   }
 }
