@@ -97,8 +97,13 @@ function FixtureForm({
     confirmed: true,
   };
   const teamOptions = data.teams.map((t) => (
-    <option value={t.id} key={t.id}>
+    <option
+      value={t.id}
+      key={t.id}
+      disabled={Boolean(fixture?.publishedAt && t.unpublished)}
+    >
       {t.name}
+      {t.unpublished ? ` · ${tr("Unpublished")}` : ""}
     </option>
   ));
   function sourceSelect(side: "home" | "away") {
@@ -207,9 +212,16 @@ function FixtureForm({
             </label>
           </div>
         </fieldset>
-        {(!homeTeamId || !awayTeamId) && (
+        {(!homeTeamId ||
+          !awayTeamId ||
+          data.teams.some(
+            (t) =>
+              t.unpublished && (t.id === homeTeamId || t.id === awayTeamId),
+          )) && (
           <p className="muted small">
-            {tr("Reporting needs two finalized, published teams.")}
+            {tr(
+              "Unpublished teams can be saved in private fixtures for testing. Reporting and publication still require finalized, published teams.",
+            )}
           </p>
         )}
         <ZonedDateInput

@@ -1044,7 +1044,9 @@ export async function fixtureCommand(
         });
         return;
       }
-      const official = await officialTeams(tx, slug);
+      const official = before?.publishedAt
+        ? await officialTeams(tx, slug)
+        : await configurationTeams(tx, slug);
       if (
         (c.homeTeamId !== null && c.homeTeamId === c.awayTeamId) ||
         (c.homeTeamId !== null &&
@@ -1053,7 +1055,7 @@ export async function fixtureCommand(
       )
         throw new HttpError(
           400,
-          "Choose different finalized, published teams from this edition, or leave participants TBD.",
+          "Choose different active teams from this edition, or leave participants TBD. Published fixtures require finalized, published teams.",
         );
       const [round] = await tx
         .select()

@@ -85,7 +85,10 @@ export function StageGroups({
                       )
                     }
                   />
-                  <span>{t.name}</span>
+                  <span>
+                    {t.name}
+                    {t.unpublished ? ` · ${tr("Unpublished")}` : ""}
+                  </span>
                 </label>
               ))}
             </div>

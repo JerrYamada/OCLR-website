@@ -3314,6 +3314,8 @@
     "m8f0f256f7967": "Unassigned teams",
     "m3fd3ce4fc11b": "Group assignments",
     "mc95d38962b1e": "No Group Stage configured yet.",
-    "m08537439fae2": "Choose active teams from this edition. Publish finalized teams and rosters before publishing groups."
+    "m08537439fae2": "Choose active teams from this edition. Publish finalized teams and rosters before publishing groups.",
+    "m55e80cf337a9": "Unpublished teams can be saved in private fixtures for testing. Reporting and publication still require finalized, published teams.",
+    "m338072b79a81": "Choose different active teams from this edition, or leave participants TBD. Published fixtures require finalized, published teams."
   }
 }

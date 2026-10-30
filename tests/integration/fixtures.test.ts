@@ -145,6 +145,82 @@ describe.skipIf(!url)(
         ...(edit ? {} : { refereeIds: [referee.osuId] }),
       };
     }
+    it("saves unpublished team choices privately and retains publication and result gates", async () => {
+      await db()
+        .update(teams)
+        .set({
+          identityPublished: false,
+          rosterPublished: false,
+          finalizedAt: null,
+        })
+        .where(eq(teams.id, homeId));
+      const data = await fixtureCommand(admin, "test-cup", body());
+      const fixture = data.fixtures[0];
+      expect(data.teams.find((t) => t.id === homeId)?.unpublished).toBe(true);
+      expect(
+        (await staffFixtures(admin, "test-cup")).fixtures[0].homeTeamId,
+      ).toBe(homeId);
+      expect(
+        (await staffFixtures(referee, "test-cup")).teams.some(
+          (t) => t.id === homeId,
+        ),
+      ).toBe(false);
+      expect(await publicFixture("test-cup", fixture.id)).toBeNull();
+      await expect(
+        fixtureCommand(admin, "test-cup", {
+          ...confirm,
+          action: "publish",
+          fixtureId: fixture.id,
+          expectedVersion: fixture.version,
+          published: true,
+        }),
+      ).rejects.toMatchObject({ status: 409 });
+      await expect(
+        fixtureForReview(referee, "test-cup", fixture.id),
+      ).rejects.toMatchObject({ status: 409 });
+      const edited = await fixtureCommand(admin, "test-cup", {
+        ...body(true),
+        action: "edit",
+        fixtureId: fixture.id,
+        expectedVersion: fixture.version,
+        label: "Private test edited",
+      });
+      expect(edited.fixtures[0]).toMatchObject({
+        homeTeamId: homeId,
+        publishedAt: null,
+      });
+      await expect(
+        fixtureCommand(admin, "test-cup", { ...body(), awayTeamId: homeId }),
+      ).rejects.toMatchObject({ status: 400 });
+      await expect(
+        fixtureCommand(admin, "test-cup", {
+          ...body(),
+          awayTeamId: randomUUID(),
+        }),
+      ).rejects.toMatchObject({ status: 400 });
+      const stage = data.stages.find((s) => s.kind === "group")!;
+      const groupCommand = {
+        ...confirm,
+        action: "stage_groups",
+        stageId: stage.id,
+        expectedVersion: stage.version,
+        configuration: {
+          groups: [{ name: "Private group", teamIds: [homeId, awayId] }],
+        },
+        published: false,
+      };
+      const grouped = await fixtureCommand(admin, "test-cup", groupCommand);
+      const saved = grouped.stages.find((s) => s.id === stage.id)!;
+      expect(saved.groupsPublishedAt).toBeNull();
+      await expect(
+        fixtureCommand(admin, "test-cup", {
+          ...groupCommand,
+          configuration: saved.groupConfiguration,
+          expectedVersion: saved.version,
+          published: true,
+        }),
+      ).rejects.toMatchObject({ status: 400 });
+    });
     it("creates persistent fixtures separately from results and limits referee reads to assigned fixtures", async () => {
       const data = await fixtureCommand(admin, "test-cup", body());
       const fixture = data.fixtures[0];
