@@ -16,7 +16,9 @@ Use the first-installation procedure below for standard hosts; these are its
 configuration and security prerequisites.
 Install this reviewed source and its locked npm dependencies into
 `/opt/oclr-backup`, owned by root and not writable by either service account.
-Use Node 24, PostgreSQL client tools matching the server, and util-linux flock.
+Use Node >=22.13 (Node 24 LTS is preferred), PostgreSQL client tools matching
+the remote server, and util-linux flock. The installer, service and media helper
+use `/usr/bin/node`; an existing supported Node 22 installation can be retained.
 Install with `npm ci --include=dev`; the separately installed operator uses tsx.
 Provision a private mode-0700 `/var/lib/oclr-backup`, owned by `oclr-backup`.
 Install the example systemd service with a root-owned mode-0600 environment file:
