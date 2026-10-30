@@ -97,12 +97,31 @@ test.describe("referee command workspace", () => {
       page.getByText("IRC not connected", { exact: true }),
     ).toBeVisible();
     const [home, away] = seeded.workspace.teams;
+    const firstBan = page.getByLabel("First Ban team", { exact: true });
+    const firstPick = page.getByLabel("First Pick team", { exact: true });
+    const originalPick = await firstPick.inputValue();
+    await firstBan.selectOption(home.id);
+    await expect(firstPick).toHaveValue(originalPick);
+    await firstPick.selectOption(home.id);
+    await expect(firstBan).toHaveValue(home.id);
+    // Clearing one choice must not clear the independently chosen other order.
+    await firstBan.selectOption("");
+    await expect(firstPick).toHaveValue(home.id);
+    await firstBan.selectOption(home.id);
+    await firstPick.selectOption("");
+    await expect(firstBan).toHaveValue(home.id);
+    await firstPick.selectOption(home.id);
     await page
-      .getByLabel("First Ban team", { exact: true })
-      .selectOption(home.id);
-    await expect(
-      page.getByLabel("First Pick team", { exact: true }),
-    ).toHaveValue(away.id);
+      .getByRole("button", { name: "Apply order", exact: true })
+      .click();
+    await expect
+      .poll(async () => (await read()).session?.firstPickTeamId)
+      .toBe(home.id);
+    await expect(firstBan).toHaveValue(home.id);
+    await expect(firstPick).toHaveValue(home.id);
+    // The other team can still be selected independently before BP starts.
+    await firstPick.selectOption(away.id);
+    await expect(firstBan).toHaveValue(home.id);
     await page
       .getByRole("button", { name: "Apply order", exact: true })
       .click();
@@ -262,6 +281,9 @@ test.describe("referee command workspace", () => {
     await page
       .getByLabel("First Ban team", { exact: true })
       .selectOption(seeded.workspace.teams[0].id);
+    await page
+      .getByLabel("First Pick team", { exact: true })
+      .selectOption(seeded.workspace.teams[1].id);
     await page
       .getByRole("button", { name: "Apply order", exact: true })
       .click();
