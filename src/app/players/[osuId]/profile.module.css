@@ -133,6 +133,17 @@
   margin: 0;
 }
 
+/* On narrow screens the cover sits at its 7rem minimum and the heading would
+   start in the same corner as the absolutely positioned player id pill, which
+   then covers the avatar. Reserve the pill's row above the heading; wider
+   covers are bottom-aligned and already tall enough for the padding to be
+   absorbed without moving the heading. */
+@media (max-width: 48rem) {
+  :global(.profile-cover-content) .heading {
+    padding-block-start: 2rem;
+  }
+}
+
 :global(.profile-cover-content) .headingText h1 {
   color: #fff;
   text-shadow: 0 1px 4px rgb(0 0 0 / 65%);

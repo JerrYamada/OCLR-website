@@ -2516,6 +2516,11 @@ html[data-appearance]
      top corners are rounded here instead. */
   border-radius: var(--radius-panel) var(--radius-panel) 0 0;
   isolation: isolate;
+  /* `isolation` makes this a stacking context, so without a z-index the whole
+     cover — including an open BWS note that reaches down over the rank chart —
+     would paint underneath the later profile body. The cover box itself only
+     overlaps the body through that note. */
+  z-index: 1;
 }
 /* Only the cover artwork itself is stretched over the banner; the overlaid
    heading also contains an avatar <img>, which must keep its own sizing. */
@@ -2846,7 +2851,7 @@ html[data-appearance]
 
 .rank-chart {
   position: relative;
-  min-height: 220px;
+  min-height: 184px;
   touch-action: pan-y;
 }
 .rank-chart-svg {
@@ -2856,7 +2861,7 @@ html[data-appearance]
   overflow: visible;
 }
 .rank-chart-blank {
-  height: 220px;
+  height: 184px;
 }
 .rank-chart-grid {
   stroke: var(--site-border, var(--color-border));
