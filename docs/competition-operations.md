@@ -168,13 +168,35 @@ and publication.
 
 ### Before play
 
-An Admin explicitly configures the round's finite Ban/Pick/TB steps, permitted
+In **Round management → Edit round → Configure round referee policy**, an Admin
+explicitly configures the round's finite Ban/Pick/TB steps, permitted
 categories/entries, repeated-category restrictions, and TB score conditions.
-The first Ban and first Pick remain separate stored fields for historical compatibility.
-The current UI links them: selecting either team chooses its opponent for the other. The preview is unsaved until **Apply order** succeeds.
+This works before a fixture exists. The referee panel reads the same saved policy
+and links back to the selected round instead of hosting the policy editor.
+The first Ban and first Pick are independent; the same team may hold both.
+The preview is unsaved until **Apply order** succeeds.
 Conflicting recorded steps must be withdrawn in reverse order before changing
 an already-used order. Missing teams, rules, pool, policy, or stale dependencies
 are shown as missing configuration, never replaced with assumed tournament rules.
+
+S11 rounds with configured BO11/BO13 scoring offer an editable draft from the
+[published S11 v1.9 rules](https://oclr.org/tournaments/s11#rules): NF,
+60-second Ban, 90-second Pick and 120-second preparation, with the corresponding
+HD/HR/DT/FM/TB command Mods. The organizer confirmed the draft order on 2026-10-30:
+one Ban per team → one Pick per team → a second Ban per team → alternating Picks
+→ TB (5:5 for BO11, 6:6 for BO13). Admins may edit this draft before saving.
+Room size and start countdown remain unset; the per-team disconnect replay
+allowance is not converted into a per-map replay cap. Category Ban limits,
+disconnect adjudication, pauses and EX conditions still require referee review
+under the published rules; the template does not automate these judgments.
+Other seasons and existing saved policies are never replaced by S11 defaults.
+
+Saving uses the edition-scoped `manage_fixtures` capability, same-origin POST,
+expected policy revision and transactional audit. It checks all sessions in the
+round, rejecting changes while any active Ban/Pick remains or approved/pool-locked
+history exists. An identical save is a no-op. Other sessions retain their saved
+basis and require the existing dependency reconfirmation flow. Deleting an otherwise
+empty round removes only its unused policy and retains its policy/deletion audit.
 
 The command assistant supports `!mp make`, `!mp set`, `!mp addref`, `!mp invite`,
 `!mp timer`, `!mp map`, `!mp mods`, `!mp start`, and `!mp abort`.

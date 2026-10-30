@@ -8,35 +8,43 @@ import {
   type RefereeMap,
 } from "@/lib/referee-model";
 import { commandMods, type RefereeCommandPolicy } from "@/lib/referee-commands";
+import { s11RefereeSteps, type RefereeDefaults } from "@/lib/referee-defaults";
 
 export function RefereePolicyEditor({
   policy,
+  defaults,
   maps,
   busy,
   onSave,
 }: {
   policy: RefereePolicy | null;
+  defaults?: RefereeDefaults | null;
   maps: RefereeMap[];
   busy: boolean;
   onSave: (policy: RefereePolicy) => Promise<void>;
 }) {
   const tr = useAppTranslations();
+  const initialPolicy = policy ?? defaults?.policy;
+  const initialCommands = policy ? policy.commands : defaults?.commands;
+  const [placement, setPlacement] = useState(
+    defaults && !policy ? "split" : "",
+  );
   const [steps, setSteps] = useState<RefereePolicy["steps"]>(
-    policy?.steps ?? [],
+    initialPolicy?.steps ?? [],
   );
   const [roomSize, setRoomSize] = useState(
     policy?.commands?.roomSize.toString() ?? "",
   );
-  const [noFail, setNoFail] = useState(policy?.commands?.noFail ?? false);
+  const [noFail, setNoFail] = useState(initialCommands?.noFail ?? false);
   const [durations, setDurations] = useState({
-    banSeconds: policy?.commands?.banSeconds?.toString() ?? "",
-    pickSeconds: policy?.commands?.pickSeconds?.toString() ?? "",
-    prepareSeconds: policy?.commands?.prepareSeconds?.toString() ?? "",
-    startSeconds: policy?.commands?.startSeconds?.toString() ?? "",
+    banSeconds: initialCommands?.banSeconds?.toString() ?? "",
+    pickSeconds: initialCommands?.pickSeconds?.toString() ?? "",
+    prepareSeconds: initialCommands?.prepareSeconds?.toString() ?? "",
+    startSeconds: initialCommands?.startSeconds?.toString() ?? "",
   });
   const [mods, setMods] = useState<Record<string, string>>(
     Object.fromEntries(
-      Object.entries(policy?.commands?.categoryMods ?? {}).map(([k, v]) => [
+      Object.entries(initialCommands?.categoryMods ?? {}).map(([k, v]) => [
         k,
         v.mods.join(" "),
       ]),
@@ -44,7 +52,7 @@ export function RefereePolicyEditor({
   );
   const [free, setFree] = useState<Record<string, boolean>>(
     Object.fromEntries(
-      Object.entries(policy?.commands?.categoryMods ?? {}).map(([k, v]) => [
+      Object.entries(initialCommands?.categoryMods ?? {}).map(([k, v]) => [
         k,
         v.freemod,
       ]),
@@ -54,7 +62,12 @@ export function RefereePolicyEditor({
     policy?.maxReplaysPerMap?.toString() ?? "",
   );
   const [error, setError] = useState("");
-  const categories = Array.from(new Set(maps.map((m) => m.category)));
+  const categories = Array.from(
+    new Set([
+      ...Object.keys(initialCommands?.categoryMods ?? {}),
+      ...maps.map((m) => m.category),
+    ]),
+  );
   function update(
     index: number,
     patch: Partial<RefereePolicy["steps"][number]>,
@@ -110,7 +123,7 @@ export function RefereePolicyEditor({
       <form className="form-stack" onSubmit={submit}>
         <p className="muted">
           {tr(
-            "These settings apply to every fixture in this round. Enter the approved rules; no tournament defaults are assumed.",
+            "These settings apply to every fixture in this round. Changes take effect only after saving; existing referee records remain protected.",
           )}
         </p>
         <fieldset disabled={busy} className="staff-readonly-fields form-stack">
@@ -126,6 +139,34 @@ export function RefereePolicyEditor({
             />
           </label>
           <h3>{tr("Finite Ban / Pick sequence")}</h3>
+          {!policy && defaults && (
+            <label className="field">
+              <span>{tr("Confirm the placement of the second Ban")}</span>
+              <select
+                value={placement}
+                required
+                onChange={(event) => {
+                  setPlacement(event.target.value);
+                  setSteps(
+                    event.target.value
+                      ? s11RefereeSteps(
+                          defaults.wins,
+                          event.target.value as "split" | "opening",
+                        )
+                      : [],
+                  );
+                }}
+              >
+                <option value="">{tr("Not set")}</option>
+                <option value="split">
+                  {tr("Second Ban after each team's first Pick")}
+                </option>
+                <option value="opening">
+                  {tr("Both Bans before any Pick")}
+                </option>
+              </select>
+            </label>
+          )}
           {steps.map((step, index) => (
             <div className="panel form-stack" key={index}>
               <strong>{tr("Step {number}", { number: index + 1 })}</strong>
@@ -299,6 +340,7 @@ export function RefereePolicyEditor({
               type="number"
               min={1}
               max={16}
+              required={Boolean(defaults && !policy)}
               value={roomSize}
               onChange={(e) => setRoomSize(e.target.value)}
             />

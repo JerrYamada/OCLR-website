@@ -3342,6 +3342,17 @@
     "m89c4fca1a599": "At least two teams per group are required before saving.",
     "m98c7524bddd6": "The backup operator has not been configured. Ask the server operator to complete the one-time installation.",
     "m0194f3b8d5b9": "The backup operator rejected the connection. Ask the server operator to check the database target and configuration.",
-    "ma2c201428dc9": "Checking backup service."
+    "ma2c201428dc9": "Checking backup service.",
+    "m32eb8770289d": "These settings apply to every fixture in this round. Changes take effect only after saving; existing referee records remain protected.",
+    "m9534f97fdf7c": "Confirm the placement of the second Ban",
+    "m97e900938aa8": "Second Ban after each team's first Pick",
+    "mddc849ffa229": "Both Bans before any Pick",
+    "m116997f71464": "Each team may Ban these categories at most once",
+    "m114582e17c47": "S11 rule defaults are an editable draft. Confirm the BP order and missing settings, then save to apply them to this round.",
+    "m1ed60443f505": "No referee policy is saved for this round. S11 defaults require configured BO11 or BO13 scoring rules.",
+    "m83580975d497": "S11 rules do not specify room size or the start countdown. The per-team disconnect replay allowance is not a per-map replay limit; leave it unset unless separately approved.",
+    "mc4e370218a67": "Round referee policy saved.",
+    "m2c92dc53ec7f": "Completed-fixture referee policies are protected; create a new round instead.",
+    "mcf07501b30f3": "Review category Ban limits, disconnect replays, pauses and EX conditions against the published rules."
   }
 }
