@@ -173,6 +173,24 @@ export function readApiSpecification() {
       },
     };
   }
+  const streamingPath = "/api/v1/streaming/tournaments/{edition}/next";
+  const shared = paths[
+    "/api/v1/me/tournaments/{edition}/streaming/next"
+  ] as Record<string, Record<string, unknown>>;
+  paths[streamingPath] = Object.fromEntries(
+    Object.entries(shared).map(([method, operation]) => [
+      method,
+      {
+        ...operation,
+        operationId: `streamingNext${method === "get" ? "" : method === "head" ? "Head" : "Preflight"}`,
+        security: method === "options" ? [] : [{ StreamingBearer: [] }],
+        "x-oclr-scopes": ["streaming:read"],
+        "x-oclr-issues": [540],
+        description:
+          "Edition-bound Streamer access to the subject's next assigned published fixture, explicit published pool and stage. Does not require Developer. No other resources or business writes.",
+      },
+    ]),
+  );
   return {
     openapi: "3.1.0",
     info: {
@@ -185,6 +203,11 @@ export function readApiSpecification() {
     paths,
     components: {
       securitySchemes: {
+        StreamingBearer: {
+          type: "http",
+          scheme: "bearer",
+          bearerFormat: "oclr_stream_opaque",
+        },
         DeveloperBearer: {
           type: "http",
           scheme: "bearer",

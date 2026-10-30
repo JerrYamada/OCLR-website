@@ -428,6 +428,13 @@
       "when": 1793287727620,
       "tag": "0060_desktop_irc_relay",
       "breakpoints": true
+    },
+    {
+      "idx": 61,
+      "version": "7",
+      "when": 1793328012376,
+      "tag": "0061_streaming_api_access",
+      "breakpoints": true
     }
   ]
 }

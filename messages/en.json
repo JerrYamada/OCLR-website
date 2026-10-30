@@ -3255,6 +3255,17 @@
     "maba68d704930": "Handbook",
     "mc5f09715dba8": "Scores",
     "md46fbd72dc2e": "Pools",
-    "mc1aade825397": "Chess"
+    "mc1aade825397": "Chess",
+    "m6a798bcba9fb": "Streaming API access",
+    "m2e2debb8935d": "Access stays active while used. It ends after one hour without a successful streaming read, or when this login session ends.",
+    "m2c3ea3d1f321": "Only your next assigned fixture, its published mappool and stage are available.",
+    "m80e95cb74a2e": "Idle access ends {date}",
+    "m2450728619b2": "Streamer access is required for this edition.",
+    "m00017936dcce": "Streaming API access was not found.",
+    "mcbd43b9d7005": "A valid streaming API token is required.",
+    "m147d29e4aafc": "This token is bound to another edition.",
+    "m0210bdbc8a1e": "Streaming API origins are not configured correctly.",
+    "m92c0a29927ec": "Streaming fixture was not found.",
+    "m15cd260127ed": "Choose valid streaming query parameters."
   }
 }

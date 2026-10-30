@@ -1,3 +1,5 @@
+import { remoteMode } from "@/lib/data-source";
+import { hasStreamingAccess } from "@/lib/streaming-api";
 import { ObsSourceLink } from "@/components/obs-source-link";
 import { StreamingManager } from "@/components/streaming-manager";
 import { PageHeading } from "@/components/ui";
@@ -18,7 +20,10 @@ async function Issue271Page({
   return authorizedPage(async () => {
     const { edition } = await params;
     const query = await searchParams;
-    const data = await streamingWorkspace(await requireUser(), edition, {
+    const actor = await requireUser();
+    const canIssue =
+      !remoteMode() && (await hasStreamingAccess(actor.osuId, edition));
+    const data = await streamingWorkspace(actor, edition, {
       date: query.date ?? "",
       round: query.round ?? "",
       view: query.view ?? "all",
@@ -43,6 +48,11 @@ async function Issue271Page({
             {tr("Open broadcast overlay")}
           </Link>
         </nav>
+        {canIssue && (
+          <Link className="button secondary" href={`/streaming/${edition}`}>
+            {tr("Streaming API access")}
+          </Link>
+        )}
         <ObsSourceLink slug={edition} />
         <StreamingManager slug={edition} data={data} />
       </>

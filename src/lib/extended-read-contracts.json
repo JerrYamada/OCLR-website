@@ -796,6 +796,74 @@
         { "type": "string", "const": "FU" }
       ]
     },
+    "Read519857e96882": {
+      "type": "object",
+      "properties": {
+        "pool": {
+          "anyOf": [
+            { "type": "null" },
+            {
+              "type": "object",
+              "properties": {
+                "id": { "type": "string" },
+                "name": { "type": "string" }
+              },
+              "required": ["id", "name"],
+              "additionalProperties": false
+            }
+          ]
+        },
+        "id": { "type": "string" },
+        "label": { "type": "string" },
+        "publishedAt": { "type": "string" },
+        "roundId": { "type": "string" },
+        "roundName": { "type": "string" },
+        "roundPosition": { "type": "number" },
+        "stageId": { "type": "string" },
+        "stage": {
+          "anyOf": [
+            { "type": "string", "const": "group" },
+            { "type": "string", "const": "knockout" }
+          ]
+        },
+        "position": { "type": "number" },
+        "home": { "$ref": "#/$defs/Read5f294e760979" },
+        "away": { "$ref": "#/$defs/Read5f294e760979" },
+        "confirmed": { "type": "boolean" },
+        "scheduledAt": { "anyOf": [{ "type": "null" }, { "type": "string" }] },
+        "timeZone": { "type": "string" },
+        "status": {
+          "anyOf": [
+            { "type": "string", "const": "scheduled" },
+            { "type": "string", "const": "in_progress" },
+            { "type": "string", "const": "cancelled" }
+          ]
+        },
+        "result": { "$ref": "#/$defs/Readbcbbfd10e5db" },
+        "updatedAt": { "type": "string" }
+      },
+      "required": [
+        "pool",
+        "id",
+        "label",
+        "publishedAt",
+        "roundId",
+        "roundName",
+        "roundPosition",
+        "stageId",
+        "stage",
+        "position",
+        "home",
+        "away",
+        "confirmed",
+        "scheduledAt",
+        "timeZone",
+        "status",
+        "result",
+        "updatedAt"
+      ],
+      "additionalProperties": false
+    },
     "Read52a708f849a1": {
       "type": "array",
       "items": { "$ref": "#/$defs/Read850c438bb6f4" }
@@ -836,6 +904,35 @@
         "captainId": { "type": "number" }
       },
       "required": ["members", "id", "name", "captainId"],
+      "additionalProperties": false
+    },
+    "Read5bb0aede2b05": {
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "poolId": { "type": "string" },
+        "category": {
+          "anyOf": [
+            { "type": "string", "const": "TB" },
+            { "type": "string", "const": "NM" },
+            { "type": "string", "const": "HD" },
+            { "type": "string", "const": "DT" },
+            { "type": "string", "const": "HR" },
+            { "type": "string", "const": "FM" }
+          ]
+        },
+        "position": { "type": "number" },
+        "beatmapId": { "type": "number" },
+        "metadata": { "$ref": "#/$defs/Readd627af2fa835" }
+      },
+      "required": [
+        "id",
+        "poolId",
+        "category",
+        "position",
+        "beatmapId",
+        "metadata"
+      ],
       "additionalProperties": false
     },
     "Read5c8b6e1d6293": {
@@ -1763,6 +1860,10 @@
         { "$ref": "#/$defs/Readb8922fa1da53" }
       ]
     },
+    "Reada2861ca718c9": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/Readad29a1ac63f4" }
+    },
     "Reada3168d882b46": {
       "anyOf": [{ "type": "null" }, { "$ref": "#/$defs/Read0bb5ac6c44c2" }]
     },
@@ -1845,6 +1946,56 @@
     "Readab8799e08222": {
       "type": "array",
       "items": { "$ref": "#/$defs/Read2ed1c27fc18f" }
+    },
+    "Readad29a1ac63f4": {
+      "type": "object",
+      "properties": {
+        "entries": { "$ref": "#/$defs/Readf6b173a37994" },
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "roundId": { "type": "string" },
+        "fmMode": {
+          "anyOf": [
+            { "type": "null" },
+            { "type": "string", "const": "free_mod" },
+            { "type": "string", "const": "force_mod" }
+          ]
+        },
+        "fmRestrictions": { "type": "string" },
+        "publishedAt": {
+          "anyOf": [
+            { "type": "null" },
+            { "type": "string", "format": "date-time", "x-oclr-date": true }
+          ]
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "x-oclr-date": true
+        },
+        "roundName": { "type": "string" },
+        "roundPosition": { "type": "number" },
+        "stage": {
+          "anyOf": [
+            { "type": "string", "const": "group" },
+            { "type": "string", "const": "knockout" }
+          ]
+        }
+      },
+      "required": [
+        "entries",
+        "id",
+        "name",
+        "roundId",
+        "fmMode",
+        "fmRestrictions",
+        "publishedAt",
+        "updatedAt",
+        "roundName",
+        "roundPosition",
+        "stage"
+      ],
+      "additionalProperties": false
     },
     "Readad6f298f8fd6": {
       "type": "object",
@@ -3214,6 +3365,10 @@
       ],
       "additionalProperties": false
     },
+    "Readf6b173a37994": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/Read5bb0aede2b05" }
+    },
     "Readf6e920ee30a0": {
       "type": "object",
       "properties": {
@@ -3463,76 +3618,7 @@
           "properties": {
             "fixtures": {
               "type": "array",
-              "items": {
-                "type": "object",
-                "properties": {
-                  "pool": {
-                    "anyOf": [
-                      { "type": "null" },
-                      {
-                        "type": "object",
-                        "properties": {
-                          "id": { "type": "string" },
-                          "name": { "type": "string" }
-                        },
-                        "required": ["id", "name"],
-                        "additionalProperties": false
-                      }
-                    ]
-                  },
-                  "id": { "type": "string" },
-                  "label": { "type": "string" },
-                  "publishedAt": { "type": "string" },
-                  "roundId": { "type": "string" },
-                  "roundName": { "type": "string" },
-                  "roundPosition": { "type": "number" },
-                  "stageId": { "type": "string" },
-                  "stage": {
-                    "anyOf": [
-                      { "type": "string", "const": "group" },
-                      { "type": "string", "const": "knockout" }
-                    ]
-                  },
-                  "position": { "type": "number" },
-                  "home": { "$ref": "#/$defs/Read5f294e760979" },
-                  "away": { "$ref": "#/$defs/Read5f294e760979" },
-                  "confirmed": { "type": "boolean" },
-                  "scheduledAt": {
-                    "anyOf": [{ "type": "null" }, { "type": "string" }]
-                  },
-                  "timeZone": { "type": "string" },
-                  "status": {
-                    "anyOf": [
-                      { "type": "string", "const": "scheduled" },
-                      { "type": "string", "const": "in_progress" },
-                      { "type": "string", "const": "cancelled" }
-                    ]
-                  },
-                  "result": { "$ref": "#/$defs/Readbcbbfd10e5db" },
-                  "updatedAt": { "type": "string" }
-                },
-                "required": [
-                  "pool",
-                  "id",
-                  "label",
-                  "publishedAt",
-                  "roundId",
-                  "roundName",
-                  "roundPosition",
-                  "stageId",
-                  "stage",
-                  "position",
-                  "home",
-                  "away",
-                  "confirmed",
-                  "scheduledAt",
-                  "timeZone",
-                  "status",
-                  "result",
-                  "updatedAt"
-                ],
-                "additionalProperties": false
-              }
+              "items": { "$ref": "#/$defs/Read519857e96882" }
             },
             "groups": {
               "type": "array",
@@ -3755,90 +3841,7 @@
         }
       ]
     },
-    "publicMappools": {
-      "type": "array",
-      "items": {
-        "type": "object",
-        "properties": {
-          "entries": {
-            "type": "array",
-            "items": {
-              "type": "object",
-              "properties": {
-                "id": { "type": "string" },
-                "poolId": { "type": "string" },
-                "category": {
-                  "anyOf": [
-                    { "type": "string", "const": "TB" },
-                    { "type": "string", "const": "NM" },
-                    { "type": "string", "const": "HD" },
-                    { "type": "string", "const": "DT" },
-                    { "type": "string", "const": "HR" },
-                    { "type": "string", "const": "FM" }
-                  ]
-                },
-                "position": { "type": "number" },
-                "beatmapId": { "type": "number" },
-                "metadata": { "$ref": "#/$defs/Readd627af2fa835" }
-              },
-              "required": [
-                "id",
-                "poolId",
-                "category",
-                "position",
-                "beatmapId",
-                "metadata"
-              ],
-              "additionalProperties": false
-            }
-          },
-          "id": { "type": "string" },
-          "name": { "type": "string" },
-          "roundId": { "type": "string" },
-          "fmMode": {
-            "anyOf": [
-              { "type": "null" },
-              { "type": "string", "const": "free_mod" },
-              { "type": "string", "const": "force_mod" }
-            ]
-          },
-          "fmRestrictions": { "type": "string" },
-          "publishedAt": {
-            "anyOf": [
-              { "type": "null" },
-              { "type": "string", "format": "date-time", "x-oclr-date": true }
-            ]
-          },
-          "updatedAt": {
-            "type": "string",
-            "format": "date-time",
-            "x-oclr-date": true
-          },
-          "roundName": { "type": "string" },
-          "roundPosition": { "type": "number" },
-          "stage": {
-            "anyOf": [
-              { "type": "string", "const": "group" },
-              { "type": "string", "const": "knockout" }
-            ]
-          }
-        },
-        "required": [
-          "entries",
-          "id",
-          "name",
-          "roundId",
-          "fmMode",
-          "fmRestrictions",
-          "publishedAt",
-          "updatedAt",
-          "roundName",
-          "roundPosition",
-          "stage"
-        ],
-        "additionalProperties": false
-      }
-    },
+    "publicMappools": { "$ref": "#/$defs/Reada2861ca718c9" },
     "publishedTeams": {
       "type": "array",
       "items": {
@@ -7923,6 +7926,47 @@
         "official",
         "history"
       ],
+      "additionalProperties": false
+    },
+    "nextStreamingRead": {
+      "type": "object",
+      "properties": {
+        "nextFixture": {
+          "anyOf": [{ "type": "null" }, { "$ref": "#/$defs/Read519857e96882" }]
+        },
+        "stage": {
+          "anyOf": [
+            { "type": "null" },
+            {
+              "type": "object",
+              "properties": {
+                "id": { "type": "string" },
+                "kind": {
+                  "anyOf": [
+                    { "type": "string", "const": "group" },
+                    { "type": "string", "const": "knockout" }
+                  ]
+                },
+                "round": {
+                  "type": "object",
+                  "properties": {
+                    "id": { "type": "string" },
+                    "name": { "type": "string" },
+                    "position": { "type": "number" },
+                    "scoringRules": { "$ref": "#/$defs/Read0d1f6c6270e0" }
+                  },
+                  "required": ["id", "name", "position", "scoringRules"],
+                  "additionalProperties": false
+                }
+              },
+              "required": ["id", "kind", "round"],
+              "additionalProperties": false
+            }
+          ]
+        },
+        "mappools": { "$ref": "#/$defs/Reada2861ca718c9" }
+      },
+      "required": ["nextFixture", "stage", "mappools"],
       "additionalProperties": false
     }
   }
