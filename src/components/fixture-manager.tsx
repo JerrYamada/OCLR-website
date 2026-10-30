@@ -1,6 +1,7 @@
 "use client";
 
 import { InfoNote } from "@/components/info-note";
+import { ForceFixtureDelete } from "./force-fixture-delete";
 
 import {
   ReadOnlyFields,
@@ -1134,6 +1135,19 @@ export function FixtureManager({
                       </div>
                     </dl>
                   </ConfirmMutation>
+                  <ForceFixtureDelete
+                    key={editing.id}
+                    slug={slug}
+                    fixtureId={editing.id}
+                    onDeleted={() => {
+                      editor.current?.close();
+                      setEditing(null);
+                      setNotice(tr("Fixture deleted."));
+                      requestAnimationFrame(() =>
+                        createButton.current?.focus(),
+                      );
+                    }}
+                  />
                   {editing.publishedAt && (
                     <p className="muted small">
                       {tr(

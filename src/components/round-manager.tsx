@@ -290,6 +290,7 @@ export function RoundManager({
                         <RoundRefereePolicy
                           key={`${round.id}-${refereeData.refereeRules.find((rule) => rule.roundId === round.id)!.revision}`}
                           slug={slug}
+                          roundVersion={round.version}
                           season={season}
                           rule={refereeData.refereeRules.find(
                             (rule) => rule.roundId === round.id,

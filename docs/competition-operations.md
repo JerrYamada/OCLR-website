@@ -191,6 +191,24 @@ pauses and EX conditions still require referee review
 under the published rules; the template does not automate these judgments.
 Other seasons and existing saved policies are never replaced by S11 defaults.
 
+The round referee form also exposes **Best of (BO)** (#574). BO is the existing
+first-to scoring series (`wins = (BO + 1) / 2`), not a second referee-only value.
+Saving a changed BO and its BP policy is atomic, checks the round version as
+well as the policy revision, and audits a new scoring release. Other scoring
+fields and standings remain unchanged. Configure complete first-to scoring
+first if it is currently missing; fixed-map formats are not silently converted.
+Unmodified S11 draft steps follow the edited BO. Saved/customized steps remain
+editable and must have a compatible Pick count and TB tied-score condition.
+Active recorded selections and completed-fixture history still block changes.
+
+Repeated Ban presets are mutually exclusive: all categories may repeat, only
+NM/FM may repeat, or no category may repeat for the same team. Existing custom
+exceptions remain visible and are preserved until explicitly changed. TB remains
+unbannable in every mode. NM's Mod/Freemod override controls have been removed;
+an explicit form save makes NM clear Mods, while the independent NF setting
+continues to apply. A previously saved NM override is called out before saving;
+existing policy data and referee history are never rewritten merely by reading.
+
 The step editor uses compact rows with one action/order selector, up/down controls
 and optional step limits. Category restrictions use buttons; selecting specific
 maps is an optional searchable checklist. All non-TB maps are eligible for Ban
@@ -276,7 +294,38 @@ If a save's network outcome is unknown, retry the same request before editing.
 If another operator changed state, refresh and review the new state. Changed
 fixture/round/pool/roster dependencies require explicit rechecking; prior steps
 are never silently interpreted using new data. Workspaces with saved history
-cannot be erased by deleting their fixture.
+cannot be erased through ordinary fixture deletion.
+
+### Admin cleanup of unapproved test fixtures (#571)
+
+**Fixtures & results → Edit fixture → Force delete test fixture** is a separate
+Admin-only flow. It first loads a consistent preview of fixture-owned record
+counts, then requires the exact fixture label and a test-data acknowledgement.
+Approved/published result state, any historical result approval or official game
+claim, downstream bracket references and published statistics block this action.
+It does not identify test data by a guessed label: Admin explicitly confirms it.
+
+For an eligible fixture, one transaction archives its execution/source evidence
+and original audit records to the edition audit stream, then removes unapproved
+imports/games/results/revisions, referee sessions/events/reconciliations, website
+IRC bindings/commands, assignments and statistics drafts before the fixture row.
+Shared teams, pools, round policies and desktop credentials remain unchanged.
+An active or published schedule alone does not make an unapproved test result
+official; the explicit force flow may remove it. Ordinary deletion keeps its
+existing restrictions.
+
+The force command shares the referee advisory → edition → fixture lock order,
+rechecks current Admin authority and requires matching fixture/assignment versions
+and the preview fingerprint. New records invalidate confirmation; heartbeat-only
+connection sequence/time updates do not. An exact same-actor retry can confirm
+the deletion tombstone without another audit/write. Stale IRC callbacks cannot
+recreate the deleted fixture. Previously sent IRC commands cannot be recalled.
+
+Both preview and deletion use the existing same-origin POST channel; this is not
+a new Developer saved-read capability. Remote/Developer business writes remain
+denied. The UI cannot undo a force deletion; retained private audit evidence is
+separate from an application restore workflow. No migration or automatic cleanup
+of existing fixtures is performed.
 
 All demonstration policies, identities and games are synthetic. The S9 reference
 sheet does not establish defaults for another edition. First-version Chinese

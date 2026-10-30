@@ -13,15 +13,18 @@ export function RoundRefereePolicy({
   rule,
   maps,
   season,
+  roundVersion,
 }: {
   slug: string;
   rule: RoundRefereeRule;
   maps: RefereeMap[];
   season?: string | null;
+  roundVersion: number;
 }) {
   const tr = useAppTranslations();
   const router = useRouter();
   const [saved, setSaved] = useState(rule);
+  const [savedRoundVersion, setSavedRoundVersion] = useState(roundVersion);
   const [busy, setBusy] = useState(false);
   const [feedback, setFeedback] = useState<{
     error: boolean;
@@ -57,12 +60,13 @@ export function RoundRefereePolicy({
       )}
       <ReadOnlyFields>
         <RefereePolicyEditor
-          key={saved.revision}
+          key={`${saved.revision}-${savedRoundVersion}`}
           policy={saved.policy}
           defaults={defaults}
           maps={maps}
+          series={saved.series}
           busy={busy}
-          onSave={async (policy) => {
+          onSave={async (policy, bestOf) => {
             setBusy(true);
             setFeedback(null);
             try {
@@ -74,6 +78,14 @@ export function RoundRefereePolicy({
                   body: JSON.stringify({
                     expectedRevision: saved.revision,
                     policy,
+                    ...(bestOf === undefined
+                      ? {}
+                      : {
+                          seriesChange: {
+                            bestOf,
+                            expectedRoundVersion: savedRoundVersion,
+                          },
+                        }),
                   }),
                 },
               );
@@ -86,7 +98,10 @@ export function RoundRefereePolicy({
                 ...saved,
                 revision: body.revision,
                 policy: body.policy,
+                series: body.series === undefined ? saved.series : body.series,
               });
+              if (body.roundVersion !== undefined)
+                setSavedRoundVersion(body.roundVersion);
               setFeedback({
                 error: false,
                 message: tr("Round referee policy saved."),
@@ -107,6 +122,14 @@ export function RoundRefereePolicy({
           }}
         />
       </ReadOnlyFields>
+      {saved.series?.type !== "first_to" && (
+        <a
+          className="button secondary"
+          href={`/admin/tournaments/${slug}/matches`}
+        >
+          {tr("Configure scoring rules")}
+        </a>
+      )}
       {feedback && (
         <p role={feedback.error ? "alert" : "status"}>{feedback.message}</p>
       )}

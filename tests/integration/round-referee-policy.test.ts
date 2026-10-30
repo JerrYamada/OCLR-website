@@ -12,6 +12,7 @@ import { eq, sql } from "drizzle-orm";
 import { db, closeDb } from "../../src/db";
 import {
   fixtures,
+  editionEvents,
   mappoolEvents,
   mappools,
   refereeSessions,
@@ -31,6 +32,7 @@ import {
   syntheticRefereePolicy as policy,
 } from "../fixtures/referee";
 import { assertTestDatabase } from "../database";
+import { s11RefereeSteps } from "../../src/lib/referee-defaults";
 const url = process.env.TEST_DATABASE_URL;
 describe.skipIf(!url)("round referee policies independent of fixtures", () => {
   let w: RefereeWorkspace;
@@ -101,6 +103,98 @@ describe.skipIf(!url)("round referee policies independent of fixtures", () => {
       .from(mappoolEvents)
       .where(eq(mappoolEvents.action, "round_referee_policy"));
     expect(audits).toHaveLength(1);
+  });
+  it("atomically saves BO with BP, scoring release, round version and audit", async () => {
+    const existingAudit = await db()
+      .select({ id: editionEvents.id })
+      .from(editionEvents)
+      .where(eq(editionEvents.kind, "competition_round_rules"));
+    const [before] = await db()
+      .select()
+      .from(tournamentRounds)
+      .where(eq(tournamentRounds.id, w.round.id));
+    const nextPolicy = { ...policy, steps: s11RefereeSteps(3, "split") };
+    const saved = await saveRoundRefereePolicy(admin, "test-cup", w.round.id, {
+      expectedRevision: 0,
+      policy: nextPolicy,
+      seriesChange: { bestOf: 5, expectedRoundVersion: before.version },
+    });
+    expect(saved).toMatchObject({
+      revision: 1,
+      series: { type: "first_to", wins: 3 },
+      roundVersion: before.version + 1,
+    });
+    const [after] = await db()
+      .select()
+      .from(tournamentRounds)
+      .where(eq(tournamentRounds.id, w.round.id));
+    expect(after.scoringRules).toMatchObject({
+      ...before.scoringRules,
+      version: expect.any(String),
+      series: { type: "first_to", wins: 3 },
+    });
+    expect(after.scoringRules?.version).not.toBe(before.scoringRules?.version);
+    expect(
+      (await refereeWorkspace(referee, "test-cup", w.fixture.id)).series,
+    ).toEqual({ type: "first_to", wins: 3 });
+    const addedAudit = (
+      await db()
+        .select()
+        .from(editionEvents)
+        .where(eq(editionEvents.kind, "competition_round_rules"))
+    ).filter(
+      (event) => !existingAudit.some((previous) => previous.id === event.id),
+    );
+    expect(addedAudit).toHaveLength(1);
+    expect(addedAudit[0].detail).toMatchObject({
+      entity: { type: "tournament_round", id: w.round.id },
+      before: { version: before.version },
+      after: {
+        version: before.version + 1,
+        scoringRules: { series: { type: "first_to", wins: 3 } },
+      },
+    });
+    await expect(
+      saveRoundRefereePolicy(admin, "test-cup", w.round.id, {
+        expectedRevision: 1,
+        policy: nextPolicy,
+        seriesChange: { bestOf: 7, expectedRoundVersion: before.version },
+      }),
+    ).rejects.toMatchObject({ status: 409 });
+  });
+  it("rejects mismatched TB, even BO and missing scoring without partially changing the round", async () => {
+    const [before] = await db()
+      .select()
+      .from(tournamentRounds)
+      .where(eq(tournamentRounds.id, w.round.id));
+    for (const bestOf of [4, 5]) {
+      await expect(
+        saveRoundRefereePolicy(admin, "test-cup", w.round.id, {
+          expectedRevision: 0,
+          policy,
+          seriesChange: { bestOf, expectedRoundVersion: before.version },
+        }),
+      ).rejects.toMatchObject({ status: 400 });
+    }
+    expect(
+      (
+        await db()
+          .select()
+          .from(tournamentRounds)
+          .where(eq(tournamentRounds.id, w.round.id))
+      )[0],
+    ).toEqual(before);
+    await db()
+      .update(tournamentRounds)
+      .set({ scoringRules: null })
+      .where(eq(tournamentRounds.id, w.round.id));
+    await expect(
+      saveRoundRefereePolicy(admin, "test-cup", w.round.id, {
+        expectedRevision: 0,
+        policy,
+        seriesChange: { bestOf: 5, expectedRoundVersion: before.version },
+      }),
+    ).rejects.toMatchObject({ status: 400 });
   });
   it("persists repeat Ban controls and rejects TB as a repeat exception", async () => {
     await save(0, {

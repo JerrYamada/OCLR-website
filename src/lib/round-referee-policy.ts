@@ -1,6 +1,7 @@
 import { db } from "@/db";
 import {
   editionState,
+  editionEvents,
   fixtures,
   mappoolEntries,
   mappoolEvents,
@@ -14,6 +15,7 @@ import {
 import { and, eq, inArray, isNotNull, sql } from "drizzle-orm";
 import { z } from "zod";
 import { isDeepStrictEqual } from "node:util";
+import { randomUUID } from "node:crypto";
 import { assertOperationalEdition } from "./archive-guard";
 import type { User } from "./auth/sessions";
 import { assertCapability } from "./auth/staff";
@@ -39,6 +41,18 @@ export const roundRefereePolicyCommandSchema = z
   .object({
     expectedRevision: z.number().int().nonnegative(),
     policy: refereePolicySchema,
+    seriesChange: z
+      .object({
+        bestOf: z
+          .number()
+          .int()
+          .min(1)
+          .max(197)
+          .refine((value) => value % 2 === 1),
+        expectedRoundVersion: z.number().int().nonnegative(),
+      })
+      .strict()
+      .optional(),
   })
   .strict();
 
@@ -50,6 +64,9 @@ export async function persistRoundRefereePolicy(
   roundId: string,
   expectedRevision: number,
   policy: RefereePolicy,
+  seriesChange?: z.infer<
+    typeof roundRefereePolicyCommandSchema
+  >["seriesChange"],
 ) {
   await assertCapability(actor, "manage_fixtures", slug, tx);
   await assertOperationalEdition(slug, tx);
@@ -64,6 +81,31 @@ export async function persistRoundRefereePolicy(
     )
     .for("update");
   if (!round) throw new HttpError(404, "Round not found.");
+  if (seriesChange && round.version !== seriesChange.expectedRoundVersion)
+    throw new HttpError(
+      409,
+      "Round configuration changed. Refresh before continuing.",
+    );
+  if (seriesChange && round.scoringRules?.series.type !== "first_to")
+    throw new HttpError(
+      400,
+      "Configure first-to scoring in Fixtures & results before setting BO here. Fixed-map series are not BO matches.",
+    );
+  const seriesChanged = Boolean(
+    seriesChange &&
+    round.scoringRules?.series.type === "first_to" &&
+    round.scoringRules.series.wins !== (seriesChange.bestOf + 1) / 2,
+  );
+  const scoringRules = seriesChanged
+    ? {
+        ...round.scoringRules!,
+        version: `release-${randomUUID()}`,
+        series: {
+          type: "first_to" as const,
+          wins: (seriesChange!.bestOf + 1) / 2,
+        },
+      }
+    : round.scoringRules;
   const [before] = await tx
     .select()
     .from(refereeRoundPolicies)
@@ -73,7 +115,7 @@ export async function persistRoundRefereePolicy(
       409,
       "The round referee policy changed. Refresh before saving.",
     );
-  if (before && isDeepStrictEqual(before.policy, policy))
+  if (before && isDeepStrictEqual(before.policy, policy) && !seriesChanged)
     return before.revision;
   const pools = await tx
     .select()
@@ -138,8 +180,8 @@ export async function persistRoundRefereePolicy(
     if (
       policy.steps.slice(0, tb).filter((step) => step.kind === "pick").length <
         tiedAt * 2 ||
-      (round.scoringRules?.series.type === "first_to" &&
-        tiedAt !== round.scoringRules.series.wins - 1)
+      (scoringRules?.series.type === "first_to" &&
+        tiedAt !== scoringRules.series.wins - 1)
     )
       throw new HttpError(
         400,
@@ -171,6 +213,26 @@ export async function persistRoundRefereePolicy(
       );
   }
   const revision = expectedRevision + 1;
+  if (seriesChanged) {
+    const [updated] = await tx
+      .update(tournamentRounds)
+      .set({
+        scoringRules,
+        version: round.version + 1,
+      })
+      .where(eq(tournamentRounds.id, roundId))
+      .returning();
+    await tx.insert(editionEvents).values({
+      editionSlug: slug,
+      actorId: actor.osuId,
+      kind: "competition_round_rules",
+      detail: {
+        entity: { type: "tournament_round", id: roundId },
+        before: round,
+        after: updated,
+      },
+    });
+  }
   await tx
     .insert(refereeRoundPolicies)
     .values({
@@ -221,7 +283,20 @@ export async function saveRoundRefereePolicy(
       roundId,
       command.data.expectedRevision,
       command.data.policy,
+      command.data.seriesChange,
     );
-    return { revision, policy: command.data.policy };
+    const [round] = await tx
+      .select({
+        series: tournamentRounds.scoringRules,
+        version: tournamentRounds.version,
+      })
+      .from(tournamentRounds)
+      .where(eq(tournamentRounds.id, roundId));
+    return {
+      revision,
+      policy: command.data.policy,
+      series: round.series?.series ?? null,
+      roundVersion: round.version,
+    };
   });
 }
