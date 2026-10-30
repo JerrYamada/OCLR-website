@@ -69,6 +69,8 @@ describe.skipIf(!url)("Admin backup PostgreSQL round trip", () => {
       OCLR_OPERATOR_RELEASE_FILE: join(root, "release"),
       OCLR_OPERATOR_RUNTIME_ROLE: decodeURIComponent(new URL(url!).username),
       APP_URL: "https://synthetic-operator.test",
+      OCLR_BIND_HOST: "127.0.0.1",
+      PORT: String(port),
       OCLR_OPERATOR_HEALTH_URL: `http://127.0.0.1:${port}/api/health`,
       OCLR_MEDIA_DIR: join(root, "media"),
       ADMIN_OSU_IDS: "999001",
