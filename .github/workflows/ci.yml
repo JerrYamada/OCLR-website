@@ -63,14 +63,14 @@ jobs:
         with:
           node-version: 24
           cache: npm
-      - name: Install PostgreSQL 17 backup clients
+      - name: Install PostgreSQL 17 backup clients and ACL tools
         run: |
           sudo install -d /usr/share/postgresql-common/pgdg
           sudo curl --fail --silent --show-error -o /usr/share/postgresql-common/pgdg/oclr.asc https://www.postgresql.org/media/keys/ACCC4CF8.asc
           . /etc/os-release
           printf 'deb [signed-by=/usr/share/postgresql-common/pgdg/oclr.asc] https://apt.postgresql.org/pub/repos/apt %s-pgdg main\n' "$VERSION_CODENAME" | sudo tee /etc/apt/sources.list.d/oclr-pgdg.list
           sudo apt-get update
-          sudo apt-get install --yes --no-install-recommends postgresql-client-17
+          sudo apt-get install --yes --no-install-recommends postgresql-client-17 acl
           echo /usr/lib/postgresql/17/bin >> "$GITHUB_PATH"
       - name: Verify backup client versions
         run: |

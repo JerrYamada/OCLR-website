@@ -11,6 +11,7 @@ case "$3" in
   --dry-run)
     printf '%s\n' 'Create a separate oclr-backup account, private data/key/config paths and root-owned operator release.' \
       'Install locked npm dependencies as the unprivileged backup account; install the systemd unit and narrow sudoers.' \
+      'Grant the backup account only directory traversal and read access to the current release marker.' \
       'Preserve existing keys/configuration. Do not start the service, load secrets, connect to a database or restart the website.' \
       'After private configuration, an operator explicitly enables the backup service and configures the website socket.'
     exit 0 ;;
@@ -21,6 +22,7 @@ esac
 source_dir=$(cd -- "${BASH_SOURCE[0]%/*}/.." && pwd -P)
 [[ "$source_dir" != /opt/oclr && "$source_dir" != /opt/oclr/* && "$source_dir" != /opt/oclr-backup && "$source_dir" != /opt/oclr-backup/* ]] || fail 'Use a separate installer checkout, never the runtime/operator installation.'
 for command in git tar npm node flock runuser install useradd getent systemctl visudo; do command -v "$command" >/dev/null || fail "Missing required tool: $command"; done
+command -v setfacl >/dev/null || fail 'Missing required tool: setfacl (Rocky: sudo dnf install acl).'
 [[ -f /etc/os-release ]] || fail 'Rocky Linux 10 is required.'
 . /etc/os-release
 [[ ${ID-} == rocky && ${VERSION_ID-} == 10* ]] || fail 'This installer supports Rocky Linux 10 only.'
@@ -33,7 +35,7 @@ installer=${SUDO_USER:-root}
 git_read() { runuser -u "$installer" -- git -c core.fsmonitor=false -C "$source_dir" "$@" 9>&-; }
 [[ -z $(git_read status --porcelain) ]] || fail 'Use a clean reviewed installer checkout.'
 git_read merge-base --is-ancestor "$sha" origin/main || fail 'The reviewed SHA is not on the fetched canonical main.'
-for required_file in operator/worker.ts operator/operator.env.example operator/media-fingerprint.mjs operator/systemd/oclr-backup.service; do git_read cat-file -e "$sha:$required_file" || fail 'The selected release lacks the operator installation contract.'; done
+for required_file in operator/worker.ts operator/operator.env.example operator/media-fingerprint.mjs operator/systemd/oclr-backup.service scripts/backup-release-access.sh; do git_read cat-file -e "$sha:$required_file" || fail 'The selected release lacks the operator installation contract.'; done
 /bin/bash "$source_dir/scripts/check-node-version.sh" /usr/bin/node || fail 'Use Node.js >=22.13 (Node.js 24 is preferred); /usr/bin/node must satisfy this requirement.'
 # PGDG client packages are often outside systemd's default PATH.
 client_dir=${OCLR_PG_BIN-}
@@ -100,6 +102,7 @@ find "$release/node_modules" -xdev -type f ! -perm /111 -exec chmod 0644 {} +
 rm -rf -- "$stage"
 stage=''
 ln -s -- "$release" /opt/oclr-backup/current
+runuser -u oclr -- /bin/bash "$release/scripts/backup-release-access.sh" /opt/oclr "$(readlink -f -- /opt/oclr/current)" 9>&-
 [[ -f "$release/operator/systemd/oclr-backup.service" && -f "$release/operator/operator.env.example" ]] || fail 'The selected release lacks the operator installation contract.'
 if [[ ! -e /etc/oclr-backup/package.key ]]; then
   [[ ! -L /etc/oclr-backup/package.key ]] || fail 'The key cannot be a symlink.'
