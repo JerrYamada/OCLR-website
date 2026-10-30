@@ -60,3 +60,17 @@ history) await CI with PostgreSQL. Full database-backed E2E was not run.
 CI, new Chinese wording review and organizer acceptance are recorded separately
 on #560. No deployment, production mutation, new credential or issue closure is
 claimed by this document.
+
+## First core CI and follow-up
+
+The [first core run](https://github.com/OCLR-dev/OCLR-website/actions/runs/41026320985)
+on `c11b182b` completed with failures: 1,789 unit/integration tests passed and one
+streaming test still asserted the previous `1.5.0` header. All six new round-policy
+database tests passed. Build, remote smoke and E2E shard 2 passed. E2E shard 1
+failed because the existing referee test read its event baseline before the
+second independent order save completed.
+
+The follow-up uses the shared contract-version constant and waits for both saved
+order values before checking that preparing an IRC command appends no events.
+These corrections do not change application behavior. Replacement CI results
+remain separate from this failed run; a merge does not establish acceptance.

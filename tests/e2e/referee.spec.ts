@@ -128,6 +128,9 @@ test.describe("referee command workspace", () => {
     await expect
       .poll(async () => (await read()).session?.firstBanTeamId)
       .toBe(home.id);
+    await expect
+      .poll(async () => (await read()).session?.firstPickTeamId)
+      .toBe(away.id);
     const beforePrepare = (await read()).events.length;
     await page
       .locator("#referee-preparation button[data-copied]:not([disabled])")
