@@ -1,7 +1,27 @@
 import Image from "next/image";
 import Link from "next/link";
 import { getAppTranslations } from "@/i18n/server";
-import { wikiArticles, wikiHref, type WikiArticle } from "@/lib/wiki-articles";
+import {
+  wikiArticles,
+  wikiHref,
+  type WikiArticle,
+  type WikiText,
+} from "@/lib/wiki-articles";
+
+function WikiTextContent({ text }: { text: WikiText }) {
+  return typeof text === "string"
+    ? text
+    : text.map((part, j) =>
+        typeof part === "string" ? (
+          part
+        ) : (
+          <a key={j} href={part.href} target="_blank" rel="noreferrer">
+            {part.label}
+          </a>
+        ),
+      );
+}
+
 export async function WikiDocument({ article }: { article: WikiArticle }) {
   const tr = await getAppTranslations();
   return (
@@ -34,22 +54,7 @@ export async function WikiDocument({ article }: { article: WikiArticle }) {
               <h2>{section.title}</h2>
               {section.paragraphs?.map((paragraph, i) => (
                 <p key={i}>
-                  {typeof paragraph === "string"
-                    ? paragraph
-                    : paragraph.map((part, j) =>
-                        typeof part === "string" ? (
-                          part
-                        ) : (
-                          <a
-                            key={j}
-                            href={part.href}
-                            target="_blank"
-                            rel="noreferrer"
-                          >
-                            {part.label}
-                          </a>
-                        ),
-                      )}
+                  <WikiTextContent text={paragraph} />
                 </p>
               ))}
               {section.figures?.map((figure) => (
@@ -95,7 +100,16 @@ export async function WikiDocument({ article }: { article: WikiArticle }) {
                       {section.table.rows.map((row, i) => (
                         <tr key={i}>
                           {row.map((cell, j) => (
-                            <td key={j}>{cell}</td>
+                            <td
+                              key={j}
+                              className={
+                                typeof cell === "string"
+                                  ? undefined
+                                  : "wiki-links"
+                              }
+                            >
+                              <WikiTextContent text={cell} />
+                            </td>
                           ))}
                         </tr>
                       ))}
