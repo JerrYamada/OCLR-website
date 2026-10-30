@@ -1456,3 +1456,57 @@ export {
   desktopTokens,
   desktopSecurityEvents,
 } from "./desktop-auth-schema";
+
+// Private candidate selection, independent of official pool publication/locks.
+export const mappoolCandidates = pgTable(
+  "mappool_candidates",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    editionSlug: text("edition_slug")
+      .notNull()
+      .references(() => editionState.slug),
+    beatmapId: bigint("beatmap_id", { mode: "number" }).notNull(),
+    metadata: jsonb("metadata")
+      .$type<import("../lib/mappool-model").BeatmapMetadata>()
+      .notNull(),
+    metadataFetchedAt: timestamp("metadata_fetched_at", {
+      withTimezone: true,
+    }).notNull(),
+    authorId: bigint("author_id", { mode: "number" }).notNull(),
+    authorName: text("author_name").notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (t) => [
+    unique("candidate_edition_bid_unique").on(t.editionSlug, t.beatmapId),
+    unique("candidate_id_edition_unique").on(t.id, t.editionSlug),
+  ],
+);
+export const mappoolCandidateComments = pgTable(
+  "mappool_candidate_comments",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    candidateId: uuid("candidate_id").notNull(),
+    editionSlug: text("edition_slug").notNull(),
+    requestId: uuid("request_id").notNull(),
+    authorId: bigint("author_id", { mode: "number" }).notNull(),
+    authorName: text("author_name").notNull(),
+    body: text("body").notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (t) => [
+    foreignKey({
+      columns: [t.candidateId, t.editionSlug],
+      foreignColumns: [mappoolCandidates.id, mappoolCandidates.editionSlug],
+    }),
+    unique("candidate_comment_request_unique").on(
+      t.candidateId,
+      t.authorId,
+      t.requestId,
+    ),
+    index("candidate_comment_target_idx").on(t.candidateId, t.createdAt),
+  ],
+);

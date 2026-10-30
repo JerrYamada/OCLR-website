@@ -22,6 +22,81 @@
       "type": "array",
       "items": { "$ref": "#/$defs/Readed79fffe39ce" }
     },
+    "Read04063581a56c": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "anyOf": [
+            { "type": "null", "x-oclr-undefined": true },
+            { "type": "string" }
+          ]
+        },
+        "setId": { "type": "number" },
+        "title": { "type": "string" },
+        "artist": { "type": "string" },
+        "difficulty": { "type": "string" },
+        "mapper": { "type": "string" },
+        "stars": { "type": "number" },
+        "bpm": { "type": "number" },
+        "duration": { "type": "number" },
+        "checksum": {
+          "anyOf": [
+            { "type": "null", "x-oclr-undefined": true },
+            { "type": "null" },
+            { "type": "string" }
+          ]
+        },
+        "mode": {
+          "anyOf": [
+            { "type": "null", "x-oclr-undefined": true },
+            { "type": "string", "const": "osu" },
+            { "type": "string", "const": "taiko" },
+            { "type": "string", "const": "fruits" },
+            { "type": "string", "const": "mania" }
+          ]
+        },
+        "ar": {
+          "anyOf": [
+            { "type": "null", "x-oclr-undefined": true },
+            { "type": "null" },
+            { "type": "number" }
+          ]
+        },
+        "od": {
+          "anyOf": [
+            { "type": "null", "x-oclr-undefined": true },
+            { "type": "null" },
+            { "type": "number" }
+          ]
+        },
+        "cs": {
+          "anyOf": [
+            { "type": "null", "x-oclr-undefined": true },
+            { "type": "null" },
+            { "type": "number" }
+          ]
+        },
+        "hp": {
+          "anyOf": [
+            { "type": "null", "x-oclr-undefined": true },
+            { "type": "null" },
+            { "type": "number" }
+          ]
+        },
+        "attributes": { "$ref": "#/$defs/Read46c7787f31bd" }
+      },
+      "required": [
+        "setId",
+        "title",
+        "artist",
+        "difficulty",
+        "mapper",
+        "stars",
+        "bpm",
+        "duration"
+      ],
+      "additionalProperties": false
+    },
     "Read04122c65226e": {
       "type": "array",
       "items": { "$ref": "#/$defs/Readd988f71c5ebc" }
@@ -426,8 +501,41 @@
         { "$ref": "#/$defs/Read99e202cb645f" }
       ]
     },
+    "Read32168f36e009": {
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "poolId": { "type": "string" },
+        "category": {
+          "anyOf": [
+            { "type": "string", "const": "TB" },
+            { "type": "string", "const": "NM" },
+            { "type": "string", "const": "HD" },
+            { "type": "string", "const": "DT" },
+            { "type": "string", "const": "HR" },
+            { "type": "string", "const": "FM" }
+          ]
+        },
+        "position": { "type": "number" },
+        "beatmapId": { "type": "number" },
+        "metadata": { "$ref": "#/$defs/Read04063581a56c" }
+      },
+      "required": [
+        "id",
+        "poolId",
+        "category",
+        "position",
+        "beatmapId",
+        "metadata"
+      ],
+      "additionalProperties": false
+    },
     "Read3335ccc07221": {
       "anyOf": [{ "type": "null" }, { "$ref": "#/$defs/Read5c8b6e1d6293" }]
+    },
+    "Read345dcae8b5f2": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/Read32168f36e009" }
     },
     "Read378164167572": {
       "type": "object",
@@ -1023,6 +1131,56 @@
       "type": "array",
       "items": { "$ref": "#/$defs/Read6b1892d15a0a" }
     },
+    "Read59eea1be11e7": {
+      "type": "object",
+      "properties": {
+        "entries": { "$ref": "#/$defs/Read345dcae8b5f2" },
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "roundId": { "type": "string" },
+        "fmMode": {
+          "anyOf": [
+            { "type": "null" },
+            { "type": "string", "const": "free_mod" },
+            { "type": "string", "const": "force_mod" }
+          ]
+        },
+        "fmRestrictions": { "type": "string" },
+        "publishedAt": {
+          "anyOf": [
+            { "type": "null" },
+            { "type": "string", "format": "date-time", "x-oclr-date": true }
+          ]
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "x-oclr-date": true
+        },
+        "roundName": { "type": "string" },
+        "roundPosition": { "type": "number" },
+        "stage": {
+          "anyOf": [
+            { "type": "string", "const": "group" },
+            { "type": "string", "const": "knockout" }
+          ]
+        }
+      },
+      "required": [
+        "entries",
+        "id",
+        "name",
+        "roundId",
+        "fmMode",
+        "fmRestrictions",
+        "publishedAt",
+        "updatedAt",
+        "roundName",
+        "roundPosition",
+        "stage"
+      ],
+      "additionalProperties": false
+    },
     "Read5b37d3f31d52": {
       "type": "object",
       "properties": {
@@ -1043,35 +1201,6 @@
         "captainId": { "type": "number" }
       },
       "required": ["members", "id", "name", "captainId"],
-      "additionalProperties": false
-    },
-    "Read5bb0aede2b05": {
-      "type": "object",
-      "properties": {
-        "id": { "type": "string" },
-        "poolId": { "type": "string" },
-        "category": {
-          "anyOf": [
-            { "type": "string", "const": "TB" },
-            { "type": "string", "const": "NM" },
-            { "type": "string", "const": "HD" },
-            { "type": "string", "const": "DT" },
-            { "type": "string", "const": "HR" },
-            { "type": "string", "const": "FM" }
-          ]
-        },
-        "position": { "type": "number" },
-        "beatmapId": { "type": "number" },
-        "metadata": { "$ref": "#/$defs/Readd627af2fa835" }
-      },
-      "required": [
-        "id",
-        "poolId",
-        "category",
-        "position",
-        "beatmapId",
-        "metadata"
-      ],
       "additionalProperties": false
     },
     "Read5c8b6e1d6293": {
@@ -1973,10 +2102,6 @@
         { "$ref": "#/$defs/Readb8922fa1da53" }
       ]
     },
-    "Reada2861ca718c9": {
-      "type": "array",
-      "items": { "$ref": "#/$defs/Readad29a1ac63f4" }
-    },
     "Reada3168d882b46": {
       "anyOf": [{ "type": "null" }, { "$ref": "#/$defs/Read0bb5ac6c44c2" }]
     },
@@ -2075,56 +2200,6 @@
     "Readab8799e08222": {
       "type": "array",
       "items": { "$ref": "#/$defs/Read2ed1c27fc18f" }
-    },
-    "Readad29a1ac63f4": {
-      "type": "object",
-      "properties": {
-        "entries": { "$ref": "#/$defs/Readf6b173a37994" },
-        "id": { "type": "string" },
-        "name": { "type": "string" },
-        "roundId": { "type": "string" },
-        "fmMode": {
-          "anyOf": [
-            { "type": "null" },
-            { "type": "string", "const": "free_mod" },
-            { "type": "string", "const": "force_mod" }
-          ]
-        },
-        "fmRestrictions": { "type": "string" },
-        "publishedAt": {
-          "anyOf": [
-            { "type": "null" },
-            { "type": "string", "format": "date-time", "x-oclr-date": true }
-          ]
-        },
-        "updatedAt": {
-          "type": "string",
-          "format": "date-time",
-          "x-oclr-date": true
-        },
-        "roundName": { "type": "string" },
-        "roundPosition": { "type": "number" },
-        "stage": {
-          "anyOf": [
-            { "type": "string", "const": "group" },
-            { "type": "string", "const": "knockout" }
-          ]
-        }
-      },
-      "required": [
-        "entries",
-        "id",
-        "name",
-        "roundId",
-        "fmMode",
-        "fmRestrictions",
-        "publishedAt",
-        "updatedAt",
-        "roundName",
-        "roundPosition",
-        "stage"
-      ],
-      "additionalProperties": false
     },
     "Readad6f298f8fd6": {
       "type": "object",
@@ -2853,75 +2928,6 @@
       "type": "array",
       "items": { "$ref": "#/$defs/Read049ed38679be" }
     },
-    "Readd627af2fa835": {
-      "type": "object",
-      "properties": {
-        "setId": { "type": "number" },
-        "title": { "type": "string" },
-        "artist": { "type": "string" },
-        "difficulty": { "type": "string" },
-        "mapper": { "type": "string" },
-        "stars": { "type": "number" },
-        "bpm": { "type": "number" },
-        "duration": { "type": "number" },
-        "checksum": {
-          "anyOf": [
-            { "type": "null", "x-oclr-undefined": true },
-            { "type": "null" },
-            { "type": "string" }
-          ]
-        },
-        "mode": {
-          "anyOf": [
-            { "type": "null", "x-oclr-undefined": true },
-            { "type": "string", "const": "osu" },
-            { "type": "string", "const": "taiko" },
-            { "type": "string", "const": "fruits" },
-            { "type": "string", "const": "mania" }
-          ]
-        },
-        "ar": {
-          "anyOf": [
-            { "type": "null", "x-oclr-undefined": true },
-            { "type": "null" },
-            { "type": "number" }
-          ]
-        },
-        "od": {
-          "anyOf": [
-            { "type": "null", "x-oclr-undefined": true },
-            { "type": "null" },
-            { "type": "number" }
-          ]
-        },
-        "cs": {
-          "anyOf": [
-            { "type": "null", "x-oclr-undefined": true },
-            { "type": "null" },
-            { "type": "number" }
-          ]
-        },
-        "hp": {
-          "anyOf": [
-            { "type": "null", "x-oclr-undefined": true },
-            { "type": "null" },
-            { "type": "number" }
-          ]
-        },
-        "attributes": { "$ref": "#/$defs/Read46c7787f31bd" }
-      },
-      "required": [
-        "setId",
-        "title",
-        "artist",
-        "difficulty",
-        "mapper",
-        "stars",
-        "bpm",
-        "duration"
-      ],
-      "additionalProperties": false
-    },
     "Readd7be8940066d": {
       "anyOf": [
         { "type": "null", "x-oclr-undefined": true },
@@ -3431,10 +3437,6 @@
       ],
       "additionalProperties": false
     },
-    "Readf6b173a37994": {
-      "type": "array",
-      "items": { "$ref": "#/$defs/Read5bb0aede2b05" }
-    },
     "Readf6e920ee30a0": {
       "type": "object",
       "properties": {
@@ -3633,6 +3635,10 @@
         "standingsRules"
       ],
       "additionalProperties": false
+    },
+    "Readfe79813fec5d": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/Read59eea1be11e7" }
     }
   },
   "resources": {
@@ -3907,7 +3913,7 @@
         }
       ]
     },
-    "publicMappools": { "$ref": "#/$defs/Reada2861ca718c9" },
+    "publicMappools": { "$ref": "#/$defs/Readfe79813fec5d" },
     "publishedTeams": {
       "type": "array",
       "items": {
@@ -5067,7 +5073,7 @@
               },
               "position": { "type": "number" },
               "beatmapId": { "type": "number" },
-              "metadata": { "$ref": "#/$defs/Readd627af2fa835" },
+              "metadata": { "$ref": "#/$defs/Read04063581a56c" },
               "metadataFetchedAt": {
                 "type": "string",
                 "format": "date-time",
@@ -7477,7 +7483,7 @@
                 ]
               },
               "position": { "type": "number" },
-              "metadata": { "$ref": "#/$defs/Readd627af2fa835" }
+              "metadata": { "$ref": "#/$defs/Read04063581a56c" }
             },
             "required": ["id", "beatmapId", "category", "position", "metadata"],
             "additionalProperties": false
@@ -8072,10 +8078,77 @@
             }
           ]
         },
-        "mappools": { "$ref": "#/$defs/Reada2861ca718c9" }
+        "mappools": { "$ref": "#/$defs/Readfe79813fec5d" }
       },
       "required": ["nextFixture", "stage", "mappools"],
       "additionalProperties": false
+    },
+    "selectionWorkspace": {
+      "type": "object",
+      "properties": {
+        "candidates": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": { "type": "string" },
+              "beatmapId": { "type": "number" },
+              "metadata": { "$ref": "#/$defs/Read04063581a56c" },
+              "metadataFetchedAt": {
+                "type": "string",
+                "format": "date-time",
+                "x-oclr-date": true
+              },
+              "authorId": { "type": "number" },
+              "authorName": { "type": "string" },
+              "createdAt": {
+                "type": "string",
+                "format": "date-time",
+                "x-oclr-date": true
+              },
+              "commentCount": { "type": "number" }
+            },
+            "required": [
+              "id",
+              "beatmapId",
+              "metadata",
+              "metadataFetchedAt",
+              "authorId",
+              "authorName",
+              "createdAt",
+              "commentCount"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "asOf": {
+          "type": "string",
+          "format": "date-time",
+          "x-oclr-date": true
+        },
+        "archived": { "type": "boolean" }
+      },
+      "required": ["candidates", "asOf", "archived"],
+      "additionalProperties": false
+    },
+    "candidateComments": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "authorId": { "type": "number" },
+          "authorName": { "type": "string" },
+          "body": { "type": "string" },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "x-oclr-date": true
+          }
+        },
+        "required": ["id", "authorId", "authorName", "body", "createdAt"],
+        "additionalProperties": false
+      }
     }
   }
 }

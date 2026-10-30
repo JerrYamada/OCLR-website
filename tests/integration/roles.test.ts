@@ -91,7 +91,12 @@ describe.skipIf(!url)("persistent role authorization", () => {
     await changeStaffRole(admin, grant("referee"));
     for (const c of capabilities)
       expect(await hasCapability(operator, c, edition.slug)).toBe(
-        ["manage_mappools", "view_replays", "record_results"].includes(c),
+        [
+          "manage_mappools",
+          "select_mappools",
+          "view_replays",
+          "record_results",
+        ].includes(c),
       );
     expect(await hasCapability(operator, "record_results")).toBe(false);
   });

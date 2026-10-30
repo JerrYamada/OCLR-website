@@ -547,5 +547,25 @@
     "query": ["afterFixtureId"],
     "scope": "identity:read",
     "issues": [540]
+  },
+  {
+    "module": "mappool-workbench",
+    "fn": "selectionWorkspace",
+    "id": "selectionWorkspace",
+    "path": "/staff/tournaments/{edition}/mappool-workbench",
+    "args": ["actor", "slug"],
+    "public": false,
+    "query": [],
+    "scope": "tournaments:private:read"
+  },
+  {
+    "module": "mappool-workbench",
+    "fn": "candidateComments",
+    "id": "candidateComments",
+    "path": "/staff/tournaments/{edition}/mappool-workbench/{id}/comments",
+    "args": ["actor", "slug", "id"],
+    "public": false,
+    "query": [],
+    "scope": "tournaments:private:read"
   }
 ]

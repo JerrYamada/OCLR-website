@@ -13,6 +13,8 @@ import {
   userProfileCache,
   teams,
   mappoolReplays,
+  mappoolCandidates,
+  mappoolCandidateComments,
   mappoolEntries,
   historicalStatistics,
   playerMessages,
@@ -145,6 +147,27 @@ export async function seedRemoteSite(base = 2711000) {
     .select()
     .from(mappoolEntries)
     .where(eq(mappoolEntries.poolId, site.poolId!));
+  const [candidate] = await db()
+    .insert(mappoolCandidates)
+    .values({
+      editionSlug: "test-cup",
+      beatmapId: entry.beatmapId,
+      metadata: entry.metadata,
+      metadataFetchedAt: new Date(),
+      authorId: base,
+      authorName: "Synthetic pooler",
+    })
+    .returning();
+  await db()
+    .insert(mappoolCandidateComments)
+    .values({
+      editionSlug: "test-cup",
+      candidateId: candidate.id,
+      requestId: randomUUID(),
+      authorId: base,
+      authorName: "Synthetic tester",
+      body: "Synthetic private test feedback",
+    });
   const bytes = syntheticReplay(),
     replayId = randomUUID(),
     entryId = entry.id;
@@ -176,6 +199,7 @@ export async function seedRemoteSite(base = 2711000) {
     replayId,
     entryId,
     replayBytes: bytes,
+    candidateId: candidate.id,
   };
 }
 export async function remoteBusinessState(includeCredentialState = false) {
