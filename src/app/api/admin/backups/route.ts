@@ -1,4 +1,8 @@
-import { backupActor, operatorRequest } from "@/lib/admin-backups";
+import {
+  backupActor,
+  operatorRequest,
+  BackupServiceError,
+} from "@/lib/admin-backups";
 import { apiError, HttpError, requireSameOrigin } from "@/lib/http";
 export const runtime = "nodejs";
 const headers = {
@@ -26,6 +30,11 @@ export async function GET(request: Request) {
       },
     });
   } catch (error) {
+    if (error instanceof BackupServiceError)
+      return Response.json(
+        { error: error.message, code: error.code },
+        { status: error.status, headers },
+      );
     return apiError(error);
   }
 }
@@ -69,6 +78,11 @@ export async function POST(request: Request) {
       headers: { ...headers, "Content-Type": "application/json" },
     });
   } catch (error) {
+    if (error instanceof BackupServiceError)
+      return Response.json(
+        { error: error.message, code: error.code },
+        { status: error.status, headers },
+      );
     return apiError(error);
   }
 }

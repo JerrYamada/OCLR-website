@@ -17,6 +17,11 @@ export async function backupActor() {
     throw new HttpError(403, "You do not have permission for this operation.");
   return actor;
 }
+export class BackupServiceError extends HttpError {
+  constructor(public code: "not_configured" | "unreachable" | "rejected") {
+    super(503, "Backup service is unavailable.");
+  }
+}
 export async function operatorRequest(
   path: string,
   method: string,
@@ -25,12 +30,12 @@ export async function operatorRequest(
 ) {
   const socketPath = process.env.OCLR_OPERATOR_SOCKET;
   if (!socketPath?.startsWith("/"))
-    throw new HttpError(503, "Backup service is unavailable.");
+    throw new BackupServiceError("not_configured");
   let identity: string;
   try {
     identity = databaseIdentity(process.env.DATABASE_URL || "");
   } catch {
-    throw new HttpError(503, "Backup service is unavailable.");
+    throw new BackupServiceError("not_configured");
   }
   return new Promise<Buffer>((resolve, reject) => {
     const req = request(
@@ -58,18 +63,19 @@ export async function operatorRequest(
           res.statusCode && res.statusCode < 300
             ? resolve(Buffer.concat(chunks))
             : reject(
-                new HttpError(409, "Backup request could not be completed."),
+                method === "GET" && path === "/jobs"
+                  ? new BackupServiceError("rejected")
+                  : new HttpError(
+                      409,
+                      "Backup request could not be completed.",
+                    ),
               ),
         );
-        res.on("error", () =>
-          reject(new HttpError(503, "Backup service is unavailable.")),
-        );
+        res.on("error", () => reject(new BackupServiceError("unreachable")));
       },
     );
     req.setTimeout(30000, () => req.destroy());
-    req.on("error", () =>
-      reject(new HttpError(503, "Backup service is unavailable.")),
-    );
+    req.on("error", () => reject(new BackupServiceError("unreachable")));
     req.end(body);
   });
 }

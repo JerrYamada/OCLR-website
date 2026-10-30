@@ -5899,3 +5899,22 @@ button.staff-role-save {
 .team-management-card > .public-team-heading {
   margin: 0;
 }
+
+/* Keep the short backup action independent of the two-line upload field. */
+.backup-actions {
+  align-items: flex-end;
+}
+.backup-actions > .button {
+  flex: 0 0 auto;
+  align-self: flex-end;
+}
+.backup-actions > label {
+  flex: 1 1 18rem;
+  min-width: 0;
+  max-width: 36rem;
+}
+.backup-actions input[type="file"] {
+  max-width: 100%;
+  width: 100%;
+  min-width: 0;
+}
