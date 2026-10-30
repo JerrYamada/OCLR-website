@@ -37,3 +37,59 @@ Files stay private even when the pool is published. There is no public replay AP
 See [historical metadata supplements](archive-map-metadata.md) for the #335 root
 cause, official snapshot provenance, field precedence and current/base-value
 disclosure. This read-only display enrichment does not rewrite archive imports.
+
+## Private map selection workbench (#572)
+
+Open **Competition → Map selection workbench** at
+`/admin/tournaments/[edition]/mappool-workbench`. Admin, Mappooler (Pooler),
+Tester and Replayer grants have the edition-scoped `select_mappools` capability.
+Tester/Replayer can add candidates and comment without gaining `manage_mappools`.
+Staff credits alone do not grant access; revoked or other-edition grants fail on
+the next request. Developer can read saved data and cannot write through this
+capability; existing additional write roles retain only their authorized scope.
+
+The first version uses one candidate list per edition, independent of official
+round/slot assignments. Paste 1–50 BIDs or supported official difficulty URLs,
+one per line. Preview marks invalid, duplicate and lookup-failed rows; select
+valid rows and confirm addition. Unselected/failed input remains available for
+correction. Duplicate BIDs within the edition are skipped without overwriting
+metadata or discussion. The edition supports up to 500 candidates. Saved metadata
+is revalidated against the preview fingerprint; changed/failed lookups reject
+the whole selected batch. Successful retries skip already saved candidates even
+when the provider is unavailable. Candidate additions and their audit events
+commit together under the edition lock.
+
+Each row shows the official saved base parameters, mode/status where available,
+BID link, adder and time. Metadata is not a live lookup, and snapshots older than
+24 hours are identified. Unknown fields stay unknown. Comments load on demand,
+are append-only in this version, and preserve author identity/name and UTC time.
+Each candidate accepts up to 200 comments of 2,000 characters. A per-submission
+request UUID makes retries idempotent for the same author/candidate; reusing it
+with different text fails. Concurrent comments append rather than overwriting.
+There is no candidate removal, comment editing/deletion, or automatic transfer
+to a formal pool in this version. Existing formal import/approval remains the
+separate authorized operation.
+
+Candidate metadata, comments and authors remain private even after an edition
+or official pool is published. The browser-session API is
+`/api/admin/tournaments/{edition}/mappool-workbench`: GET saved candidates; POST
+`preview` (text), `add` (selected BID/fingerprint pairs), or `comment`
+(candidate UUID, request UUID and body). GET `/{candidateId}/comments` loads a
+thread. POST requires same-origin and fresh write authorization; no Bearer
+business writes are accepted. Reads never query osu! or mutate official pools.
+Historical archives are readable but cannot receive new candidates/comments.
+Formal pool selection/completed-fixture locks and Replay deadlines are unchanged.
+
+Saved-read contract **1.8.0** adds `selectionWorkspace` and `candidateComments`
+under `/api/v1/staff/tournaments/{edition}/mappool-workbench[/{id}/comments]`.
+Both require the private tournament read scope plus existing server read
+permission (or explicit Developer read access). The remote frontend supports
+these saved views through the same adapter, with preview/add/comment disabled;
+it grants no remote business-write transport. Older backends need the additive
+contract and migration `0062_mappool_workbench` to serve this workspace.
+
+Migration adds only private candidate/comment tables and their constraints;
+it does not change official pools or grant real staff roles. Apply through the
+normal reviewed migration/deployment process. New Chinese interface wording and
+actual organizer workflow acceptance remain review items distinct from local
+synthetic verification.

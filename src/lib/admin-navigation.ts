@@ -108,6 +108,11 @@ export const tournamentNavigation: readonly {
         capabilities: ["approve_results"],
       },
       {
+        path: "mappool-workbench",
+        label: "Map selection workbench",
+        capabilities: ["select_mappools"],
+      },
+      {
         path: "mappools",
         label: "Mappools",
         capabilities: ["manage_mappools", "view_replays"],

@@ -59,6 +59,7 @@ export function parseBeatmapId(input: string): number | null {
   return Number.isSafeInteger(id) && id > 0 ? id : null;
 }
 export type BeatmapMetadata = {
+  status?: string;
   setId: number;
   title: string;
   artist: string;

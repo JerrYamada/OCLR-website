@@ -48,14 +48,12 @@ describe.skipIf(!url)("full-site saved-only read services", () => {
     );
     vi.stubEnv("OCLR_ANNOUNCEMENTS_FILE", join(media, "news.json"));
     fixture = await seedRemoteSite();
-    await db()
-      .insert(staffRoles)
-      .values({
-        userId: fixture.owner,
-        role: "streamer",
-        editionSlug: "test-cup",
-        grantedBy: fixture.admin,
-      });
+    await db().insert(staffRoles).values({
+      userId: fixture.owner,
+      role: "streamer",
+      editionSlug: "test-cup",
+      grantedBy: fixture.admin,
+    });
     const session = await readSessionContext(
       (await createSession(fixture.owner)).token,
     );
@@ -96,11 +94,14 @@ describe.skipIf(!url)("full-site saved-only read services", () => {
         )
       )
         edition = "remote-draft";
-      const id = ["applicationDetails", "staffBws"].includes(resource.id)
-        ? fixture.registrationId
-        : resource.id === "replayList"
-          ? fixture.entryId
-          : fixture.fixtureId;
+      const id =
+        resource.id === "candidateComments"
+          ? fixture.candidateId
+          : ["applicationDetails", "staffBws"].includes(resource.id)
+            ? fixture.registrationId
+            : resource.id === "replayList"
+              ? fixture.entryId
+              : fixture.fixtureId;
       const path = resource.path
         .replace("{edition}", edition)
         .replace("{id}", id)

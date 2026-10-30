@@ -47,6 +47,7 @@ const componentOps: Record<string, string[]> = {
   RegistrationList: ["listApplications", "listStaffTournaments", "staffAccess"],
   EventPlayers: ["publicPlayerMessages"],
   PlayerMessageBoard: ["publicPlayerMessages"],
+  SelectionWorkbench: ["selectionWorkspace", "candidateComments"],
   MappoolEditor: ["replayList", "downloadReplay"],
   BroadcastDraft: ["publicBroadcastDraft"],
   LiveDraft: ["publicDraft", "captainDraft"],
@@ -129,6 +130,7 @@ const rows = files.map((file) => {
     "staff-draft": ["staffDraft"],
     "streaming-manager": ["streamingWorkspace"],
     "statistics-manager": ["statisticsWorkspace"],
+    "mappool-workbench": ["selectionWorkspace", "candidateComments"],
     "mappool-replays": ["replayList", "downloadReplay"],
     "player-message-board": ["publicPlayerMessages"],
     "bws-review": ["staffBws"],
@@ -240,11 +242,13 @@ const rows = files.map((file) => {
           : operations.size
             ? "shared service wrapper → fixed v1 resource"
             : "no database; repository content/navigation/preferences",
-    media: file.includes("/mappool")
-      ? "Replay list/file authorization"
-      : /team|bracket|schedule|matches/.test(file)
-        ? "Published/protected avatar routes"
-        : "Existing public assets",
+    media: file.includes("/mappool-workbench")
+      ? "Public beatmap cover assets; private candidates and comments"
+      : file.includes("/mappool")
+        ? "Replay list/file authorization"
+        : /team|bracket|schedule|matches/.test(file)
+          ? "Published/protected avatar routes"
+          : "Existing public assets",
     requiredVerification: backendOnly
       ? "Backend contract/CORS and local frontend 403 without database/provider access"
       : kind === "client"

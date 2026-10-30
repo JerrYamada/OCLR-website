@@ -173,7 +173,7 @@ describe.skipIf(!url)(
         ).toBe(false);
         expect(
           (await tournamentForAdmin(developer, "test-cup")).links,
-        ).toHaveLength(12);
+        ).toHaveLength(13);
         expect((await listApplications(developer, {})).total).toBeGreaterThan(
           0,
         );

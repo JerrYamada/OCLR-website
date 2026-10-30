@@ -214,6 +214,7 @@ test("renders the complete saved-read page and GET matrix without a frontend dat
       .replace("[poolId]", fixture.poolId!)
       .replace("[teamId]", fixture.home.teamId)
       .replace("[entryId]", fixture.entryId)
+      .replace("[candidateId]", fixture.candidateId)
       .replace("[replayId]", fixture.replayId)
       .replace("[osuId]", String(fixture.owner))
       .replace("[id]", fixture.registrationId);
