@@ -29,6 +29,10 @@ describe.skipIf(!url)("Admin backup PostgreSQL round trip", () => {
     await admin.query('CREATE DATABASE "' + isolatedName + '"');
     const isolatedUrl = new URL(url!);
     isolatedUrl.pathname = "/" + isolatedName;
+    // The synthetic CI PostgreSQL service has no TLS configuration. The operator
+    // intentionally requires an explicit mode; retain any caller-supplied mode.
+    if (!isolatedUrl.searchParams.has("sslmode"))
+      isolatedUrl.searchParams.set("sslmode", "disable");
     const databaseUrl = isolatedUrl.toString();
     const migrationClient = new Client({ connectionString: databaseUrl });
     await migrationClient.connect();
