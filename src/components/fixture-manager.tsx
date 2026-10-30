@@ -97,8 +97,13 @@ function FixtureForm({
     confirmed: true,
   };
   const teamOptions = data.teams.map((t) => (
-    <option value={t.id} key={t.id}>
+    <option
+      value={t.id}
+      key={t.id}
+      disabled={Boolean(fixture?.publishedAt && t.unpublished)}
+    >
       {t.name}
+      {t.unpublished ? ` · ${tr("Unpublished")}` : ""}
     </option>
   ));
   function sourceSelect(side: "home" | "away") {
@@ -186,7 +191,7 @@ function FixtureForm({
           <legend>{tr("Teams")}</legend>
           <div className="form-grid">
             <label className="field">
-              <span>{tr("Home team")}</span>
+              <span>{tr("Red Team")}</span>
               <select
                 value={homeTeamId}
                 onChange={(e) => setHome(e.target.value)}
@@ -196,7 +201,7 @@ function FixtureForm({
               </select>
             </label>
             <label className="field">
-              <span>{tr("Away team")}</span>
+              <span>{tr("Blue Team")}</span>
               <select
                 value={awayTeamId}
                 onChange={(e) => setAway(e.target.value)}
@@ -207,9 +212,16 @@ function FixtureForm({
             </label>
           </div>
         </fieldset>
-        {(!homeTeamId || !awayTeamId) && (
+        {(!homeTeamId ||
+          !awayTeamId ||
+          data.teams.some(
+            (t) =>
+              t.unpublished && (t.id === homeTeamId || t.id === awayTeamId),
+          )) && (
           <p className="muted small">
-            {tr("Reporting needs two finalized, published teams.")}
+            {tr(
+              "Unpublished teams can be saved in private fixtures for testing. Reporting and publication still require finalized, published teams.",
+            )}
           </p>
         )}
         <ZonedDateInput
@@ -651,127 +663,6 @@ function RoundRules({ slug, entry }: { slug: string; entry: Round }) {
     </ReadOnlyFields>
   );
 }
-function StageGroups({
-  slug,
-  data,
-  stage,
-}: {
-  slug: string;
-  data: FixtureWorkspace;
-  stage: FixtureWorkspace["stages"][number];
-}) {
-  const tr = useAppTranslations();
-
-  const [groups, setGroups] = useState<
-    { key?: string; name: string; teamIds: string[] }[]
-  >(stage.groupConfiguration?.groups ?? []);
-  const [published, setPublished] = useState(Boolean(stage.groupsPublishedAt));
-  return (
-    <ReadOnlyFields>
-      <section className="settings-card form-stack">
-        <h3>{tr("Approved Group Stage assignments")}</h3>
-        <InfoNote>
-          <p className="muted">
-            {tr(
-              "Configure the actual groups and team membership. Unpublished assignments never appear in standings. Each team may belong to one group in this stage.",
-            )}
-          </p>
-        </InfoNote>
-        {groups.map((group, index) => (
-          <fieldset key={index}>
-            <legend>
-              {tr("Group ")}
-              {index + 1}
-            </legend>
-            <label className="field">
-              <span>
-                {tr("Group name ")}
-                {index + 1}
-              </span>
-              <input
-                value={group.name}
-                maxLength={80}
-                onChange={(e) =>
-                  setGroups((old) =>
-                    old.map((g, i) =>
-                      i === index ? { ...g, name: e.target.value } : g,
-                    ),
-                  )
-                }
-              />
-            </label>
-            {data.teams.map((t) => (
-              <label className="checkbox-row" key={t.id}>
-                <input
-                  type="checkbox"
-                  checked={group.teamIds.includes(t.id)}
-                  onChange={(e) =>
-                    setGroups((old) =>
-                      old.map((g, i) =>
-                        i === index
-                          ? {
-                              ...g,
-                              teamIds: e.target.checked
-                                ? [...g.teamIds, t.id]
-                                : g.teamIds.filter((id) => id !== t.id),
-                            }
-                          : g,
-                      ),
-                    )
-                  }
-                />
-                <span>{t.name}</span>
-              </label>
-            ))}
-            <button
-              type="button"
-              className="secondary"
-              onClick={() =>
-                setGroups((old) => old.filter((_, i) => i !== index))
-              }
-            >
-              {tr("Remove group ")}
-              {index + 1}
-            </button>
-          </fieldset>
-        ))}
-        <button
-          type="button"
-          className="secondary"
-          onClick={() =>
-            setGroups((old) => [...old, { name: "", teamIds: [] }])
-          }
-        >
-          {tr("Add group")}
-        </button>
-        <label className="checkbox-row">
-          <input
-            type="checkbox"
-            checked={published}
-            onChange={(e) => setPublished(e.target.checked)}
-          />
-          <span>{tr("Publish approved group assignments")}</span>
-        </label>
-        <ConfirmMutation
-          label={tr("Save group assignments")}
-          title={tr("Save approved Group Stage configuration?")}
-          description={tr(
-            "This updates the group membership used by public standings when published. Scores remain governed by reviewed results and the configured round ranking rules.",
-          )}
-          url={`/api/admin/tournaments/${slug}/matches`}
-          payload={{
-            action: "stage_groups",
-            stageId: stage.id,
-            expectedVersion: stage.version,
-            configuration: groups.length ? { groups } : null,
-            published,
-            confirmed: true,
-          }}
-        />
-      </section>
-    </ReadOnlyFields>
-  );
-}
 export function FixtureManager({
   slug,
   data,
@@ -1062,16 +953,12 @@ export function FixtureManager({
           >
             <h2>{tr("Competition configuration")}</h2>
             <div className="form-stack">
-              {data.stages
-                .filter((s) => s.kind === "group")
-                .map((s) => (
-                  <StaffReadOnlyContext
-                    key={`${s.id}-${s.version}`}
-                    value={readOnly || !data.canManage}
-                  >
-                    <StageGroups stage={s} slug={slug} data={data} />
-                  </StaffReadOnlyContext>
-                ))}
+              <Link
+                className="text-link"
+                href={`/admin/tournaments/${slug}/teams#groups`}
+              >
+                {tr("Configure groups in team management")}
+              </Link>
               {data.rounds.map((r) => (
                 <section className="settings-card form-stack" key={r.round.id}>
                   <h3>

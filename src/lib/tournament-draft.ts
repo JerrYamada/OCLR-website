@@ -8,6 +8,7 @@ export function isBlankTournamentDraft(e: Edition | EditionConfiguration) {
     "season",
     "timeZone",
     "branding",
+    "coachesEnabled",
     "defaultAppearance",
     "archive",
     "published",
@@ -22,6 +23,7 @@ export function isBlankTournamentDraft(e: Edition | EditionConfiguration) {
   ]);
   return (
     Object.keys(e).every((key) => fields.has(key)) &&
+    e.coachesEnabled !== true &&
     !e.published &&
     e.status === "upcoming" &&
     e.summary === "" &&

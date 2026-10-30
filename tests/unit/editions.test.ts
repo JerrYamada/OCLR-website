@@ -164,3 +164,11 @@ describe("edition configuration", () => {
     }
   });
 });
+
+import { coachingEnabled } from "../../src/lib/editions";
+it("defaults S11 coaching off, retains legacy editions and respects explicit settings", () => {
+  expect(coachingEnabled({ slug: "s11" })).toBe(false);
+  expect(coachingEnabled({ slug: "s10" })).toBe(true);
+  expect(coachingEnabled({ slug: "s11", coachesEnabled: true })).toBe(true);
+  expect(coachingEnabled({ slug: "s10", coachesEnabled: false })).toBe(false);
+});

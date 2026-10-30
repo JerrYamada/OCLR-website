@@ -22,6 +22,7 @@ export function TeamCoachManager({
   const [id, setId] = useState(""),
     [requestPending, setPending] = useState(false),
     [error, setError] = useState("");
+  const [notice, setNotice] = useState("");
   const pending = requestPending || refreshing;
   const [activeCoach, setActiveCoach] = useState<number | "add" | null>(null);
   async function save(action: "add_coach" | "remove_coach", userId: number) {
@@ -29,6 +30,7 @@ export function TeamCoachManager({
     setActiveCoach(action === "add_coach" ? "add" : userId);
     setPending(true);
     setError("");
+    setNotice("");
     try {
       const response = await fetch(`/api/admin/tournaments/${slug}/teams`, {
         method: "POST",
@@ -45,6 +47,9 @@ export function TeamCoachManager({
         refresh();
         throw new Error(result.error);
       }
+      setNotice(
+        action === "add_coach" ? tr("Coach added.") : tr("Coach removed."),
+      );
       setId("");
       refresh();
     } catch (e) {
@@ -61,7 +66,10 @@ export function TeamCoachManager({
   }
   return (
     <ReadOnlyFields>
-      <section className="form-stack spaced" aria-label={tr("Coaches")}>
+      <section
+        className="form-stack team-coach-manager"
+        aria-label={tr("Coaches")}
+      >
         {pending && <LoadingRegion />}
         <h3>{tr("Coaches")}</h3>
         <p className="small muted">
@@ -69,25 +77,29 @@ export function TeamCoachManager({
             "Coaches do not occupy player slots or receive staff permissions. Coach identities follow roster publication; changes to a published roster are public immediately.",
           )}
         </p>
-        <ul className="public-roster-grid">
-          {coaches.map((c) => (
-            <li className="panel form-stack" key={c.osuId}>
-              <PublicPlayerIdentity {...c} />
-              <span className="badge">{tr("Coach")}</span>
-              <button
-                type="button"
-                className="secondary"
-                disabled={pending}
-                aria-busy={pending && activeCoach === c.osuId}
-                aria-label={tr("Remove coach {name}", { name: c.username })}
-                onClick={() => void save("remove_coach", c.osuId)}
-              >
-                {tr("Remove coach")}
-              </button>
-            </li>
-          ))}
-        </ul>
-        <form className="form-stack" onSubmit={submit}>
+        {coaches.length > 0 && (
+          <ul className="public-roster-grid">
+            {coaches.map((c) => (
+              <li className="panel form-stack" key={c.osuId}>
+                <PublicPlayerIdentity {...c} />
+                <span className="badge">{tr("Coach")}</span>
+                <button
+                  type="button"
+                  className="secondary"
+                  disabled={pending}
+                  aria-busy={pending && activeCoach === c.osuId}
+                  aria-label={tr("Remove coach {name}", { name: c.username })}
+                  onClick={() => void save("remove_coach", c.osuId)}
+                >
+                  {pending && activeCoach === c.osuId
+                    ? tr("Removing…")
+                    : tr("Remove coach")}
+                </button>
+              </li>
+            ))}
+          </ul>
+        )}
+        <form className="team-coach-form" onSubmit={submit}>
           <label className="field">
             <span>{tr("Coach osu! ID")}</span>
             <input
@@ -108,10 +120,17 @@ export function TeamCoachManager({
               aria-busy={pending && activeCoach === "add"}
               type="submit"
             >
-              {tr("Add coach")}
+              {pending && activeCoach === "add"
+                ? tr("Adding…")
+                : tr("Add coach")}
             </button>
           </div>
         </form>
+        {notice && (
+          <p className="notice small" role="status">
+            {notice}
+          </p>
+        )}
         {error && (
           <p className="notice error-text" role="alert">
             {tr(error)}

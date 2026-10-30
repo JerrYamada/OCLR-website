@@ -3301,6 +3301,23 @@
     "m085dded9e477": "Backup file is too large.",
     "m661ff40a07e0": "Queued",
     "mf4ccae29e1bb": "Running",
-    "meeab9cd4421b": "Validated"
+    "meeab9cd4421b": "Validated",
+    "m3bdae4099c10": "Red Team",
+    "m11a866af58ff": "Blue Team",
+    "md4b09919ec92": "Removing…",
+    "mc6de6f45c827": "Adding…",
+    "m92baf2e59cda": "Team coaches",
+    "md50259d5d842": "Enable coaches for this tournament",
+    "m3bee15cd381a": "Disabling coaching hides and locks coach configuration. Existing assignments and their publication remain unchanged.",
+    "m455c7323cf40": "Coaching is disabled for this tournament.",
+    "maf8cc63f3e88": "Configure groups in team management",
+    "m8f0f256f7967": "Unassigned teams",
+    "m3fd3ce4fc11b": "Group assignments",
+    "mc95d38962b1e": "No Group Stage configured yet.",
+    "m08537439fae2": "Choose active teams from this edition. Publish finalized teams and rosters before publishing groups.",
+    "m55e80cf337a9": "Unpublished teams can be saved in private fixtures for testing. Reporting and publication still require finalized, published teams.",
+    "m338072b79a81": "Choose different active teams from this edition, or leave participants TBD. Published fixtures require finalized, published teams.",
+    "m476c81cad5e9": "Coach added.",
+    "m19aed18780d3": "Coach removed."
   }
 }

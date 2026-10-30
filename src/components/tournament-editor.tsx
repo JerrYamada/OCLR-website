@@ -1,4 +1,5 @@
 "use client";
+import { coachingEnabled } from "@/lib/editions";
 
 import { InfoNote } from "@/components/info-note";
 
@@ -362,6 +363,9 @@ function General({ data, saved }: EditorProps) {
     branding: data.edition.branding,
   });
   const [status, setStatus] = useState(data.edition.status);
+  const [coachesEnabled, setCoachesEnabled] = useState(
+    coachingEnabled(data.edition),
+  );
   const [appearance, setAppearance] = useState(
     data.edition.defaultAppearance ?? "site",
   );
@@ -391,6 +395,22 @@ function General({ data, saved }: EditorProps) {
             </select>
           </label>
         </IdentityFields>
+        <fieldset className="settings-card form-stack">
+          <legend>{tr("Team coaches")}</legend>
+          <label className="checkbox-row">
+            <input
+              type="checkbox"
+              checked={coachesEnabled}
+              onChange={(e) => setCoachesEnabled(e.target.checked)}
+            />
+            <span>{tr("Enable coaches for this tournament")}</span>
+          </label>
+          <p className="muted small">
+            {tr(
+              "Disabling coaching hides and locks coach configuration. Existing assignments and their publication remain unchanged.",
+            )}
+          </p>
+        </fieldset>
         <label className="field">
           <span>{tr("Default tournament appearance")}</span>
           <select
@@ -421,6 +441,7 @@ function General({ data, saved }: EditorProps) {
           fields={{
             ...value,
             status,
+            coachesEnabled,
             defaultAppearance: appearance === "site" ? null : appearance,
           }}
           label={tr("Save general settings")}

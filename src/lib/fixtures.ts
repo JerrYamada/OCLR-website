@@ -204,6 +204,20 @@ export async function officialTeams(reader: Reader, slug: string) {
       .map(({ osuId, username }) => ({ osuId, username })),
   }));
 }
+/** Private setup choices; officialTeams remains the publication/result boundary. */
+export async function configurationTeams(reader: Reader, slug: string) {
+  const official = await officialTeams(reader, slug);
+  const rows = await reader
+    .select({ id: teams.id, name: teams.name, captainId: teams.captainId })
+    .from(teams)
+    .where(and(eq(teams.editionSlug, slug), isNull(teams.archivedAt)))
+    .orderBy(teams.name);
+  return rows.map((t) => ({
+    ...t,
+    members: official.find((o) => o.id === t.id)?.members ?? [],
+    unpublished: !official.some((o) => o.id === t.id),
+  }));
+}
 async function configuredEdition(slug: string) {
   const edition = await getEdition(slug);
   if (!edition) throw new HttpError(404, "Edition not found.");
@@ -474,10 +488,14 @@ async function databaseStaffFixtures(actor: User, slug: string) {
         })),
         rounds,
         teams: viewAll
-          ? official
-          : official.filter((t) =>
-              rows.some((f) => f.homeTeamId === t.id || f.awayTeamId === t.id),
-            ),
+          ? await configurationTeams(tx, slug)
+          : official
+              .map((t) => ({ ...t, unpublished: false }))
+              .filter((t) =>
+                rows.some(
+                  (f) => f.homeTeamId === t.id || f.awayTeamId === t.id,
+                ),
+              ),
         pools,
       };
     },
@@ -719,7 +737,9 @@ export async function fixtureCommand(
             400,
             "Configure approved groups before publication.",
           );
-        const official = await officialTeams(tx, slug);
+        const official = c.published
+          ? await officialTeams(tx, slug)
+          : await configurationTeams(tx, slug);
         if (
           c.configuration?.groups.some((g) =>
             g.teamIds.some((id) => !official.some((t) => t.id === id)),
@@ -727,7 +747,7 @@ export async function fixtureCommand(
         )
           throw new HttpError(
             400,
-            "Groups may contain only this edition's finalized published teams.",
+            "Choose active teams from this edition. Publish finalized teams and rosters before publishing groups.",
           );
         const [after] = await tx
           .update(tournamentStages)
@@ -1024,7 +1044,9 @@ export async function fixtureCommand(
         });
         return;
       }
-      const official = await officialTeams(tx, slug);
+      const official = before?.publishedAt
+        ? await officialTeams(tx, slug)
+        : await configurationTeams(tx, slug);
       if (
         (c.homeTeamId !== null && c.homeTeamId === c.awayTeamId) ||
         (c.homeTeamId !== null &&
@@ -1033,7 +1055,7 @@ export async function fixtureCommand(
       )
         throw new HttpError(
           400,
-          "Choose different finalized, published teams from this edition, or leave participants TBD.",
+          "Choose different active teams from this edition, or leave participants TBD. Published fixtures require finalized, published teams.",
         );
       const [round] = await tx
         .select()

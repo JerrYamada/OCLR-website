@@ -200,6 +200,7 @@ const commandSchema = z.discriminatedUnion("action", [
       action: z.literal("general"),
       ...identity,
       status: shape.status,
+      coachesEnabled: shape.coachesEnabled,
     })
     .strict(),
   z
@@ -390,6 +391,7 @@ export async function createTournament(actor: User, input: unknown) {
     ...fields,
     published: false,
     status: "upcoming",
+    coachesEnabled: false,
     rules: null,
     eligibility: null,
     registration: null,
@@ -655,6 +657,9 @@ export async function tournamentCommand(
         season: c.season,
         summary: c.summary,
         status: c.status,
+        ...(c.coachesEnabled !== undefined
+          ? { coachesEnabled: c.coachesEnabled }
+          : {}),
         timeZone: c.timeZone,
         branding: c.branding,
         ...(c.defaultAppearance !== undefined

@@ -124,10 +124,10 @@ test.describe("staff fixtures and referee assignments over HTTP", () => {
         .getByRole("combobox", { name: /^Competition round/ })
         .selectOption(round.id);
       await page
-        .getByRole("combobox", { name: /^Home team/ })
+        .getByRole("combobox", { name: /^Red Team/ })
         .selectOption(home.teamId);
       await page
-        .getByRole("combobox", { name: /^Away team/ })
+        .getByRole("combobox", { name: /^Blue Team/ })
         .selectOption(away.teamId);
       await expect(
         page.getByRole("combobox", { name: "Associated mappool", exact: true }),

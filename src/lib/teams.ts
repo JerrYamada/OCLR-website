@@ -20,6 +20,7 @@ import { remoteMode } from "./data-source";
 import { refreshDraftSnapshot } from "./draft";
 import { draftSetupProtection } from "./draft-setup";
 import { assertRemoteSubject, frontendResource } from "./frontend-resource";
+import { coachingEnabled, editionSchema } from "./editions";
 import { HttpError } from "./http";
 import { getOsuUserProfile } from "./osu-profiles";
 const teamInput = z
@@ -115,6 +116,9 @@ async function databaseStaffTeams(actor: User, slug: string) {
       return {
         version: state?.setupVersion ?? 0,
         locked: protection.locked,
+        coachesEnabled: coachingEnabled(
+          editionSchema.parse({ ...state?.configuration, slug }),
+        ),
         teams: rows.map((team) => ({
           ...team,
           coaches: coaches.filter((c) => c.teamId === team.id),
@@ -157,6 +161,8 @@ export async function updateTeams(
   let coachProfile: { osuId: number; username: string } | undefined;
   if (command.action === "add_coach") {
     const current = await staffTeams(actor, slug);
+    if (!current.coachesEnabled)
+      throw new HttpError(409, "Coaching is disabled for this tournament.");
     if (current.version !== expectedVersion)
       throw new HttpError(409, "Setup changed. Refresh before continuing.");
     if (!current.teams.some((t) => t.id === command.teamId))
@@ -182,6 +188,11 @@ export async function updateTeams(
     await assertOperationalEdition(slug, tx);
     if (!state || state.setupVersion !== expectedVersion)
       throw new HttpError(409, "Setup changed. Refresh before continuing.");
+    if (
+      coachAction &&
+      !coachingEnabled(editionSchema.parse({ ...state.configuration, slug }))
+    )
+      throw new HttpError(409, "Coaching is disabled for this tournament.");
     const protection = await draftSetupProtection(tx, slug);
     const before = await tx
       .select()

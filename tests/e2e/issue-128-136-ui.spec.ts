@@ -80,6 +80,15 @@ test.describe("operations presentation batch", () => {
     await page
       .getByRole("tab", { name: "Competition configuration", exact: true })
       .click();
+    await expect(
+      page.getByRole("button", { name: "Add group", exact: true }),
+    ).toHaveCount(0);
+    await page
+      .getByRole("link", {
+        name: "Configure groups in team management",
+        exact: true,
+      })
+      .click();
     const groups = page
       .locator("section")
       .filter({

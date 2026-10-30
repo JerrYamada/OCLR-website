@@ -204,6 +204,58 @@ describe.skipIf(!url)(
       );
       expect((await publishedTeams(edition.slug))[0].members).toHaveLength(1);
     });
+    it("locks coach writes when disabled and retains assignments for re-enabling", async () => {
+      const data = await configure();
+      const team = data.teams[0];
+      await updateTeams(
+        staff,
+        edition.slug,
+        command(data.version, {
+          action: "add_coach",
+          teamId: team.id,
+          userId: coach.osuId,
+        }),
+      );
+      await db().execute(
+        sql`UPDATE edition_state SET configuration = configuration || '{"coachesEnabled":false}'::jsonb WHERE slug = ${edition.slug}`,
+      );
+      const disabled = await staffTeams(staff, edition.slug);
+      expect(disabled.coachesEnabled).toBe(false);
+      expect(disabled.teams[0].coaches).toHaveLength(1);
+      vi.mocked(getOsuUserProfile).mockClear();
+      for (const action of ["add_coach", "remove_coach"]) {
+        await expect(
+          updateTeams(
+            staff,
+            edition.slug,
+            command(disabled.version, {
+              action,
+              teamId: team.id,
+              userId: coach.osuId,
+            }),
+          ),
+        ).rejects.toMatchObject({ status: 409 });
+      }
+      expect(getOsuUserProfile).not.toHaveBeenCalled();
+      await db().execute(
+        sql`UPDATE edition_state SET configuration = configuration || '{"coachesEnabled":true}'::jsonb WHERE slug = ${edition.slug}`,
+      );
+      expect(
+        (await staffTeams(staff, edition.slug)).teams[0].coaches,
+      ).toHaveLength(1);
+      await updateTeams(
+        staff,
+        edition.slug,
+        command(disabled.version, {
+          action: "remove_coach",
+          teamId: team.id,
+          userId: coach.osuId,
+        }),
+      );
+      expect(
+        (await staffTeams(staff, edition.slug)).teams[0].coaches,
+      ).toHaveLength(0);
+    });
     it("assigns verified coaches without adding players, capacity usage, registration or staff grants", async () => {
       const configured = await configure(),
         team = configured.teams[0];
