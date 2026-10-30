@@ -3366,7 +3366,6 @@
     "md5e2b2bb2303": "Allow all maps",
     "m70a38d77c2b9": "This team has already banned this restricted category.",
     "mefaa2447abfc": "Tiebreaker maps cannot be banned.",
-    "mcf07501b30f3": "Review category Ban limits, disconnect replays, pauses and EX conditions against the published rules.",
     "m9462cb923384": "BW-rank",
     "mcf46d3c49df3": "BW-PP",
     "m18ac3e7343f0": "d",
@@ -3375,6 +3374,15 @@
     "m043a718774c5": "s",
     "me4f9e9e783ef": "Could not copy the player ID.",
     "m87308bc50b10": "Copy player ID",
-    "ma61174f8783c": "Player ID copied."
+    "ma61174f8783c": "Player ID copied.",
+    "m7430b603c2ac": "BO must be an odd number between 1 and 197.",
+    "md64b3eb37dd5": "Best of (BO)",
+    "md7b79b605377": "Configure first-to scoring in Fixtures & results before setting BO here. Fixed-map series are not BO matches.",
+    "m0cab7abdedb4": "BO uses the round's first-to scoring. Review the Pick count and tied-score condition before saving a changed BO.",
+    "m0d11d5c48983": "Only NM and FM may be banned more than once by the same team",
+    "m8088658f82ba": "Do not allow the same team to Ban a Mod more than once",
+    "m96b57b7bf006": "NM always clears Mods. No Fail is controlled separately above.",
+    "m608a6732a76c": "This saved policy overrides NM. Saving will restore NM to No Mod; existing referee history remains unchanged.",
+    "m7f8fc03a5631": "Configure scoring rules"
   }
 }

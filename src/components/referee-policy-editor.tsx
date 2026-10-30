@@ -11,6 +11,7 @@ import { commandMods, type RefereeCommandPolicy } from "@/lib/referee-commands";
 import { s11RefereeSteps, type RefereeDefaults } from "@/lib/referee-defaults";
 import { RefereeStepEditor } from "./referee-step-editor";
 import styles from "./referee-step-editor.module.css";
+import type { ScoringRules } from "@/lib/competition-model";
 
 export function RefereePolicyEditor({
   policy,
@@ -18,19 +19,26 @@ export function RefereePolicyEditor({
   maps,
   busy,
   onSave,
+  series,
 }: {
   policy: RefereePolicy | null;
   defaults?: RefereeDefaults | null;
   maps: RefereeMap[];
   busy: boolean;
-  onSave: (policy: RefereePolicy) => Promise<void>;
+  onSave: (policy: RefereePolicy, bestOf?: number) => Promise<void>;
+  series: ScoringRules["series"] | null;
 }) {
   const tr = useAppTranslations();
   const initialPolicy = policy ?? defaults?.policy;
   const initialCommands = policy ? policy.commands : defaults?.commands;
+  const originalBestOf =
+    series?.type === "first_to" ? series.wins * 2 - 1 : null;
+  const [bestOf, setBestOf] = useState(originalBestOf?.toString() ?? "");
+  const wins = (Number(bestOf) + 1) / 2;
   const [placement, setPlacement] = useState(
     defaults && !policy ? "split" : "",
   );
+  const generatedWins = useRef(defaults?.wins ?? 0);
   const nextStepKey = useRef(initialPolicy?.steps.length ?? 0);
   const [steps, setSteps] = useState(() =>
     (initialPolicy?.steps ?? []).map((step, key) => ({ key, step })),
@@ -91,6 +99,13 @@ export function RefereePolicyEditor({
   async function submit(e: React.FormEvent) {
     e.preventDefault();
     setError("");
+    if (
+      originalBestOf !== null &&
+      (!Number.isInteger(wins) || wins < 1 || wins > 99)
+    ) {
+      setError(tr("BO must be an odd number between 1 and 197."));
+      return;
+    }
     const commands: RefereeCommandPolicy | null = roomSize
       ? {
           roomSize: Number(roomSize),
@@ -99,11 +114,11 @@ export function RefereePolicyEditor({
             categories.map((c) => [
               c,
               {
-                mods: (mods[c] ?? "")
+                mods: (c === "NM" ? "" : (mods[c] ?? ""))
                   .trim()
                   .split(/\s+/)
                   .filter(Boolean) as (typeof commandMods)[number][],
-                freemod: free[c] ?? false,
+                freemod: c === "NM" ? false : (free[c] ?? false),
               },
             ]),
           ),
@@ -137,7 +152,12 @@ export function RefereePolicyEditor({
       );
       return;
     }
-    await onSave(parsed.data);
+    await onSave(
+      parsed.data,
+      originalBestOf !== null && Number(bestOf) !== originalBestOf
+        ? Number(bestOf)
+        : undefined,
+    );
   }
   return (
     <details className="panel">
@@ -149,6 +169,53 @@ export function RefereePolicyEditor({
           )}
         </p>
         <fieldset disabled={busy} className="staff-readonly-fields form-stack">
+          <label className="field">
+            <span>{tr("Best of (BO)")}</span>
+            <input
+              type="number"
+              min={1}
+              max={197}
+              step={2}
+              required={originalBestOf !== null}
+              disabled={originalBestOf === null}
+              value={bestOf}
+              onChange={(event) => {
+                setBestOf(event.target.value);
+                const nextWins = (Number(event.target.value) + 1) / 2;
+                if (
+                  placement &&
+                  Number.isInteger(nextWins) &&
+                  nextWins >= 1 &&
+                  nextWins <= 98
+                ) {
+                  const order = placement as "split" | "opening";
+                  if (
+                    JSON.stringify(steps.map(({ step }) => step)) ===
+                    JSON.stringify(
+                      s11RefereeSteps(generatedWins.current, order),
+                    )
+                  ) {
+                    setSteps(
+                      s11RefereeSteps(nextWins, order).map((step) => ({
+                        key: nextStepKey.current++,
+                        step,
+                      })),
+                    );
+                    generatedWins.current = nextWins;
+                  }
+                }
+              }}
+            />
+          </label>
+          <p className="muted small">
+            {originalBestOf === null
+              ? tr(
+                  "Configure first-to scoring in Fixtures & results before setting BO here. Fixed-map series are not BO matches.",
+                )
+              : tr(
+                  "BO uses the round's first-to scoring. Review the Pick count and tied-score condition before saving a changed BO.",
+                )}
+          </p>
           <label className="field">
             {tr("Maximum replays per map")}
             <input
@@ -169,9 +236,10 @@ export function RefereePolicyEditor({
                 required
                 onChange={(event) => {
                   setPlacement(event.target.value);
+                  generatedWins.current = wins;
                   const generated = event.target.value
                     ? s11RefereeSteps(
-                        defaults.wins,
+                        wins,
                         event.target.value as "split" | "opening",
                       )
                     : [];
@@ -202,38 +270,81 @@ export function RefereePolicyEditor({
             <legend>{tr("Repeated Mod Bans")}</legend>
             <label>
               <input
-                type="checkbox"
+                type="radio"
+                name="repeat-ban-mode"
                 checked={allowRepeatBan}
-                onChange={(event) => setAllowRepeatBan(event.target.checked)}
+                onChange={() => {
+                  setAllowRepeatBan(true);
+                  setRepeatExceptions([]);
+                }}
               />{" "}
               {tr("Allow each team to Ban the same Mod more than once")}
             </label>
-            {!allowRepeatBan && (
-              <fieldset>
-                <legend>
-                  {tr("Allow repeated Bans for these categories")}
-                </legend>
-                <div className={styles.choices}>
-                  {(["NM", "HD", "HR", "DT", "FM"] as const).map((category) => (
-                    <button
-                      key={category}
-                      type="button"
-                      className="secondary"
-                      aria-pressed={repeatExceptions.includes(category)}
-                      onClick={() =>
-                        setRepeatExceptions((previous) =>
-                          previous.includes(category)
-                            ? previous.filter((value) => value !== category)
-                            : [...previous, category],
-                        )
-                      }
-                    >
-                      {category}
-                    </button>
-                  ))}
-                </div>
-              </fieldset>
-            )}
+            <label>
+              <input
+                type="radio"
+                name="repeat-ban-mode"
+                checked={
+                  !allowRepeatBan &&
+                  repeatExceptions.length === 2 &&
+                  repeatExceptions.includes("NM") &&
+                  repeatExceptions.includes("FM")
+                }
+                onChange={() => {
+                  setAllowRepeatBan(false);
+                  setRepeatExceptions(["NM", "FM"]);
+                }}
+              />{" "}
+              {tr(
+                "Only NM and FM may be banned more than once by the same team",
+              )}
+            </label>
+            <label>
+              <input
+                type="radio"
+                name="repeat-ban-mode"
+                checked={!allowRepeatBan && !repeatExceptions.length}
+                onChange={() => {
+                  setAllowRepeatBan(false);
+                  setRepeatExceptions([]);
+                }}
+              />{" "}
+              {tr("Do not allow the same team to Ban a Mod more than once")}
+            </label>
+            {!allowRepeatBan &&
+              repeatExceptions.length > 0 &&
+              !(
+                repeatExceptions.length === 2 &&
+                repeatExceptions.includes("NM") &&
+                repeatExceptions.includes("FM")
+              ) && (
+                <fieldset>
+                  <legend>
+                    {tr("Allow repeated Bans for these categories")}
+                  </legend>
+                  <div className={styles.choices}>
+                    {(["NM", "HD", "HR", "DT", "FM"] as const).map(
+                      (category) => (
+                        <button
+                          key={category}
+                          type="button"
+                          className="secondary"
+                          aria-pressed={repeatExceptions.includes(category)}
+                          onClick={() =>
+                            setRepeatExceptions((previous) =>
+                              previous.includes(category)
+                                ? previous.filter((value) => value !== category)
+                                : [...previous, category],
+                            )
+                          }
+                        >
+                          {category}
+                        </button>
+                      ),
+                    )}
+                  </div>
+                </fieldset>
+              )}
           </fieldset>
           <ol
             className={styles.list}
@@ -247,7 +358,9 @@ export function RefereePolicyEditor({
                 count={steps.length}
                 categories={categories}
                 maps={maps}
-                defaultTiedAt={(defaults?.wins ?? 1) - 1}
+                defaultTiedAt={
+                  Number.isInteger(wins) && wins > 0 ? wins - 1 : 0
+                }
                 onChange={(patch) => update(index, patch)}
                 onMove={(direction) =>
                   setSteps((previous) => {
@@ -330,38 +443,56 @@ export function RefereePolicyEditor({
               />
             </label>
           ))}
-          {categories.map((category) => (
-            <div className="form-stack" key={category}>
-              <label className="field">
-                <span>
-                  {tr(
-                    "Mods for {category} (space separated; empty clears Mods)",
-                    { category },
-                  )}
-                </span>
-                <input
-                  value={mods[category] ?? ""}
-                  onChange={(e) =>
-                    setMods((m) => ({
-                      ...m,
-                      [category]: e.target.value.toUpperCase(),
-                    }))
-                  }
-                  placeholder="HD"
-                />
-              </label>
-              <label>
-                <input
-                  type="checkbox"
-                  checked={free[category] ?? false}
-                  onChange={(e) =>
-                    setFree((f) => ({ ...f, [category]: e.target.checked }))
-                  }
-                />{" "}
-                {category} · {tr("Freemod")}
-              </label>
-            </div>
-          ))}
+          <p className="muted small">
+            {tr(
+              "NM always clears Mods. No Fail is controlled separately above.",
+            )}
+          </p>
+          {Boolean(
+            initialCommands?.categoryMods.NM &&
+            (initialCommands.categoryMods.NM.mods.length ||
+              initialCommands.categoryMods.NM.freemod),
+          ) && (
+            <p className="notice">
+              {tr(
+                "This saved policy overrides NM. Saving will restore NM to No Mod; existing referee history remains unchanged.",
+              )}
+            </p>
+          )}
+          {categories
+            .filter((category) => category !== "NM")
+            .map((category) => (
+              <div className="form-stack" key={category}>
+                <label className="field">
+                  <span>
+                    {tr(
+                      "Mods for {category} (space separated; empty clears Mods)",
+                      { category },
+                    )}
+                  </span>
+                  <input
+                    value={mods[category] ?? ""}
+                    onChange={(e) =>
+                      setMods((m) => ({
+                        ...m,
+                        [category]: e.target.value.toUpperCase(),
+                      }))
+                    }
+                    placeholder="HD"
+                  />
+                </label>
+                <label>
+                  <input
+                    type="checkbox"
+                    checked={free[category] ?? false}
+                    onChange={(e) =>
+                      setFree((f) => ({ ...f, [category]: e.target.checked }))
+                    }
+                  />{" "}
+                  {category} · {tr("Freemod")}
+                </label>
+              </div>
+            ))}
           <button type="submit">{tr("Save round referee policy")}</button>
         </fieldset>
         {error && <p role="alert">{error}</p>}

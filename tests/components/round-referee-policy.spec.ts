@@ -144,7 +144,9 @@ test("supports the repeat Ban option and preserves legacy rules when unchanged",
   await page.route(route, async (request) => {
     const body = request.request().postDataJSON();
     writes.push(body);
-    await request.fulfill({ json: { revision: 5, policy: body.policy } });
+    await request.fulfill({
+      json: { revision: 4 + writes.length, policy: body.policy },
+    });
   });
   await page.goto("/round-referee-policy?saved");
   await page
@@ -163,13 +165,13 @@ test("supports the repeat Ban option and preserves legacy rules when unchanged",
   await page
     .getByText("Configure round referee policy", { exact: true })
     .click();
-  await allow.uncheck();
-  const exceptions = page.getByRole("group", {
-    name: "Allow repeated Bans for these categories",
-    exact: true,
-  });
-  await exceptions.getByRole("button", { name: "NM", exact: true }).click();
-  await exceptions.getByRole("button", { name: "FM", exact: true }).click();
+  await page
+    .getByLabel(
+      "Only NM and FM may be banned more than once by the same team",
+      { exact: true },
+    )
+    .check();
+  await expect(allow).not.toBeChecked();
   await page
     .getByRole("button", { name: "Save round referee policy", exact: true })
     .click();
@@ -177,6 +179,24 @@ test("supports the repeat Ban option and preserves legacy rules when unchanged",
   expect(writes[1].policy.banCategoryRules).toEqual({
     allowRepeats: false,
     repeatExceptions: ["NM", "FM"],
+  });
+  await page
+    .getByText("Configure round referee policy", { exact: true })
+    .click();
+  await allow.check();
+  await expect(
+    page.getByLabel(
+      "Only NM and FM may be banned more than once by the same team",
+      { exact: true },
+    ),
+  ).not.toBeChecked();
+  await page
+    .getByRole("button", { name: "Save round referee policy", exact: true })
+    .click();
+  await expect.poll(() => writes.length).toBe(3);
+  expect(writes[2].policy.banCategoryRules).toEqual({
+    allowRepeats: true,
+    repeatExceptions: [],
   });
 });
 test("preserves saved settings and keeps the draft on a revision conflict", async ({
@@ -266,3 +286,157 @@ for (const [locale, catalog] of [
     expect(errors).toEqual([]);
   });
 }
+
+test("updates BO and the unsaved S11 sequence together without NM override controls", async ({
+  page,
+}) => {
+  const writes: Record<string, unknown>[] = [];
+  await page.route(route, async (request) => {
+    const body = request.request().postDataJSON();
+    writes.push(body);
+    await request.fulfill({
+      json: {
+        revision: 1,
+        policy: body.policy,
+        series: { type: "first_to", wins: 7 },
+        roundVersion: 1,
+      },
+    });
+  });
+  await page.goto("/round-referee-policy");
+  await page
+    .getByText("Configure round referee policy", { exact: true })
+    .click();
+  await page.getByLabel("Best of (BO)", { exact: true }).fill("13");
+  await expect(
+    page
+      .getByRole("list", { name: "Finite Ban / Pick sequence", exact: true })
+      .locator(":scope > li"),
+  ).toHaveCount(17);
+  await expect(
+    page.getByLabel("Both teams must have this score before TB", {
+      exact: true,
+    }),
+  ).toHaveValue("6");
+  await expect(
+    page.getByLabel("Mods for NM (space separated; empty clears Mods)", {
+      exact: true,
+    }),
+  ).toHaveCount(0);
+  await expect(page.getByLabel("NM · Freemod", { exact: true })).toHaveCount(0);
+  await page
+    .getByLabel("Room size (separate from players per team)", { exact: true })
+    .fill("16");
+  await page
+    .getByRole("button", { name: "Save round referee policy", exact: true })
+    .click();
+  await expect(page.getByRole("status")).toHaveText(
+    "Round referee policy saved.",
+  );
+  expect(writes[0]).toMatchObject({
+    seriesChange: { bestOf: 13, expectedRoundVersion: 0 },
+    policy: {
+      commands: { categoryMods: { NM: { mods: [], freemod: false } } },
+    },
+  });
+  await page
+    .getByText("Configure round referee policy", { exact: true })
+    .click();
+  await expect(page.getByLabel("Best of (BO)", { exact: true })).toHaveValue(
+    "13",
+  );
+});
+test("normalizes a saved NM override on explicit save and keeps custom steps", async ({
+  page,
+}) => {
+  let write!: {
+    policy: {
+      commands: {
+        categoryMods: Record<string, { mods: string[]; freemod: boolean }>;
+      };
+      steps: unknown[];
+    };
+  };
+  await page.route(route, async (request) => {
+    write = request.request().postDataJSON();
+    await request.fulfill({ json: { revision: 5, policy: write.policy } });
+  });
+  await page.goto("/round-referee-policy?saved&nm-override");
+  await page
+    .getByText("Configure round referee policy", { exact: true })
+    .click();
+  await expect(
+    page.getByText(
+      "This saved policy overrides NM. Saving will restore NM to No Mod; existing referee history remains unchanged.",
+      { exact: true },
+    ),
+  ).toBeVisible();
+  await page
+    .getByRole("button", { name: "Save round referee policy", exact: true })
+    .click();
+  await expect(page.getByRole("status")).toBeVisible();
+  expect(write.policy.commands.categoryMods.NM).toEqual({
+    mods: [],
+    freemod: false,
+  });
+  expect(write.policy.commands.categoryMods.HD).toEqual({
+    mods: ["HD"],
+    freemod: false,
+  });
+  expect(write.policy.steps).toHaveLength(15);
+  expect(write).not.toHaveProperty("seriesChange");
+});
+test("does not convert unconfigured or fixed-map scoring into BO", async ({
+  page,
+}) => {
+  for (const mode of ["no-scoring", "fixed"]) {
+    await page.goto(`/round-referee-policy?saved&${mode}`);
+    await page
+      .getByText("Configure round referee policy", { exact: true })
+      .click();
+    await expect(
+      page.getByLabel("Best of (BO)", { exact: true }),
+    ).toBeDisabled();
+    await expect(
+      page.getByRole("link", { name: "Configure scoring rules", exact: true }),
+    ).toHaveAttribute("href", "/admin/tournaments/synthetic/matches");
+  }
+});
+
+test("preserves saved custom exceptions and edited steps when BO changes", async ({
+  page,
+}) => {
+  let saved: { policy: { banCategoryRules: unknown } };
+  await page.route(route, async (request) => {
+    saved = request.request().postDataJSON();
+    await request.fulfill({ json: { revision: 5, policy: saved.policy } });
+  });
+  await page.goto("/round-referee-policy?saved&custom-ban");
+  await page
+    .getByText("Configure round referee policy", { exact: true })
+    .click();
+  await page
+    .getByRole("button", { name: "Save round referee policy", exact: true })
+    .click();
+  await expect(page.getByRole("status")).toBeVisible();
+  expect(saved!.policy.banCategoryRules).toEqual({
+    allowRepeats: false,
+    repeatExceptions: ["HD"],
+  });
+  await page.goto("/round-referee-policy");
+  await page
+    .getByText("Configure round referee policy", { exact: true })
+    .click();
+  const sequence = page.getByRole("list", {
+    name: "Finite Ban / Pick sequence",
+    exact: true,
+  });
+  const first = sequence.locator(":scope > li").first();
+  await first.getByText("Step limits (optional)", { exact: true }).click();
+  await first.getByRole("button", { name: "HD", exact: true }).click();
+  await page.getByLabel("Best of (BO)", { exact: true }).fill("13");
+  await expect(sequence.locator(":scope > li")).toHaveCount(15);
+  await expect(
+    first.getByRole("button", { name: "HD", exact: true }),
+  ).toHaveAttribute("aria-pressed", "true");
+});

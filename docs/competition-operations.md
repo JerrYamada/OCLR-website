@@ -191,6 +191,24 @@ pauses and EX conditions still require referee review
 under the published rules; the template does not automate these judgments.
 Other seasons and existing saved policies are never replaced by S11 defaults.
 
+The round referee form also exposes **Best of (BO)** (#574). BO is the existing
+first-to scoring series (`wins = (BO + 1) / 2`), not a second referee-only value.
+Saving a changed BO and its BP policy is atomic, checks the round version as
+well as the policy revision, and audits a new scoring release. Other scoring
+fields and standings remain unchanged. Configure complete first-to scoring
+first if it is currently missing; fixed-map formats are not silently converted.
+Unmodified S11 draft steps follow the edited BO. Saved/customized steps remain
+editable and must have a compatible Pick count and TB tied-score condition.
+Active recorded selections and completed-fixture history still block changes.
+
+Repeated Ban presets are mutually exclusive: all categories may repeat, only
+NM/FM may repeat, or no category may repeat for the same team. Existing custom
+exceptions remain visible and are preserved until explicitly changed. TB remains
+unbannable in every mode. NM's Mod/Freemod override controls have been removed;
+an explicit form save makes NM clear Mods, while the independent NF setting
+continues to apply. A previously saved NM override is called out before saving;
+existing policy data and referee history are never rewritten merely by reading.
+
 The step editor uses compact rows with one action/order selector, up/down controls
 and optional step limits. Category restrictions use buttons; selecting specific
 maps is an optional searchable checklist. All non-TB maps are eligible for Ban
