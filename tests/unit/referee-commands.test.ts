@@ -1,12 +1,34 @@
 import { describe, expect, it, vi } from "vitest";
 import {
   copyRefereeCommand,
+  defaultRefereeRoomName,
   emptyRefereeSettings,
   refereeCommandPolicySchema,
   refereeCommands,
   refereeSettingsSchema,
   type RefereeCommandInput,
 } from "../../src/lib/referee-commands";
+
+describe("default referee room name", () => {
+  const teams = [{ name: "knd" }, { name: "bhou" }];
+  it.each(["11", "s11", "S11"])("formats season %s", (season) => {
+    const roomName = defaultRefereeRoomName(season, teams);
+    expect(roomName).toBe("OCLR S11: (knd) vs (bhou)");
+    expect(
+      refereeCommands({
+        ...input,
+        settings: { ...input.settings, roomName },
+      }).find((command) => command.kind === "make")?.text,
+    ).toBe("!mp make OCLR S11: (knd) vs (bhou)");
+  });
+  it("uses the configured season and requires both teams", () => {
+    expect(defaultRefereeRoomName("12", teams)).toBe(
+      "OCLR S12: (knd) vs (bhou)",
+    );
+    expect(defaultRefereeRoomName(null, teams)).toBe("OCLR: (knd) vs (bhou)");
+    expect(defaultRefereeRoomName("11", teams.slice(0, 1))).toBe("");
+  });
+});
 
 const input: RefereeCommandInput = {
   settings: {
