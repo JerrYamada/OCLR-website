@@ -3339,6 +3339,9 @@
     "mb1b4ac56f9f0": "Drop teams here",
     "ma724e8dfbdc2": "Add team to {group}",
     "m518a3d1bb0e7": "Choose a team",
-    "m89c4fca1a599": "At least two teams per group are required before saving."
+    "m89c4fca1a599": "At least two teams per group are required before saving.",
+    "m98c7524bddd6": "The backup operator has not been configured. Ask the server operator to complete the one-time installation.",
+    "m0194f3b8d5b9": "The backup operator rejected the connection. Ask the server operator to check the database target and configuration.",
+    "ma2c201428dc9": "Checking backup service."
   }
 }

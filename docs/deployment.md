@@ -584,3 +584,9 @@ Database packages exclude durable media bytes and require an exact matching
 media-tree fingerprint before restoration. Sessions and tokens are cleared and
 staff grants revoked after restore; recovery Admins must reauthorize staff.
 See the operator guide for limits, retention, stopped-service cutover and recovery.
+
+A website-only update does not provision the separate backup operator. For a new
+installation, use the explicit [first-installation procedure](../operator/README.md#first-installation-after-a-website-only-update)
+and reviewed `scripts/install-backup-operator.sh`. The script leaves the service
+stopped until private operator configuration, matching database authorization
+and the website socket setting are ready.

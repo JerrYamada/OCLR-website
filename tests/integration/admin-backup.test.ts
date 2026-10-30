@@ -46,7 +46,13 @@ describe.skipIf(!url)("Admin backup PostgreSQL round trip", () => {
       mode: 0o700,
     });
     const release = "a".repeat(40);
-    const health = createServer((_, res) => {
+    writeFileSync(join(root, "release"), release + "\n");
+    const health = createServer((req, res) => {
+      if (req.headers.host !== "synthetic-operator.test") {
+        res.statusCode = 400;
+        res.end("bad canonical host");
+        return;
+      }
       res.setHeader("Content-Type", "application/json");
       res.end(JSON.stringify({ release }));
     });
@@ -59,8 +65,10 @@ describe.skipIf(!url)("Admin backup PostgreSQL round trip", () => {
       OCLR_OPERATOR_DATA: root,
       OCLR_OPERATOR_KEY: join(root, "key"),
       OCLR_OPERATOR_DATABASE_URL: databaseUrl,
-      OCLR_OPERATOR_RELEASE: release,
+      OCLR_OPERATOR_RELEASE: "b".repeat(40),
+      OCLR_OPERATOR_RELEASE_FILE: join(root, "release"),
       OCLR_OPERATOR_RUNTIME_ROLE: decodeURIComponent(new URL(url!).username),
+      APP_URL: "https://synthetic-operator.test",
       OCLR_OPERATOR_HEALTH_URL: `http://127.0.0.1:${port}/api/health`,
       OCLR_MEDIA_DIR: join(root, "media"),
       ADMIN_OSU_IDS: "999001",

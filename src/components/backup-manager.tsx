@@ -20,6 +20,8 @@ export function BackupManager() {
     [jobs, setJobs] = useState<Job[]>([]),
     [error, setError] = useState(""),
     [busy, setBusy] = useState(false),
+    [ready, setReady] = useState(false),
+    [serviceCode, setServiceCode] = useState("loading"),
     [selected, setSelected] = useState<Job | null>(null),
     [confirmation, setConfirmation] = useState("");
   function statusLabel(value: string) {
@@ -40,19 +42,48 @@ export function BackupManager() {
   }
 
   const unavailable = tr("Backup service is unavailable.");
+  const serviceMessage =
+    serviceCode === "not_configured"
+      ? tr(
+          "The backup operator has not been configured. Ask the server operator to complete the one-time installation.",
+        )
+      : serviceCode === "rejected"
+        ? tr(
+            "The backup operator rejected the connection. Ask the server operator to check the database target and configuration.",
+          )
+        : serviceCode === "loading"
+          ? tr("Checking backup service.")
+          : unavailable;
   useEffect(() => {
     let active = true;
+    let loading = false;
     const load = async () => {
+      if (loading) return;
+      loading = true;
       try {
         const r = await fetch("/api/admin/backups", { cache: "no-store" });
-        if (!r.ok) throw Error();
+        if (!r.ok) {
+          const failure = await r.json().catch(() => ({}));
+          if (active) {
+            setReady(false);
+            setServiceCode(failure.code || "unreachable");
+          }
+          return;
+        }
         const data = await r.json();
+        if (!Array.isArray(data)) throw Error();
         if (active) {
           setJobs(data);
-          setError("");
+          setReady(true);
+          setServiceCode("");
         }
       } catch {
-        if (active) setError(unavailable);
+        if (active) {
+          setReady(false);
+          setServiceCode("unreachable");
+        }
+      } finally {
+        loading = false;
       }
     };
     void load();
@@ -61,7 +92,7 @@ export function BackupManager() {
       active = false;
       clearInterval(timer);
     };
-  }, [unavailable]);
+  }, []);
   async function submit(action: string, file?: File, source?: string) {
     setBusy(true);
     setError("");
@@ -91,10 +122,10 @@ export function BackupManager() {
           "Backups contain private site data. Restore replaces the entire database and signs everyone out. All staff grants require reauthorization. Matching media files are required separately.",
         )}
       </p>
-      <div className="actions">
+      <div className="actions backup-actions">
         <button
           className="button"
-          disabled={busy}
+          disabled={busy || !ready}
           onClick={() => void submit("backup")}
         >
           {tr("Create backup")}
@@ -104,7 +135,7 @@ export function BackupManager() {
           <input
             type="file"
             accept=".oclr"
-            disabled={busy}
+            disabled={busy || !ready}
             onChange={(e) => {
               const file = e.target.files?.[0];
               if (file) void submit("import", file);
@@ -113,6 +144,11 @@ export function BackupManager() {
           />
         </label>
       </div>
+      {!ready && (
+        <p role={serviceCode === "loading" ? "status" : "alert"}>
+          {serviceMessage}
+        </p>
+      )}
       {error && <p role="alert">{error}</p>}
       <ul>
         {jobs.map((job) => (
@@ -171,7 +207,7 @@ export function BackupManager() {
           <div className="actions">
             <button
               className="button"
-              disabled={busy || confirmation !== "REPLACE"}
+              disabled={busy || !ready || confirmation !== "REPLACE"}
               onClick={() => void submit("restore", undefined, selected.id)}
             >
               {tr("Confirm restore")}

@@ -12,6 +12,8 @@ The worker rechecks the actor against the current database before doing work.
 ## Operator preparation
 
 Installation and real restores require separately authorized operator work.
+Use the first-installation procedure below for standard hosts; these are its
+configuration and security prerequisites.
 Install this reviewed source and its locked npm dependencies into
 `/opt/oclr-backup`, owned by root and not writable by either service account.
 Use Node 24, PostgreSQL client tools matching the server, and util-linux flock.
@@ -26,10 +28,12 @@ OCLR_OPERATOR_LOCK=/opt/oclr/.update.lock
 OCLR_OPERATOR_KEY=/etc/oclr-backup/package.key
 OCLR_OPERATOR_DATABASE_URL=postgresql://OPERATOR@DB_HOST/DB_NAME?sslmode=disable
 OCLR_OPERATOR_RUNTIME_ROLE=oclr_runtime
-OCLR_OPERATOR_RELEASE=FULL_40_CHARACTER_REVIEWED_RELEASE_SHA
+OCLR_OPERATOR_RELEASE_FILE=/opt/oclr/current/.oclr-release
+APP_URL=https://YOUR_OCLR_HOST
 OCLR_OPERATOR_HEALTH_URL=http://127.0.0.1:3000/api/health
 OCLR_ENVIRONMENT=production
 OCLR_SERVICE=oclr.service
+OCLR_OPERATOR_MEDIA_HELPER=/opt/oclr-backup/current/operator/media-fingerprint.mjs
 OCLR_MEDIA_DIR=/var/lib/oclr/media
 ADMIN_OSU_IDS=APPROVED_RECOVERY_ADMIN_IDS
 ```
@@ -52,12 +56,14 @@ same inode. The operator account needs exactly these sudoers commands:
 
 ```
 oclr-backup ALL=(root) NOPASSWD: /usr/bin/systemctl stop oclr.service, /usr/bin/systemctl start oclr.service
+oclr-backup ALL=(oclr) NOPASSWD: /usr/bin/node /opt/oclr-backup/current/operator/media-fingerprint.mjs /var/lib/oclr/media
 ```
 
 It must not receive arbitrary sudo or permission to modify the target service.
 The website needs only `OCLR_OPERATOR_SOCKET`; its account must have socket group
 access. Keep the parent directory operator-owned and inaccessible to other users.
-Allow the operator read-only access to durable media. Adapt SELinux policy while
+Use the fixed root-owned helper to fingerprint private media as the website
+account; retain mode-0600 files instead of granting broad file access. Adapt SELinux policy while
 keeping enforcement enabled. Set the proxy's upload limit to 65 MiB for this
 route only; retain authentication, HTTPS, request timeouts and no shared caching.
 
@@ -109,3 +115,70 @@ the service, active database and retained candidate/original and updates the
 private job recovery record. Never automatically drop recovery databases or
 restore over an active database. Audit records survive package expiry and old
 snapshot restoration. Back them up separately with restricted access.
+
+## First installation after a website-only update
+
+A normal `sudo oclr update` installs the application; it does **not** create the
+separate privileged backup operator. If only the website was updated, the backup
+page cannot create jobs until this one-time provisioning is complete.
+
+From a clean, separately reviewed installer checkout (not the serving application
+or operator directory), fetch canonical main and select the reviewed full SHA:
+
+```sh
+sudo bash scripts/install-backup-operator.sh --ref FULL_REVIEWED_SHA --dry-run
+sudo bash scripts/install-backup-operator.sh --ref FULL_REVIEWED_SHA --apply
+```
+
+If more than one client version is installed, explicitly select the existing
+matching client directory, for example `sudo OCLR_PG_BIN=/usr/pgsql-17/bin bash
+scripts/install-backup-operator.sh --ref FULL_REVIEWED_SHA --apply` for a reviewed
+PostgreSQL 17 client. The installer records this path in the unit, so PGDG tools
+are available to systemd. It does not install a replacement database server.
+
+The explicit installer provisions the separate account, a private random package
+key, an example configuration, root-owned source/dependencies, shared lock access,
+unit and narrow sudoers. It keeps control files root-owned throughout provisioning. npm runs as the
+backup account in a separate dependency staging tree with lifecycle scripts
+disabled; only node_modules is copied into the immutable release. It preserves existing
+keys/configuration and refuses existing service/sudoers installations. It does
+not read runtime.env, create database roles, start the operator or restart the
+website. Review the output before proceeding.
+
+1. Have the DBA provision/review the operator database identity and required
+   ownership/CREATEDB permission. Fill `/etc/oclr-backup/operator.env` privately;
+   do not send its contents, passwords or package key to chat or logs.
+2. Use `OCLR_OPERATOR_RELEASE_FILE=/opt/oclr/current/.oclr-release` in place of a
+   hard-coded `OCLR_OPERATOR_RELEASE`. Each job reads the current release marker
+   under the shared update lock, so a routine website update does not leave a
+   stale backup release or fail the exact-release health check.
+3. Add `OCLR_OPERATOR_SOCKET=/run/oclr-backup/operator.sock` to the website's
+   existing private runtime configuration. Both database URLs must identify the
+   same canonical host/port/name; the credentials remain separate. Set the
+   operator `APP_URL` to the website's public HTTPS origin as well; local health
+   requests send its canonical Host header rather than triggering a redirect.
+4. Review SELinux policy and back up the package key. The installer grants only
+   a fixed root-owned media fingerprint helper, running as `oclr`, so the backup
+   account can hash mode-0600 media without receiving raw media access, a shell
+   or broader sudo privileges. The default helper path/media root in the example
+   configuration must match the fixed sudoers entry; review both explicitly for
+   a nonstandard media root.
+5. Explicitly enable the operator with
+   `sudo systemctl enable --now oclr-backup.service`. Restart the website in an
+   approved maintenance window so it loads the socket setting.
+6. Check only service state with `sudo systemctl is-active oclr-backup.service`,
+   then open `/admin/backups`. Do not paste environment files or general journal
+   output into chat; diagnostics can contain private operator information.
+
+The page now distinguishes missing runtime configuration, an unreachable socket
+and an operator-rejected connection. Actions remain disabled until the job list
+can be read successfully. A missing-configuration message means step 3 has not
+reached the running website process. An unreachable message means the daemon,
+socket permissions or SELinux need inspection. A rejected-connection message
+requires checking the matching database target and operator configuration.
+
+Routine website updates may follow the current release marker, but changes to
+the backup/authentication/schema contract still require a separately reviewed
+operator upgrade; do not assume an older operator understands a new credential
+family. The first-install script intentionally refuses to overwrite an existing
+operator installation.

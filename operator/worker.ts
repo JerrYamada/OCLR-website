@@ -1,5 +1,6 @@
 /** Run only by the separately installed operator, under the updater's flock. */
 import { Client } from "pg";
+import { request as healthRequest } from "node:http";
 import { spawnSync } from "node:child_process";
 import {
   readFileSync,
@@ -27,7 +28,9 @@ const job = JSON.parse(readFileSync(path, "utf8"));
 const key = readFileSync(process.env.OCLR_OPERATOR_KEY!);
 const url = new URL(process.env.OCLR_OPERATOR_DATABASE_URL!);
 const database = decodeURIComponent(url.pathname.slice(1));
-const release = process.env.OCLR_OPERATOR_RELEASE!;
+const release = process.env.OCLR_OPERATOR_RELEASE_FILE
+  ? readFileSync(process.env.OCLR_OPERATOR_RELEASE_FILE, "utf8").trim()
+  : process.env.OCLR_OPERATOR_RELEASE!;
 const runtimeRole = process.env.OCLR_OPERATOR_RUNTIME_ROLE!;
 const service = process.env.OCLR_SERVICE || "oclr.service";
 if (
@@ -112,6 +115,23 @@ async function inventory(c: Client) {
 function media() {
   const directory = process.env.OCLR_MEDIA_DIR;
   if (!directory) throw Error("Configure the matching durable media directory");
+  const helper = process.env.OCLR_OPERATOR_MEDIA_HELPER;
+  if (helper) {
+    if (!helper.startsWith("/")) throw Error("Invalid media helper");
+    const fingerprint = tool("sudo", [
+      "-n",
+      "-u",
+      "oclr",
+      "/usr/bin/node",
+      helper,
+      directory,
+    ])
+      .toString()
+      .trim();
+    if (!/^[a-f0-9]{64}$/.test(fingerprint))
+      throw Error("Invalid media fingerprint");
+    return fingerprint;
+  }
   const hash = createHash("sha256");
   function walk(dir: string, prefix = "") {
     for (const name of readdirSync(dir).sort()) {
@@ -369,18 +389,53 @@ try {
     )
       throw Error("Configure local health URL");
     let healthy = false;
+    const healthTarget = new URL(healthUrl);
+    if (
+      healthTarget.protocol !== "http:" ||
+      healthTarget.username ||
+      healthTarget.password ||
+      healthTarget.search ||
+      healthTarget.hash
+    )
+      throw Error("Use a plain loopback health origin");
+    const canonicalHost = process.env.APP_URL
+      ? new URL(process.env.APP_URL).host
+      : healthTarget.host;
     for (let attempt = 0; attempt < 30; attempt++) {
-      try {
-        const response = await fetch(healthUrl, {
-          signal: AbortSignal.timeout(2000),
-          redirect: "error",
+      healthy = await new Promise<boolean>((resolve) => {
+        const request = healthRequest(
+          healthTarget,
+          { headers: { Host: canonicalHost } },
+          (response) => {
+            let body = "";
+            response.on("data", (chunk) => {
+              body += chunk.toString();
+              if (body.length > 8192) {
+                response.destroy();
+                resolve(false);
+              }
+            });
+            response.on("end", () => {
+              try {
+                resolve(
+                  response.statusCode === 200 &&
+                    JSON.parse(body).release === release,
+                );
+              } catch {
+                resolve(false);
+              }
+            });
+            response.on("error", () => resolve(false));
+          },
+        );
+        request.setTimeout(2000, () => {
+          request.destroy();
+          resolve(false);
         });
-        const body = await response.json();
-        if (response.ok && body.release === release) {
-          healthy = true;
-          break;
-        }
-      } catch {}
+        request.on("error", () => resolve(false));
+        request.end();
+      });
+      if (healthy) break;
       await new Promise((resolve) => setTimeout(resolve, 1000));
     }
     if (!healthy) throw Error("Health verification failed");
