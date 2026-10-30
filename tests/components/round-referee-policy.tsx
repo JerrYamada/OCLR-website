@@ -18,6 +18,7 @@ const defaults = s11RefereeDefaults("11", { type: "first_to", wins })!;
 const roundId = "00000000-0000-4000-8000-000000000001";
 const savedPolicy = {
   ...defaults.policy,
+  banCategoryRules: undefined,
   commands: {
     ...defaults.commands,
     roomSize: 8,
@@ -38,6 +39,19 @@ const router = {
   prefetch() {},
   bfcacheId: "synthetic",
 } as AppRouterInstance;
+type RefereeData = NonNullable<
+  Parameters<typeof RoundManager>[0]["refereeData"]
+>;
+const poolId = "00000000-0000-4000-8000-000000000002";
+const entries = ["NM", "HD", "HR", "FM", "TB"].flatMap((category, index) =>
+  [1, 2].map((position) => ({
+    id: `00000000-0000-4000-8000-${String(100 + index * 2 + position).padStart(12, "0")}`,
+    poolId,
+    category,
+    position,
+    beatmapId: 1000 + index * 2 + position,
+  })),
+) as RefereeData["entries"];
 const locale = params.get("locale") ?? "en";
 document.documentElement.dataset.theme = params.get("theme") ?? "light";
 document.documentElement.dataset.appearance = "default";
@@ -66,8 +80,8 @@ createRoot(document.getElementById("root")!).render(
               },
             ]}
             refereeData={{
-              pools: [],
-              entries: [],
+              pools: [{ id: poolId, roundId }] as RefereeData["pools"],
+              entries,
               refereeRules: [
                 {
                   roundId,

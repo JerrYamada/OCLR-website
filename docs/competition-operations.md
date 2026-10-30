@@ -186,10 +186,24 @@ HD/HR/DT/FM/TB command Mods. The organizer confirmed the draft order on 2026-10-
 one Ban per team → one Pick per team → a second Ban per team → alternating Picks
 → TB (5:5 for BO11, 6:6 for BO13). Admins may edit this draft before saving.
 Room size and start countdown remain unset; the per-team disconnect replay
-allowance is not converted into a per-map replay cap. Category Ban limits,
-disconnect adjudication, pauses and EX conditions still require referee review
+allowance is not converted into a per-map replay cap. Disconnect adjudication,
+pauses and EX conditions still require referee review
 under the published rules; the template does not automate these judgments.
 Other seasons and existing saved policies are never replaced by S11 defaults.
+
+The step editor uses compact rows with one action/order selector, up/down controls
+and optional step limits. Category restrictions use buttons; selecting specific
+maps is an optional searchable checklist. All non-TB maps are eligible for Ban
+by default. TB cannot be banned, even when a policy has no explicit TB step.
+
+**Repeated Mod Bans** controls whether the same team may Ban the same pool
+category again across the round's Ban phases. Admins may allow exception
+categories. New S11 drafts prohibit repeats except NM/FM. Existing policies
+without `banCategoryRules` retain allowed-repeat behavior; no backfill is applied.
+Opposing teams may Ban the same category. Only active Ban selections count;
+withdrawn selections and Picks do not. The server and the shared desktop model
+enforce the same rules. A repeated category never permits reusing a previously
+banned/picked map, and no setting permits banning TB.
 
 Saving uses the edition-scoped `manage_fixtures` capability, same-origin POST,
 expected policy revision and transactional audit. It checks all sessions in the

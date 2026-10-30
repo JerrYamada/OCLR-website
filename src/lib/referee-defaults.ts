@@ -20,7 +20,11 @@ export function s11RefereeDefaults(
     return null;
   return {
     wins: series.wins,
-    policy: { steps: s11RefereeSteps(series.wins, "split"), commands: null },
+    policy: {
+      steps: s11RefereeSteps(series.wins, "split"),
+      commands: null,
+      banCategoryRules: { allowRepeats: false, repeatExceptions: ["NM", "FM"] },
+    },
     commands: {
       noFail: true,
       banSeconds: 60,
