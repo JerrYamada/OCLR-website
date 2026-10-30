@@ -30,7 +30,7 @@ getent passwd oclr >/dev/null || fail 'Install the existing website account firs
 getent group oclr >/dev/null || fail 'The website group is missing.'
 installer=${SUDO_USER:-root}
 [[ "$installer" != oclr && "$installer" != oclr-backup ]] || fail 'The installer checkout must not belong to a service account.'
-git_read() { runuser -u "$installer" -- git -c core.fsmonitor=false -C "$source_dir" "$@"; }
+git_read() { runuser -u "$installer" -- git -c core.fsmonitor=false -C "$source_dir" "$@" 9>&-; }
 [[ -z $(git_read status --porcelain) ]] || fail 'Use a clean reviewed installer checkout.'
 git_read merge-base --is-ancestor "$sha" origin/main || fail 'The reviewed SHA is not on the fetched canonical main.'
 for required_file in operator/worker.ts operator/operator.env.example operator/media-fingerprint.mjs operator/systemd/oclr-backup.service; do git_read cat-file -e "$sha:$required_file" || fail 'The selected release lacks the operator installation contract.'; done
@@ -76,7 +76,7 @@ install -d -o oclr-backup -g oclr -m 0755 "$release"
 # Git runs as the installer, and npm scripts run only as the backup account.
 git_read archive "$sha" | tar --no-same-owner -xf - -C "$release"
 chown -hR oclr-backup:oclr "$release"
-runuser -u oclr-backup -- env -i HOME=/var/lib/oclr-backup USER=oclr-backup LOGNAME=oclr-backup PATH="$operator_path" NODE_ENV=development npm --prefix "$release" ci --include=dev
+runuser -u oclr-backup -- env -i HOME=/var/lib/oclr-backup USER=oclr-backup LOGNAME=oclr-backup PATH="$operator_path" NODE_ENV=development npm --prefix "$release" ci --include=dev 9>&-
 chown -hR root:root "$release"
 find "$release" -xdev -type d -exec chmod 0755 {} +
 find "$release" -xdev -type f -perm /111 -exec chmod 0755 {} +

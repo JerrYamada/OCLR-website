@@ -54,3 +54,9 @@ upload field from stretching the create button.
 - Installer apply, real Rocky systemd/sudo/SELinux provisioning and production
   service startup were **not performed**. Production remains dependent on the
   one-time installation and privately approved operator DB configuration.
+
+Final follow-up unit/integration run: **219 files passed; 1,768 tests passed,
+1 skipped**. The preliminary run caught the download error classification while
+that change was being added; the corrected committed source passed the final
+full run. Review also closes the shared lock descriptor in unprivileged git/npm
+children; installer syntax/preview tests passed again after that change.

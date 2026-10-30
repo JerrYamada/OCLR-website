@@ -174,3 +174,9 @@ can be read successfully. A missing-configuration message means step 3 has not
 reached the running website process. An unreachable message means the daemon,
 socket permissions or SELinux need inspection. A rejected-connection message
 requires checking the matching database target and operator configuration.
+
+Routine website updates may follow the current release marker, but changes to
+the backup/authentication/schema contract still require a separately reviewed
+operator upgrade; do not assume an older operator understands a new credential
+family. The first-install script intentionally refuses to overwrite an existing
+operator installation.
