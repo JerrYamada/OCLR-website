@@ -52,3 +52,18 @@ Existing permission, active-selection and completed-history tests remain in plac
 
 Build/CI status is recorded on #574 after completion. Chinese wording requires
 organizer review; no merge, deployment or real tournament data edit is claimed.
+
+## PR integration — 2026-10-31
+
+The organizer requested updating and merging the existing PR #573. The #574
+change is now combined there with #571, retaining both issue commits and the
+latest main (#576); no history was rewritten.
+
+The branch CI run [41081292009](https://github.com/OCLR-dev/OCLR-website/actions/runs/41081292009)
+at `6584b0ca` completed build, core browser and remote permission smoke successfully.
+Unit/integration reported **1,820 passed, 1 failed**. The only failure was the new
+BO audit assertion expecting one total event despite the fixture seed already
+having a scoring audit. The assertion now checks exactly one newly created event
+and its round identity, before/after version and scoring series. No application
+behavior was changed for this test correction. Combined-head CI is recorded in
+the PR and issues separately from this historical result.

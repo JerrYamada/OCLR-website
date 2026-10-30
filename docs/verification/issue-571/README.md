@@ -56,3 +56,15 @@ approved/current/old/claimed/audited official history, bracket/published-statist
 blocks, audit-failure rollback and concurrent referee writes. These await CI.
 PR/CI evidence and organizer review of new Chinese wording are tracked on #571;
 no acceptance, merge or deployment is claimed here.
+
+## PR update — 2026-10-31
+
+PR #573's original `2a7dab4b` passed its complete selected core CI run
+[41077828078](https://github.com/OCLR-dev/OCLR-website/actions/runs/41077828078),
+including database verification, build, both core browser shards and remote
+permission smoke. This resolves the original local DB execution gap for that
+commit; it does not establish full regression or deployment acceptance.
+
+The organizer subsequently authorized updating and merging #573 with the #574
+BO/Ban rules. The combined head retains the latest main and both issue histories.
+Its distinct CI status and final merge commit are recorded on the PR/issues.

@@ -105,6 +105,10 @@ describe.skipIf(!url)("round referee policies independent of fixtures", () => {
     expect(audits).toHaveLength(1);
   });
   it("atomically saves BO with BP, scoring release, round version and audit", async () => {
+    const existingAudit = await db()
+      .select({ id: editionEvents.id })
+      .from(editionEvents)
+      .where(eq(editionEvents.kind, "competition_round_rules"));
     const [before] = await db()
       .select()
       .from(tournamentRounds)
@@ -133,12 +137,23 @@ describe.skipIf(!url)("round referee policies independent of fixtures", () => {
     expect(
       (await refereeWorkspace(referee, "test-cup", w.fixture.id)).series,
     ).toEqual({ type: "first_to", wins: 3 });
-    expect(
+    const addedAudit = (
       await db()
         .select()
         .from(editionEvents)
-        .where(eq(editionEvents.kind, "competition_round_rules")),
-    ).toHaveLength(1);
+        .where(eq(editionEvents.kind, "competition_round_rules"))
+    ).filter(
+      (event) => !existingAudit.some((previous) => previous.id === event.id),
+    );
+    expect(addedAudit).toHaveLength(1);
+    expect(addedAudit[0].detail).toMatchObject({
+      entity: { type: "tournament_round", id: w.round.id },
+      before: { version: before.version },
+      after: {
+        version: before.version + 1,
+        scoringRules: { series: { type: "first_to", wins: 3 } },
+      },
+    });
     await expect(
       saveRoundRefereePolicy(admin, "test-cup", w.round.id, {
         expectedRevision: 1,
