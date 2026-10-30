@@ -17,6 +17,7 @@ import { HttpError } from "./http";
 import { fetchBeatmaps } from "./osu-beatmaps";
 import type { BeatmapSnapshot } from "./mappool-model";
 import {
+  candidateCategories,
   candidateLimit,
   commentLimit,
   commentLength,
@@ -31,6 +32,7 @@ async function databaseSelectionWorkspace(actor: User, slug: string) {
     .select({
       id: mappoolCandidates.id,
       beatmapId: mappoolCandidates.beatmapId,
+      category: mappoolCandidates.category,
       metadata: mappoolCandidates.metadata,
       metadataFetchedAt: mappoolCandidates.metadataFetchedAt,
       authorId: mappoolCandidates.authorId,
@@ -111,7 +113,10 @@ export async function previewCandidates(
   // Preview spends provider budget, so it requires the same live write grant.
   await assertCapability(actor, "select_mappools", slug);
   const parsed = z
-    .object({ text: z.string().max(16000) })
+    .object({
+      text: z.string().max(16000),
+      category: z.enum(candidateCategories).default("unassigned"),
+    })
     .strict()
     .safeParse(input);
   if (!parsed.success)
@@ -126,7 +131,9 @@ export async function previewCandidates(
   try {
     rows = parseCandidateRows(
       parsed.data.text,
-      data.candidates.map((c) => c.beatmapId),
+      data.candidates
+        .filter((c) => c.category === parsed.data.category)
+        .map((c) => c.beatmapId),
     );
   } catch {
     throw new HttpError(400, "Enter between 1 and 50 map rows.");
@@ -154,7 +161,16 @@ export type CandidatePreview = Awaited<ReturnType<typeof previewCandidates>>;
 const commandSchema = z.discriminatedUnion("action", [
   z
     .object({
+      action: z.literal("classify"),
+      candidateId: z.uuid(),
+      category: z.enum(candidateCategories),
+      expectedCategory: z.enum(candidateCategories),
+    })
+    .strict(),
+  z
+    .object({
       action: z.literal("add"),
+      category: z.enum(candidateCategories).default("unassigned"),
       rows: z
         .array(
           z
@@ -198,10 +214,15 @@ export async function selectionCommand(
   const snapshots = new Map<number, BeatmapSnapshot>();
   if (c.action === "add") {
     const existing = await db()
-      .select({ id: mappoolCandidates.beatmapId })
+      .select({
+        id: mappoolCandidates.beatmapId,
+        category: mappoolCandidates.category,
+      })
       .from(mappoolCandidates)
       .where(eq(mappoolCandidates.editionSlug, slug));
-    const known = new Set(existing.map((r) => r.id));
+    const known = new Set(
+      existing.filter((r) => r.category === c.category).map((r) => r.id),
+    );
     const ids = c.rows
       .filter((r) => !known.has(r.beatmapId))
       .map((r) => r.beatmapId);
@@ -231,10 +252,15 @@ export async function selectionCommand(
     await assertOperationalEdition(slug, tx);
     if (c.action === "add") {
       const existing = await tx
-        .select({ id: mappoolCandidates.beatmapId })
+        .select({
+          id: mappoolCandidates.beatmapId,
+          category: mappoolCandidates.category,
+        })
         .from(mappoolCandidates)
         .where(eq(mappoolCandidates.editionSlug, slug));
-      const known = new Set(existing.map((r) => r.id));
+      const known = new Set(
+        existing.filter((r) => r.category === c.category).map((r) => r.id),
+      );
       const pending = c.rows.filter((r) => !known.has(r.beatmapId));
       if (existing.length + pending.length > candidateLimit)
         throw new HttpError(
@@ -243,12 +269,19 @@ export async function selectionCommand(
         );
       const added: number[] = [];
       for (const row of pending) {
-        const snapshot = snapshots.get(row.beatmapId)!;
+        const snapshot = snapshots.get(row.beatmapId);
+        // A previously known candidate may have moved while provider work ran.
+        if (!snapshot)
+          throw new HttpError(
+            409,
+            "Candidate category changed. Refresh the list.",
+          );
         const [candidate] = await tx
           .insert(mappoolCandidates)
           .values({
             editionSlug: slug,
             beatmapId: row.beatmapId,
+            category: c.category,
             metadata: snapshot.metadata,
             metadataFetchedAt: new Date(snapshot.fetchedAt),
             authorId: actor.osuId,
@@ -259,7 +292,11 @@ export async function selectionCommand(
           editionSlug: slug,
           actorId: actor.osuId,
           action: "candidate_add",
-          after: { candidateId: candidate.id, beatmapId: row.beatmapId },
+          after: {
+            candidateId: candidate.id,
+            beatmapId: row.beatmapId,
+            category: c.category,
+          },
         });
         added.push(row.beatmapId);
       }
@@ -275,6 +312,41 @@ export async function selectionCommand(
         ),
       );
     if (!candidate) throw new HttpError(404, "Candidate not found.");
+    if (c.action === "classify") {
+      if (candidate.category === c.category) return { added: 0, skipped: 1 };
+      if (candidate.category !== c.expectedCategory)
+        throw new HttpError(
+          409,
+          "Candidate category changed. Refresh the list.",
+        );
+      const [duplicate] = await tx
+        .select({ id: mappoolCandidates.id })
+        .from(mappoolCandidates)
+        .where(
+          and(
+            eq(mappoolCandidates.editionSlug, slug),
+            eq(mappoolCandidates.category, c.category),
+            eq(mappoolCandidates.beatmapId, candidate.beatmapId),
+          ),
+        );
+      if (duplicate)
+        throw new HttpError(
+          409,
+          "This map already exists in that Mod category.",
+        );
+      await tx
+        .update(mappoolCandidates)
+        .set({ category: c.category })
+        .where(eq(mappoolCandidates.id, candidate.id));
+      await tx.insert(mappoolEvents).values({
+        editionSlug: slug,
+        actorId: actor.osuId,
+        action: "candidate_classify",
+        before: { candidateId: candidate.id, category: candidate.category },
+        after: { candidateId: candidate.id, category: c.category },
+      });
+      return { added: 0, skipped: 0 };
+    }
     const [prior] = await tx
       .select()
       .from(mappoolCandidateComments)

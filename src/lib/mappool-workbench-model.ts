@@ -1,4 +1,6 @@
-import { parseBeatmapId } from "./mappool-model";
+import { categories, parseBeatmapId } from "./mappool-model";
+export const candidateCategories = ["unassigned", ...categories] as const;
+export type CandidateCategory = (typeof candidateCategories)[number];
 export const candidateBatchLimit = 50;
 export const candidateLimit = 500;
 export const commentLimit = 200;

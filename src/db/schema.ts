@@ -1465,6 +1465,11 @@ export const mappoolCandidates = pgTable(
     editionSlug: text("edition_slug")
       .notNull()
       .references(() => editionState.slug),
+    category: text("category", {
+      enum: ["unassigned", "NM", "HD", "DT", "HR", "FM", "TB"],
+    })
+      .notNull()
+      .default("unassigned"),
     beatmapId: bigint("beatmap_id", { mode: "number" }).notNull(),
     metadata: jsonb("metadata")
       .$type<import("../lib/mappool-model").BeatmapMetadata>()
@@ -1479,7 +1484,15 @@ export const mappoolCandidates = pgTable(
       .defaultNow(),
   },
   (t) => [
-    unique("candidate_edition_bid_unique").on(t.editionSlug, t.beatmapId),
+    check(
+      "candidate_category_valid",
+      sql`${t.category} in ('unassigned', 'NM', 'HD', 'DT', 'HR', 'FM', 'TB')`,
+    ),
+    unique("candidate_edition_category_bid_unique").on(
+      t.editionSlug,
+      t.category,
+      t.beatmapId,
+    ),
     unique("candidate_id_edition_unique").on(t.id, t.editionSlug),
   ],
 );

@@ -292,6 +292,7 @@
       "operations": [
         "candidateComments",
         "getApiIdentity",
+        "mappoolWorkspace",
         "selectionWorkspace"
       ],
       "commands": "Denied in remote mode; connection management and preference cookies remain separate",
@@ -299,7 +300,8 @@
       "services": [
         "src/lib/mappool-workbench.ts#selectionWorkspace",
         "src/lib/mappool-workbench.ts#candidateComments",
-        "src/lib/public-read-models.ts / frontend-data.ts (getApiIdentity)"
+        "src/lib/public-read-models.ts / frontend-data.ts (getApiIdentity)",
+        "src/lib/mappools.ts#mappoolWorkspace"
       ],
       "test": "remote-e2e/full-site.spec.ts + integration/extended-read.test.ts",
       "authorization": "Live Developer + private scope; write controls disabled",
