@@ -49,6 +49,32 @@ operator role must own the existing application database and objects and have
 CREATEDB; the runtime role must remain separate and unprivileged. Have the DBA
 review this ownership and the absence of other application writers first.
 
+Database ownership alone does not grant access to a migration ledger created
+by a different role. In **the application database named in the operator URL**,
+the DBA must also grant schema USAGE and ledger SELECT to the dedicated operator
+database role. For the example `oclr_migrator` role and `oclr` database:
+
+```sql
+\connect oclr
+GRANT USAGE ON SCHEMA drizzle TO oclr_migrator;
+GRANT SELECT ON TABLE drizzle.__drizzle_migrations TO oclr_migrator;
+```
+
+Substitute the actual application database and dedicated PostgreSQL role, not
+the Linux service user or the website runtime role. PostgreSQL schemas and
+these grants are local to each database; a psql prompt of `postgres=#` normally
+means the maintenance database, which does not contain the app ledger. Do not
+create a substitute ledger there. Grants take effect on the next connection
+without restarting either service. A privately changed operator URL requires
+restarting only the operator when no job is active.
+
+The worker preflights these exact ledger reads after actor authorization and
+before stopping the website. Missing privileges fail in `database-preflight`
+without calling service control. Subsequent private audit phases distinguish
+`stopping-service`, `inventory` and `database-size`. Installing this worker change
+requires the separately reviewed operator upgrade; a website-only update does
+not replace the operator. Existing operators can use the DBA grants immediately.
+
 Generate a private random **32-byte binary key**, readable only by the operator.
 Keep an encrypted offline copy: loss of this key makes packages unrecoverable.
 Only packages made with this installation's key are trusted. Do not accept a

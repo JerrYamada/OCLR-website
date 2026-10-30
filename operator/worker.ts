@@ -205,6 +205,12 @@ try {
         )
       ).rowCount;
     if (!authorized) throw Error("Permission revoked");
+    // Validate the ledger's exact read permissions before any service control.
+    // Owning the application database does not imply owning an older ledger.
+    phase = "database-preflight";
+    await current.query(
+      "SELECT id,hash,created_at FROM drizzle.__drizzle_migrations LIMIT 0",
+    );
   } finally {
     await current.end();
   }
@@ -238,6 +244,7 @@ try {
     phase = "stopping-service";
     stopped = true;
     tool("sudo", ["-n", "/usr/bin/systemctl", "stop", service]);
+    phase = "inventory";
     const c = await connection();
     let inv;
     try {
@@ -248,6 +255,7 @@ try {
     const schema = createHash("sha256")
       .update(JSON.stringify(inv.ledger))
       .digest("hex");
+    phase = "database-size";
     if (
       Number(
         await (async () => {

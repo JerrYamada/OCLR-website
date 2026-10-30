@@ -42,9 +42,13 @@ describe.skipIf(!url)("Admin backup PostgreSQL round trip", () => {
     mkdirSync(join(root, "media"));
     mkdirSync(join(root, "bin"));
     writeFileSync(join(root, "key"), randomBytes(32));
-    writeFileSync(join(root, "bin/sudo"), "#!/bin/sh\nexit 0\n", {
-      mode: 0o700,
-    });
+    const serviceLog = join(root, "service.log");
+    writeFileSync(serviceLog, "");
+    writeFileSync(
+      join(root, "bin/sudo"),
+      '#!/bin/sh\nprintf "%s\\n" "$*" >> "$OCLR_TEST_SERVICE_LOG"\nexit 0\n',
+      { mode: 0o700 },
+    );
     const release = "a".repeat(40);
     writeFileSync(join(root, "release"), release + "\n");
     const health = createServer((req, res) => {
@@ -74,9 +78,15 @@ describe.skipIf(!url)("Admin backup PostgreSQL round trip", () => {
       OCLR_OPERATOR_HEALTH_URL: `http://127.0.0.1:${port}/api/health`,
       OCLR_MEDIA_DIR: join(root, "media"),
       ADMIN_OSU_IDS: "999001",
+      OCLR_TEST_SERVICE_LOG: serviceLog,
       PATH: join(root, "bin") + ":" + process.env.PATH,
     };
-    async function run(action: string, source?: string, upload?: Buffer) {
+    async function run(
+      action: string,
+      source?: string,
+      upload?: Buffer,
+      operatorDatabaseUrl = databaseUrl,
+    ) {
       const id = randomUUID();
       writeFileSync(
         join(root, id + ".json"),
@@ -87,7 +97,10 @@ describe.skipIf(!url)("Admin backup PostgreSQL round trip", () => {
         const child = spawn(
           process.execPath,
           ["--import", "tsx", "operator/worker.ts", id],
-          { env, stdio: "ignore" },
+          {
+            env: { ...env, OCLR_OPERATOR_DATABASE_URL: operatorDatabaseUrl },
+            stdio: "ignore",
+          },
         );
         child.on("exit", () => resolve());
       });
@@ -95,7 +108,49 @@ describe.skipIf(!url)("Admin backup PostgreSQL round trip", () => {
     }
     const c = new Client({ connectionString: databaseUrl });
     await c.connect();
+    const deniedRole =
+      "oclr_test_ledger_" + randomUUID().replaceAll("-", "").slice(0, 12);
+    let roleCreated = false;
     try {
+      // A separately authenticated, authorized actor can still lack ledger reads.
+      // Reject this before the first service-control command; never grant runtime rights.
+      await admin.query(
+        `CREATE ROLE "${deniedRole}" LOGIN PASSWORD 'synthetic_test_only'`,
+      );
+      roleCreated = true;
+      await c.query(`GRANT USAGE ON SCHEMA drizzle TO "${deniedRole}"`);
+      const deniedUrl = new URL(databaseUrl);
+      deniedUrl.username = deniedRole;
+      deniedUrl.password = "synthetic_test_only";
+      const denied = await run(
+        "backup",
+        undefined,
+        undefined,
+        deniedUrl.toString(),
+      );
+      expect(denied.state).toBe("failed");
+      expect(denied.recovery).toBe("original-preserved");
+      const events = readFileSync(join(root, "audit.jsonl"), "utf8")
+        .trim()
+        .split("\n")
+        .map((line) => JSON.parse(line));
+      expect(events.at(-1).phase).toBe("database-preflight");
+      expect(readFileSync(serviceLog, "utf8")).toBe("");
+      // The documented grant is sufficient for the exact columns the worker reads.
+      await c.query(
+        `GRANT SELECT ON TABLE drizzle.__drizzle_migrations TO "${deniedRole}"`,
+      );
+      const ledgerReader = new Client({
+        connectionString: deniedUrl.toString(),
+      });
+      await ledgerReader.connect();
+      try {
+        await ledgerReader.query(
+          "SELECT id,hash,created_at FROM drizzle.__drizzle_migrations LIMIT 0",
+        );
+      } finally {
+        await ledgerReader.end();
+      }
       await c.query(
         "CREATE TABLE IF NOT EXISTS backup_synthetic (id integer primary key, value text not null)",
       );
@@ -174,6 +229,7 @@ describe.skipIf(!url)("Admin backup PostgreSQL round trip", () => {
           throw Error("Unsafe cleanup");
         await admin.query('DROP DATABASE "' + row.datname + '" WITH (FORCE)');
       }
+      if (roleCreated) await admin.query(`DROP ROLE "${deniedRole}"`);
       await admin.end();
     }
   }, 120000);
