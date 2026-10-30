@@ -52,6 +52,15 @@ function BwsNote({ value }: { value: Summary }) {
   );
 }
 
+function RankValue({ value }: { value: string }) {
+  return (
+    <strong className="bws-value">
+      <span className="bws-value-hash">#</span>
+      {value}
+    </strong>
+  );
+}
+
 function InfoTrigger({ onOpenLabel }: { onOpenLabel: string }) {
   return (
     <button
@@ -89,11 +98,18 @@ function InfoTrigger({ onOpenLabel }: { onOpenLabel: string }) {
 }
 
 /**
- * Compact badge-weighted seeding card overlaid on the player cover: BWS and
- * weighted pp side by side, the original rank/pp in small parentheses, and all
- * explanatory copy behind the `i` trigger (same disclosure pattern as map notes).
+ * Compact badge-weighted seeding card overlaid on the player cover: BWS, the
+ * plain country rank and weighted pp side by side, the original rank/pp in small
+ * parentheses, and all explanatory copy behind the `i` trigger (same disclosure
+ * pattern as map notes).
  */
-function CompactBwsSummary({ value }: { value: Summary }) {
+function CompactBwsSummary({
+  value,
+  countryRank,
+}: {
+  value: Summary;
+  countryRank: number | null;
+}) {
   const tr = useAppTranslations();
   const number = (v: number, digits: number) =>
     new Intl.NumberFormat(tr.locale, {
@@ -111,6 +127,37 @@ function CompactBwsSummary({ value }: { value: Summary }) {
     >
       <div className="bws-card-metric">
         <div className="bws-card-label-row">
+          <span className="bws-card-label">{pending ? "pp" : tr("BW-PP")}</span>
+          {value.rawPp !== null && (
+            <div className="bws-card-note">
+              <InfoTrigger onOpenLabel={tr("Explanation")} />
+              <div className="bws-card-note-panel" role="note">
+                <p className="small muted">
+                  {tr("Original pp")}: {number(value.rawPp, 2)}
+                </p>
+              </div>
+            </div>
+          )}
+        </div>
+        <div className="bws-card-value-row">
+          {value.adjustedPp !== null ? (
+            <strong className="bws-value">
+              {number(Math.floor(value.adjustedPp), 0)}
+            </strong>
+          ) : pending && value.rawPp !== null ? (
+            <strong className="bws-value">{number(value.rawPp, 2)}</strong>
+          ) : (
+            <span className="bws-card-state">
+              {value.ppStatus === "pending"
+                ? tr("Badge eligibility pending staff review")
+                : tr("Weighted pp unavailable (missing data or numeric limit)")}
+            </span>
+          )}
+        </div>
+      </div>
+      <span className="bws-card-divider" aria-hidden="true" />
+      <div className="bws-card-metric">
+        <div className="bws-card-label-row">
           <span className="bws-card-label">
             {pending ? tr("Global rank") : tr("BW-rank")}
           </span>
@@ -123,18 +170,9 @@ function CompactBwsSummary({ value }: { value: Summary }) {
         </div>
         <div className="bws-card-value-row">
           {value.value !== null ? (
-            <>
-              <strong className="bws-value">{number(value.value, 0)}</strong>
-              {value.globalRank !== null && (
-                <span className="bws-card-hint">
-                  ({tr("Rank")} #{number(value.globalRank, 0)})
-                </span>
-              )}
-            </>
+            <RankValue value={number(value.value, 0)} />
           ) : pending && value.globalRank !== null ? (
-            <strong className="bws-value">
-              #{number(value.globalRank, 0)}
-            </strong>
+            <RankValue value={number(value.globalRank, 0)} />
           ) : (
             <span className="bws-card-state">
               {value.status === "unranked"
@@ -146,28 +184,13 @@ function CompactBwsSummary({ value }: { value: Summary }) {
       </div>
       <span className="bws-card-divider" aria-hidden="true" />
       <div className="bws-card-metric">
-        <span className="bws-card-label">
-          {pending ? "pp" : tr("BW-PP")}
-        </span>
+        <span className="bws-card-label">{tr("Country rank")}</span>
         <div className="bws-card-value-row">
-          {value.adjustedPp !== null ? (
-            <>
-              <strong className="bws-value">
-                {number(value.adjustedPp, 2)}
-              </strong>
-              {value.rawPp !== null && (
-                <span className="bws-card-hint">
-                  ({tr("Original pp")} {number(value.rawPp, 2)})
-                </span>
-              )}
-            </>
-          ) : pending && value.rawPp !== null ? (
-            <strong className="bws-value">{number(value.rawPp, 2)}</strong>
+          {countryRank !== null ? (
+            <RankValue value={number(countryRank, 0)} />
           ) : (
             <span className="bws-card-state">
-              {value.ppStatus === "pending"
-                ? tr("Badge eligibility pending staff review")
-                : tr("Weighted pp unavailable (missing data or numeric limit)")}
+              {tr("Unranked / unavailable")}
             </span>
           )}
         </div>
@@ -179,12 +202,15 @@ function CompactBwsSummary({ value }: { value: Summary }) {
 export function BwsSummary({
   value,
   variant = "detail",
+  countryRank = null,
 }: {
   value: Summary;
   variant?: "detail" | "compact";
+  countryRank?: number | null;
 }) {
   const tr = useAppTranslations();
-  if (variant === "compact") return <CompactBwsSummary value={value} />;
+  if (variant === "compact")
+    return <CompactBwsSummary value={value} countryRank={countryRank} />;
   return (
     <section className="bws-summary" aria-label={tr("Badge-weighted seeding")}>
       <div className="bws-metrics">

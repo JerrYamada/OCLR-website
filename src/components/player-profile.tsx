@@ -1,5 +1,6 @@
 import { useAppTranslations } from "@/i18n/shared";
 import { BwsSummary } from "./bws-summary";
+import { RankChart } from "./rank-chart";
 import type { BwsSummary as BwsData } from "@/lib/bws-model";
 import Image from "next/image";
 import type { ReactNode } from "react";
@@ -25,28 +26,25 @@ export function PlayerProfile({
   const playTime = (seconds: number | null) => {
     if (seconds === null) return tr("Unavailable");
     const total = Math.floor(seconds);
+    // Compact units keep long play times on one row.
     const parts: [number, string][] = [
-      [Math.floor(total / 86400), "day"],
-      [Math.floor(total / 3600) % 24, "hour"],
-      [Math.floor(total / 60) % 60, "minute"],
-      [total % 60, "second"],
+      [Math.floor(total / 86400), tr("d")],
+      [Math.floor(total / 3600) % 24, tr("h")],
+      [Math.floor(total / 60) % 60, tr("m")],
+      [total % 60, tr("s")],
     ];
     return parts
-      .filter(
-        ([value, unit]) => value > 0 || (total === 0 && unit === "second"),
-      )
-      .map(([value, unit]) =>
-        new Intl.NumberFormat(tr.locale, {
-          style: "unit",
-          unit,
-          unitDisplay: "long",
-        }).format(value),
+      .filter(([value], index) => value > 0 || (total === 0 && index === 3))
+      .map(
+        ([value, unit]) =>
+          `${new Intl.NumberFormat(tr.locale).format(value)}${unit}`,
       )
       .join(" ");
   };
 
   const p = snapshot.profile;
   const s = p.statistics;
+  const history = p.rankHistory?.data ?? null;
   return (
     <section
       className="panel profile-summary"
@@ -67,63 +65,72 @@ export function PlayerProfile({
           {(heading || bws) && (
             <div className="profile-cover-content">
               {heading}
-              {bws && <BwsSummary value={bws} variant="compact" />}
+              {bws && (
+                <BwsSummary
+                  value={bws}
+                  variant="compact"
+                  countryRank={s.countryRank}
+                />
+              )}
             </div>
           )}
         </div>
       ) : (
         <>
           {heading}
-          {bws && <BwsSummary value={bws} variant="compact" />}
+          {bws && (
+            <BwsSummary
+              value={bws}
+              variant="compact"
+              countryRank={s.countryRank}
+            />
+          )}
         </>
       )}
-      <dl className="profile-statistics">
-        {[
-          [
-            "Global rank",
-            s.globalRank === null
-              ? tr("Unranked / unavailable")
-              : `#${number(s.globalRank)}`,
-          ],
-          [
-            "Country rank",
-            s.countryRank === null
-              ? tr("Unranked / unavailable")
-              : `#${number(s.countryRank)}`,
-          ],
-          [
-            "Performance",
-            s.pp === null ? tr("Unavailable") : `${number(s.pp, 2)} pp`,
-          ],
-          [
-            "Accuracy",
-            s.accuracy === null
-              ? tr("Unavailable")
-              : `${number(s.accuracy, 2)}%`,
-          ],
-          ["Play count", number(s.playCount)],
-          ["Play time", playTime(s.playTimeSeconds)],
-          ["Ranked score", score(s.rankedScore)],
-          ["Total score", score(s.totalScore)],
-          [
-            "Maximum combo",
-            s.maximumCombo === null
-              ? tr("Unavailable")
-              : `${number(s.maximumCombo)}×`,
-          ],
-          [
-            "Level",
-            s.level?.current === null || s.level?.current === undefined
-              ? tr("Unavailable")
-              : `${number(s.level.current)}${s.level.progress !== null ? ` (${number(s.level.progress)}%)` : ""}`,
-          ],
-        ].map(([label, value]) => (
-          <div key={label}>
-            <dt>{tr(label)}</dt>
-            <dd>{value}</dd>
+      <div
+        className={
+          history && history.length > 1
+            ? "profile-body"
+            : "profile-body profile-body--single"
+        }
+      >
+        {history && history.length > 1 && (
+          <div className="rank-chart-card">
+            <RankChart data={history} globalRank={s.globalRank} />
           </div>
-        ))}
-      </dl>
+        )}
+        <dl className="profile-statistics">
+          {[
+            [
+              "Accuracy",
+              s.accuracy === null
+                ? tr("Unavailable")
+                : `${number(s.accuracy, 2)}%`,
+            ],
+            ["Play count", number(s.playCount)],
+            ["Play time", playTime(s.playTimeSeconds)],
+            ["Ranked score", score(s.rankedScore)],
+            ["Total score", score(s.totalScore)],
+            [
+              "Maximum combo",
+              s.maximumCombo === null
+                ? tr("Unavailable")
+                : `${number(s.maximumCombo)}×`,
+            ],
+            [
+              "Level",
+              s.level?.current === null || s.level?.current === undefined
+                ? tr("Unavailable")
+                : `${number(s.level.current)}${s.level.progress !== null ? ` (${number(s.level.progress)}%)` : ""}`,
+            ],
+          ].map(([label, value]) => (
+            <div key={label}>
+              <dt>{tr(label)}</dt>
+              <dd>{value}</dd>
+            </div>
+          ))}
+        </dl>
+      </div>
       {s.grades && (
         <p className="muted small">
           {tr("Grades:")}{" "}

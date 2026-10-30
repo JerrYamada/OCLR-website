@@ -161,7 +161,10 @@ on the saved profile, never a new stored eligibility decision.
 Player statistics distinguish `fresh`, `stale`, `missing`, `not_recorded` and
 `preview` (or `unavailable` for a failed cache read); unranked global rank is null, valid PP zero is 0. Saved profile models
 whitelist the normalized osu! profile fields and verify osuId/mode against the
-cache key. Error/stale cache state remains explicit. Missing or malformed saved
+cache key. An optional `profile.rankHistory` carries the requested ruleset's
+daily global ranks (oldest first, unranked days omitted) for the players-page
+rank chart; rows saved before it was retained, and older v1 backends, return
+`null`. Error/stale cache state remains explicit. Missing or malformed saved
 profiles return 404 `PROFILE_SNAPSHOT_NOT_FOUND` on the standalone staff resource.
 A published participant without a profile still returns 200 with identity and
 `snapshot: null`; missing directory statistics have state `missing`. Historical

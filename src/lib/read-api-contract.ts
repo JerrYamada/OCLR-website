@@ -303,6 +303,16 @@ export const savedOsuProfileSchema = z
       )
       .nullable()
       .default(null),
+    // Optional so rows saved before rank history was retained (and older v1
+    // backends) still parse; the players page simply omits the chart then.
+    rankHistory: z
+      .object({
+        mode: profileMode,
+        data: z.array(z.number().int().positive()).max(1000),
+      })
+      .strip()
+      .nullable()
+      .default(null),
     statistics: z
       .object({
         globalRank: nullableInteger,

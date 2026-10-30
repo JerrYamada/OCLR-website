@@ -48,11 +48,20 @@ describe("shared public and staff BWS display", () => {
     expect(html).toContain("Weighted pp unavailable");
     expect(html).not.toMatch(/NaN|Infinity/);
   });
+  it("floors the weighted pp and keeps the raw values in the note", () => {
+    const html = render(10000, 1234.567, false, "compact");
+    expect(html).toContain('<strong class="bws-value">1,234</strong>');
+    expect(html).not.toContain("(Rank #");
+    expect(html).not.toContain("(Original pp");
+    expect(html).toContain("Original pp: 1,234.57");
+  });
   it("shows the plain rank and pp while badges await review", () => {
     expect(render(null, 0)).toContain('class="bws-value">0</strong>');
     const html = render(10000, 1234.567, true, "compact");
     expect(html).toContain("Global rank");
-    expect(html).toContain("#10,000");
+    expect(html).toContain(
+      '<span class="bws-value-hash">#</span>10,000</strong>',
+    );
     expect(html).toContain("pp");
     expect(html).toContain("1,234.57");
     expect(html).not.toContain("BW-rank");

@@ -112,6 +112,19 @@ const stats = z
       .catch(null),
   })
   .nullish();
+// Daily global rank history, oldest first. Unranked days arrive as null and are
+// compacted: the chart only needs the sequence of known ranks.
+const rankHistory = z
+  .object({
+    mode: profileMode.nullish().catch(null),
+    data: z
+      .array(integer.positive().nullish().catch(null))
+      .max(1000)
+      .nullish()
+      .catch(null),
+  })
+  .nullish()
+  .catch(null);
 const responseSchema = z.object({
   id: integer.positive(),
   username: z.string().trim().min(1).max(100),
@@ -149,6 +162,7 @@ const responseSchema = z.object({
   is_bot: z.boolean().nullish().catch(null),
   is_restricted: z.boolean().nullish().catch(null),
   statistics: stats,
+  rank_history: rankHistory,
   badges: z.unknown().optional(),
 });
 function imageUrl(value: string | null | undefined, host: string) {
@@ -187,6 +201,12 @@ export function normalizeOsuProfile(
       "osu! returned a different ruleset. The saved snapshot was preserved.",
     );
   const s = p.statistics;
+  const rankData =
+    p.rank_history && (!p.rank_history.mode || p.rank_history.mode === mode)
+      ? (p.rank_history.data ?? []).filter(
+          (rank): rank is number => typeof rank === "number" && rank > 0,
+        )
+      : [];
   return {
     osuId,
     username: p.username,
@@ -206,6 +226,8 @@ export function normalizeOsuProfile(
     source: "osu! API v2" as const,
     // Missing/partial inventories are unknown, never a fabricated zero count.
     badges: profileBadges(p.badges),
+    // Only the requested ruleset's history is meaningful for this profile.
+    rankHistory: rankData.length ? { mode, data: rankData } : null,
     statistics: {
       globalRank: s?.global_rank ?? null,
       countryRank: s?.country_rank ?? null,

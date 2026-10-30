@@ -27,6 +27,11 @@ export const profileResponse = {
     level: { current: 75, progress: 42 },
     grade_counts: { ssh: 1, ss: 2, sh: 3, s: 4, a: 5 },
   },
+  rank_history: {
+    mode: "osu",
+    // One unranked day is compacted by normalization; the chart only draws ranks.
+    data: [16200, null, 15500, 15000],
+  },
   discord: "MUST_NOT_CACHE_PRIVATE_CONTACT",
   account_history: [{ description: "MUST_NOT_CACHE_HISTORY" }],
 };

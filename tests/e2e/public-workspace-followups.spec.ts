@@ -489,11 +489,10 @@ test.describe("public and operational follow-ups", () => {
             });
           }
       await preferences(guest, "en");
-      await publicPage.goto(
-        `/players/${seed.memberId}?edition=test-cup`,
-      );
-      await expect(publicPage.locator(".bws-value").first()).toHaveText(
-        "10,000",
+      await publicPage.goto(`/players/${seed.memberId}?edition=test-cup`);
+      // The card lists pp, BW-rank, then country rank.
+      await expect(publicPage.locator(".bws-value").nth(1)).toHaveText(
+        "#10,000",
       );
     } finally {
       await guest.close();
