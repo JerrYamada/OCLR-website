@@ -414,6 +414,16 @@ Replace the SHA/host examples; a floating `main` is deliberately rejected. The n
 
 `--dry-run` prints the sequence without commands/network/filesystem changes; it does **not** validate live connectivity. `--apply` acquires an installation file lock, verifies a clean operator checkout/service target, archives the exact commit to a new directory, then runs `production.sh prepare --apply` (install/check/build, no DB changes). It checks both DB targets and the applied Drizzle hash/timestamp prefix, prints pending IDs, stops the old service, takes a custom-format dump and verifies both its table of contents and full decoding using pg_restore. A SHA-256 sidecar detects later archive changes. This archive verification is not a substitute for a real restore drill. Pending SQL runs with an advisory DB lock; an already-applied journal is a no-op. Runtime preflight then runs before atomic symlink activation/start.
 
+When the separate `oclr-backup` account is installed, updates require `setfacl`
+(Rocky package `acl`, included by the convenience bootstrap). Before stopping
+the website, the updater grants that UID traversal of the installation/release
+directories and read-only access to the new `.oclr-release` marker. It also
+repairs access on same-SHA retries. No recursive/default ACLs, broad chmod or
+write access are granted. An ACL failure leaves the current website online.
+Hosts without the backup account keep their existing release permissions. For
+an already installed operator with an unreadable current marker, follow the
+[targeted repair](../operator/README.md#repair-an-existing-unreadable-release-marker).
+
 Health checks require a successful DB query and the **exact new SHA** at `/api/health`, plus public HTML, both through the configured private listener and the real HTTPS origin. The private HTTP client explicitly sends the canonical `Host` header to avoid canonical-host redirects; public HTTPS is checked independently without following redirects. IPv6 wildcard listeners are checked through `::1`. Checks allow about two minutes for startup and report which endpoint failed: HTTP status, invalid JSON/HTML, stale release, database readiness or a safe network/TLS error code. Response bodies/provider error messages are never logged. No session or private records are returned. The canonical hostname must resolve from the app host back through Nginx. A network/certificate/proxy error fails activation verification. The script writes a timestamped private `update.log` including the failed phase/exit status, keeps `previous` and the database archive, and reports their paths. It checks committed migration history and detects a changed schema source without a new journal entry; it does not audit arbitrary out-of-band database DDL. Investigate any drift rather than resetting the ledger.
 
 Both production and staging database URLs must explicitly choose `sslmode=disable` for the approved internal network or `sslmode=verify-full` for verified TLS. Setup, runtime, backups and updates use the chosen transport without a separate opt-in flag. The updater still verifies the environment, host/database, credentials and migration history. Public HTTPS and OAuth requirements remain independent. Staging uses a different database, OAuth app, paths, service and domain.

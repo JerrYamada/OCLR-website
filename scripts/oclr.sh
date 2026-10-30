@@ -224,8 +224,8 @@ main() {
   install_command "$script_snapshot" /usr/local/bin/oclr /usr/sbin/oclr
   printf 'Command installed: /usr/local/bin/oclr (sudo oclr update)\n'
   [[ "$action" != install-command ]] || return 0
-  for name in node npm git flock tar runuser visudo systemctl; do command -v "$name" >/dev/null || missing=true; done
-  if "$missing"; then dnf install -y nodejs nodejs-npm git util-linux tar sudo; fi
+  for name in node npm git flock tar runuser visudo systemctl setfacl; do command -v "$name" >/dev/null || missing=true; done
+  if "$missing"; then dnf install -y nodejs nodejs-npm git util-linux tar sudo acl; fi
   [[ -f "$env_file" && ! -L "$env_file" ]] || fail 'Create /etc/oclr/runtime.env first; see docs/deployment.md.'
   [[ ! -L /etc/oclr && ! -L "$root" ]] || fail 'Configuration/install parents must be real directories.'
   mkdir -p -- "$root"

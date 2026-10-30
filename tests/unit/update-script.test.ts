@@ -33,7 +33,7 @@ function rehearsal(failure = "", initial = false) {
     join(archive, "scripts"),
   ])
     mkdirSync(path, { recursive: true });
-  for (const file of ["update.sh", "production.sh"])
+  for (const file of ["update.sh", "production.sh", "backup-release-access.sh"])
     copyFileSync(join(source, file), join(repo, "scripts", file));
   copyFileSync(
     join(source, "production.sh"),
@@ -82,6 +82,12 @@ if (name === 'git') {
 } else if (name === 'sudo') {
  if (a.includes('-l')) process.exit(0);
  const r=cp.spawnSync(a[1],a.slice(2),{stdio:'inherit',env}); process.exit(r.status);
+} else if (name === 'id') {
+ if (a.join(' ') === '-u oclr-backup') { if (env.REHEARSAL_BACKUP === '1') console.log('99998'); else process.exit(1); }
+ else { const r=cp.spawnSync('/usr/bin/id',a,{stdio:'inherit'}); process.exit(r.status); }
+} else if (name === 'setfacl') {
+ log('acl '+(a.at(-1).endsWith('/.oclr-release') ? 'marker' : 'directories')+' active='+fs.readFileSync(root+'/active','utf8'));
+ if (fail === 'acl') process.exit(7);
 } else if (name === 'stat') console.log(process.getuid());
 else if (name === 'readlink') console.log(fs.realpathSync(a.at(-1)));
 else if (name === 'mv') fs.renameSync(a.at(-2),a.at(-1));
@@ -92,6 +98,8 @@ else throw new Error('Unexpected external backup command');
 `;
   for (const name of [
     "git",
+    "id",
+    "setfacl",
     "node",
     "npm",
     "systemctl",
@@ -124,6 +132,9 @@ else throw new Error('Unexpected external backup command');
           PATH: `${bin}:/usr/bin:/bin`,
           REHEARSAL_ROOT: root,
           REHEARSAL_FAILURE: failure,
+          REHEARSAL_BACKUP: ["operator", "acl", "same"].includes(failure)
+            ? "1"
+            : "0",
           OCLR_INSTALL_DIR: install,
           OCLR_BACKUP_DIR: join(root, "backups"),
           OCLR_ENVIRONMENT: "staging",
@@ -206,6 +217,22 @@ describe("Bash site updates", () => {
     expect(run.calls).toContain("db apply migration=true");
     expect(run.calls.at(-1)).toBe("db health migration=false");
   });
+  it("grants operator marker access on each new release before maintenance", () => {
+    const run = rehearsal("operator");
+    expect(run.result.status, run.result.stderr).toBe(0);
+    expect(run.calls).toContain("acl directories active=yes");
+    expect(run.calls).toContain("acl marker active=yes");
+    expect(run.calls.indexOf("acl marker active=yes")).toBeLessThan(
+      run.calls.indexOf("service stop"),
+    );
+  });
+  it("keeps the current website online if operator access cannot be granted", () => {
+    const run = rehearsal("acl");
+    expect(run.result.status).not.toBe(0);
+    expect(run.active).toBe("yes");
+    expect(run.switched).toBe(false);
+    expect(run.calls).not.toContain("service stop");
+  });
   it.each(["build", "backup", "migration", "health"])(
     "leaves an initial installation stopped after %s failure",
     (failure) => {
@@ -231,6 +258,7 @@ describe("Bash site updates", () => {
     expect(run.result.status, run.result.stderr).toBe(0);
     expect(run.active).toBe("yes");
     expect(run.switched).toBe(false);
+    expect(run.calls).toContain("acl marker active=yes");
     expect(run.calls.filter((call) => call.startsWith("db "))).toEqual([
       "db health migration=false",
     ]);

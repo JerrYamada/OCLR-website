@@ -59,6 +59,7 @@ fi
 [[ ! -e "$install_dir/previous" || -L "$install_dir/previous" ]] || fail 'The previous path is not a symlink; preserve it and investigate.'
 exec 9>"$install_dir/.update.lock"
 flock -n 9 || fail 'Another update is already running for this installation.'
+bash "$source_dir/scripts/backup-release-access.sh" --check
 [[ -z $(git -C "$source_dir" status --porcelain) ]] || fail 'The operator checkout has uncommitted changes. Preserve them; use a clean checkout for updates.'
 [[ $("$systemctl_bin" show --property=User --value "$service") == "$(id -un)" ]] || fail 'Run as the configured service user.'
 [[ $("$systemctl_bin" show --property=WorkingDirectory --value "$service") == "$install_dir/current" ]] || fail 'The service WorkingDirectory does not match this installation current symlink.'
@@ -85,6 +86,7 @@ fi
 if ! "$initial"; then
   [[ "$old_sha" =~ ^[a-f0-9]{40}$ ]] || fail 'Cannot identify the previous release SHA.'
   if [[ "$old_sha" == "$sha" && -f "$previous/.oclr-release" ]]; then
+    bash "$source_dir/scripts/backup-release-access.sh" "$install_dir" "$previous"
     (cd -- "$previous"; node --import tsx scripts/deployment-db.ts health "$sha")
     printf 'Release already active and healthy: %s\n' "$sha"
     exit 0
@@ -147,6 +149,7 @@ cd -- "$release"
 log 'Preparing the new release while the old service stays online.'
 phase='building and checking the new release'
 run bash scripts/production.sh prepare --apply
+bash "$source_dir/scripts/backup-release-access.sh" "$install_dir" "$release"
 phase='checking database target and migration history'
 run database inspect
 if [[ -n ${OCLR_MEDIA_DIR-} ]]; then

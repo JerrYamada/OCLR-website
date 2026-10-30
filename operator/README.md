@@ -139,6 +139,8 @@ matching client directory, for example `sudo OCLR_PG_BIN=/usr/pgsql-17/bin bash
 scripts/install-backup-operator.sh --ref FULL_REVIEWED_SHA --apply` for a reviewed
 PostgreSQL 17 client. The installer records this path in the unit, so PGDG tools
 are available to systemd. It does not install a replacement database server.
+Install the Rocky `acl` package (`sudo dnf install acl`) before provisioning;
+the installer requires `setfacl` for the separate operator's release-marker access.
 
 The explicit installer provisions the separate account, a private random package
 key, an example configuration, root-owned source/dependencies, shared lock access,
@@ -156,6 +158,11 @@ website. Review the output before proceeding.
    hard-coded `OCLR_OPERATOR_RELEASE`. Each job reads the current release marker
    under the shared update lock, so a routine website update does not leave a
    stale backup release or fail the exact-release health check.
+   The installer grants the backup UID execute-only ACLs on `/opt/oclr`,
+   `releases` and the current release directory, plus a read-only ACL on the
+   marker. The updater repeats this for each new release before maintenance,
+   including same-SHA retries. These are individual access ACLs, never recursive
+   or default ACLs; private release files, media and credentials stay private.
 3. Add `OCLR_OPERATOR_SOCKET=/run/oclr-backup/operator.sock` to the website's
    existing private runtime configuration. Both database URLs must identify the
    same canonical host/port/name; the credentials remain separate. Set the
@@ -186,6 +193,29 @@ the backup/authentication/schema contract still require a separately reviewed
 operator upgrade; do not assume an older operator understands a new credential
 family. The first-install script intentionally refuses to overwrite an existing
 operator installation.
+
+### Repair an existing unreadable release marker
+
+If `sudo -u oclr-backup test -r /opt/oclr/current/.oclr-release` fails and the
+current release was created with private owner-only permissions, install `acl`
+and grant only the following access on the standard installation. Run with no
+update/backup in progress; these commands do not restart either service:
+
+```sh
+sudo dnf install -y acl
+sudo setfacl -m u:oclr-backup:--x /opt/oclr /opt/oclr/releases
+sudo setfacl -m u:oclr-backup:--x "$(readlink -f /opt/oclr/current)"
+sudo setfacl -m u:oclr-backup:r-- /opt/oclr/current/.oclr-release
+sudo -u oclr-backup test -r /opt/oclr/current/.oclr-release && echo RELEASE_READABLE
+```
+
+Do not recursively chmod/chown the release or regenerate the package key. Use
+the corrected updater from a reviewed checkout on the next website update;
+merely changing the selected application SHA does not update an older updater
+script. Existing operator code/configuration need no replacement for this fix.
+After `RELEASE_READABLE`, retry backup from the Admin page in a maintenance
+window (backup temporarily stops the website). This repairs marker access;
+database/tool/health checks still have to pass independently.
 
 ## Health target for a private app listener
 
