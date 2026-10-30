@@ -1,4 +1,6 @@
 import { createHash, randomBytes, randomUUID } from "node:crypto";
+import { createServer } from "node:http";
+import type { AddressInfo } from "node:net";
 import { test, expect, request as apiRequest } from "@playwright/test";
 import { eq } from "drizzle-orm";
 import { db, closeDb } from "../../src/db";
@@ -38,7 +40,7 @@ const scopes = [
   "referee:panel:read",
   "referee:relay",
 ];
-function authorizationInput(deviceName: string) {
+function authorizationInput(deviceName: string, port = 42123) {
   const verifier = randomBytes(32).toString("base64url");
   const state = randomBytes(32).toString("base64url");
   return {
@@ -49,7 +51,7 @@ function authorizationInput(deviceName: string) {
       client_version: "0.7.0",
       platform: "linux",
       device_name: deviceName,
-      redirect_uri: "http://127.0.0.1:42123/oclr/callback",
+      redirect_uri: `http://127.0.0.1:${port}/oclr/callback`,
       scope: scopes,
       state,
       code_challenge: createHash("sha256").update(verifier).digest("base64url"),
@@ -78,7 +80,23 @@ test.describe("desktop browser authorization", () => {
       storageState: { cookies: [], origins: [] },
     });
     const deviceName = `${info.project.name} Browser relay ${randomUUID()}`;
-    const input = authorizationInput(deviceName);
+    // page.route only sees the first URL of a redirect chain, so the consent
+    // form's 303 must reach a real loopback listener, as the desktop app's does.
+    const callback: { query?: URLSearchParams } = {};
+    const loopback = createServer((req, res) => {
+      const url = new URL(req.url ?? "/", "http://127.0.0.1");
+      if (url.pathname === "/oclr/callback") callback.query = url.searchParams;
+      res
+        .writeHead(200, { "Content-Type": "text/html" })
+        .end("<h1>Local authorization received</h1>");
+    }).unref();
+    await new Promise<void>((resolve) =>
+      loopback.listen(0, "127.0.0.1", resolve),
+    );
+    const input = authorizationInput(
+      deviceName,
+      (loopback.address() as AddressInfo).port,
+    );
     const created = await desktop.post("/api/desktop/v1/auth/requests", {
       data: input.body,
     });
@@ -105,20 +123,6 @@ test.describe("desktop browser authorization", () => {
       }),
     ).toHaveCount(0);
     await guest.close();
-    let callbackCode: string | null = null;
-    await page.route(
-      "http://127.0.0.1:42123/oclr/callback?**",
-      async (route) => {
-        const callback = new URL(route.request().url());
-        expect(callback.searchParams.get("state") === input.state).toBe(true);
-        callbackCode = callback.searchParams.get("code");
-        await route.fulfill({
-          status: 200,
-          contentType: "text/html",
-          body: "<h1>Local authorization received</h1>",
-        });
-      },
-    );
     await page.goto(authPath);
     await expect(
       page.getByText(authorization.verification_code, { exact: true }),
@@ -144,9 +148,13 @@ test.describe("desktop browser authorization", () => {
         exact: true,
       }),
     ).toBeVisible();
-    expect(
-      typeof callbackCode === "string" && String(callbackCode).length === 43,
-    ).toBe(true);
+    loopback.closeAllConnections();
+    loopback.close();
+    expect(callback.query?.get("state") === input.state).toBe(true);
+    const callbackCode = callback.query?.get("code");
+    expect(typeof callbackCode === "string" && callbackCode.length === 43).toBe(
+      true,
+    );
     const exchange = await desktop.post("/api/desktop/v1/auth/exchange", {
       data: {
         authorization_request_id: authorization.authorization_request_id,
