@@ -1,0 +1,24 @@
+[Unit]
+Description=OCLR private backup operator
+After=network.target
+
+[Service]
+Type=simple
+User=oclr-backup
+Group=oclr
+WorkingDirectory=/opt/oclr-backup
+EnvironmentFile=/etc/oclr-backup/operator.env
+ExecStart=/usr/bin/node --import tsx operator/server.ts
+UMask=0077
+Restart=on-failure
+RuntimeDirectory=oclr-backup
+RuntimeDirectoryMode=0750
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/var/lib/oclr-backup /run/oclr-backup /opt/oclr/.update.lock
+# Scoped sudo for service stop/start requires privilege acquisition.
+# Never add arbitrary commands, a shell or checkout scripts to sudoers.
+
+[Install]
+WantedBy=multi-user.target
