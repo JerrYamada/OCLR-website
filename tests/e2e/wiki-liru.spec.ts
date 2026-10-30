@@ -50,7 +50,7 @@ for (const [locale, appearance] of cases)
           page.locator(".wiki-articles a[aria-current='page']"),
         ).toHaveAttribute("href", "/wiki/liru");
         const figures = page.locator(".wiki-figure");
-        await expect(figures).toHaveCount(4);
+        await expect(figures).toHaveCount(5);
         for (const img of await figures.locator("img").all()) {
           await img.scrollIntoViewIfNeeded();
           await expect(img).toHaveAttribute("alt", /.{10,}/);
