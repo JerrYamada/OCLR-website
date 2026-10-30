@@ -22,7 +22,7 @@ Coach cards and edition-bound profiles become public only when the edition, capt
 
 ## Group assignments
 
-Configure stage-scoped groups at **Team management → Group assignments** before arranging fixtures (#545). The fixture configuration links to this workspace. Saving and publishing still use the existing versioned `stage_groups` command; group identifiers, membership, standings and publication rules are unchanged. Each team can belong to one group per stage. Unassigned teams are listed explicitly, and a team already selected in another group cannot be selected twice.
+Configure stage-scoped groups at **Team management → Group assignments** before arranging fixtures (#545). The fixture configuration links to this workspace. Saving and publishing still use the existing versioned `stage_groups` command; group identifiers, membership, standings and publication rules are unchanged. Choose the group count and generate the cards (#551), then assign teams using each card’s picker, drag a team card, or select a team and activate its destination. Moving a team between cards removes its previous membership, so each team belongs to at most one group per stage. The unassigned pool also accepts returned teams. Increasing the count preserves existing group keys and members; shrinking it asks for confirmation when removed groups contain teams and returns those teams to the pool. These edits remain local until Save and its confirmation; each saved group still requires at least two teams. Publication is a separate explicit choice, and unpublished teams retain their staff-only marker and existing publication checks.
 
 ## Authoritative draft engine
 

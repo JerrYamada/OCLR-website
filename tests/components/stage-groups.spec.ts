@@ -1,0 +1,221 @@
+import { test, expect, type Page, type Locator } from "@playwright/test";
+const teamId = (index: number) => `00000000-0000-4000-8000-00000000000${index}`;
+async function pointerMove(page: Page, handle: Locator, target: Locator) {
+  await handle.scrollIntoViewIfNeeded();
+  const from = await handle.boundingBox();
+  await target.scrollIntoViewIfNeeded();
+  const to = await target.boundingBox();
+  // Restore the source into view before starting capture; targets are within the same board.
+  await handle.scrollIntoViewIfNeeded();
+  const start = await handle.boundingBox();
+  expect(from && to && start).toBeTruthy();
+  await page.mouse.move(
+    start!.x + start!.width / 2,
+    start!.y + start!.height / 2,
+  );
+  await page.mouse.down();
+  // Selection affordances can change card height while the pointer is captured.
+  const destination = await target.boundingBox();
+  await page.mouse.move(
+    destination!.x + destination!.width / 2,
+    destination!.y + 32,
+    { steps: 12 },
+  );
+  await page.mouse.up();
+}
+test("generates cards, moves teams by drag, picker and keyboard without saving early", async ({
+  page,
+  isMobile,
+}, info) => {
+  const writes: Record<string, unknown>[] = [];
+  await page.route(
+    "**/api/admin/tournaments/synthetic/matches",
+    async (route) => {
+      writes.push(route.request().postDataJSON());
+      await route.fulfill({ json: {} });
+    },
+  );
+  await page.goto("/stage-groups");
+  await page.getByLabel("Group count", { exact: true }).selectOption("2");
+  await page
+    .getByRole("button", { name: "Generate groups", exact: true })
+    .click();
+  const a = page.getByRole("article", { name: "Group A", exact: true }),
+    b = page.getByRole("article", { name: "Group B", exact: true });
+  await expect(page.locator(".group-assignment-card")).toHaveCount(2);
+  if (isMobile) {
+    await page
+      .getByRole("button", { name: "Select team Atlas", exact: true })
+      .click();
+    await a
+      .getByRole("button", { name: "Move selected team here", exact: true })
+      .click();
+  } else
+    await pointerMove(
+      page,
+      page.getByRole("button", { name: "Drag team Atlas", exact: true }),
+      a,
+    );
+  await expect(
+    a.getByRole("button", { name: "Select team Atlas", exact: true }),
+  ).toBeVisible();
+  await a.getByRole("combobox").selectOption(teamId(2));
+  await page
+    .getByRole("button", { name: "Select team Cobalt", exact: true })
+    .focus();
+  await page.keyboard.press("Space");
+  await b
+    .getByRole("button", { name: "Move selected team here", exact: true })
+    .focus();
+  await page.keyboard.press("Enter");
+  await b.getByRole("combobox").selectOption(teamId(4));
+  expect(writes).toHaveLength(0);
+  await expect(
+    page.getByRole("button", { name: "Save group assignments", exact: true }),
+  ).toBeEnabled();
+  if (isMobile) await b.getByRole("combobox").selectOption(teamId(1));
+  else
+    await pointerMove(
+      page,
+      a.getByRole("button", { name: "Drag team Atlas", exact: true }),
+      b,
+    );
+  await expect(
+    a.getByRole("button", { name: "Select team Atlas", exact: true }),
+  ).toHaveCount(0);
+  await expect(
+    b.getByRole("button", { name: "Select team Atlas", exact: true }),
+  ).toHaveCount(1);
+  await expect(
+    page.getByRole("button", { name: "Save group assignments", exact: true }),
+  ).toBeDisabled();
+  await a.getByRole("combobox").selectOption(teamId(1));
+  await page
+    .getByRole("button", { name: "Save group assignments", exact: true })
+    .click();
+  await page
+    .getByRole("dialog")
+    .getByRole("button", { name: "Confirm", exact: true })
+    .click();
+  expect(writes).toHaveLength(1);
+  expect(writes[0]).toMatchObject({
+    expectedVersion: 7,
+    published: false,
+    configuration: {
+      groups: [
+        { name: "A", teamIds: [teamId(2), teamId(1)] },
+        { name: "B", teamIds: [teamId(3), teamId(4)] },
+      ],
+    },
+  });
+  for (const theme of ["light", "dark"]) {
+    await page.evaluate(
+      (value) => (document.documentElement.dataset.theme = value),
+      theme,
+    );
+    await page.evaluate(() => window.scrollTo(0, 0));
+    expect(
+      await page.evaluate(
+        () => document.documentElement.scrollWidth <= innerWidth,
+      ),
+    ).toBe(true);
+    await page.screenshot({
+      path: info.outputPath(`groups-${theme}.png`),
+      fullPage: true,
+    });
+  }
+});
+test("resizes existing groups without losing stable identities and confirms returning assigned teams", async ({
+  page,
+}) => {
+  let payload: Record<string, unknown> = {};
+  await page.route(
+    "**/api/admin/tournaments/synthetic/matches",
+    async (route) => {
+      payload = route.request().postDataJSON();
+      await route.fulfill({ json: {} });
+    },
+  );
+  await page.goto("/stage-groups?saved=1");
+  await page.getByLabel("Group count", { exact: true }).selectOption("3");
+  await page
+    .getByRole("button", { name: "Apply group count", exact: true })
+    .click();
+  await page
+    .getByRole("article", { name: "Group C", exact: true })
+    .getByRole("combobox")
+    .selectOption(teamId(5));
+  await page.getByLabel("Group count", { exact: true }).selectOption("2");
+  await page
+    .getByRole("button", { name: "Apply group count", exact: true })
+    .click();
+  await expect(page.getByRole("alert")).toContainText(
+    "Teams in removed groups",
+  );
+  await page
+    .getByRole("alert")
+    .getByRole("button", { name: "Cancel", exact: true })
+    .click();
+  await expect(page.locator(".group-assignment-card")).toHaveCount(3);
+  await page.getByLabel("Group count", { exact: true }).selectOption("2");
+  await page
+    .getByRole("button", { name: "Apply group count", exact: true })
+    .click();
+  await page
+    .getByRole("alert")
+    .getByRole("button", { name: "Apply group count", exact: true })
+    .click();
+  await expect(
+    page
+      .getByRole("region", { name: "Unassigned teams", exact: true })
+      .getByRole("button", { name: "Select team Echo", exact: true }),
+  ).toBeVisible();
+  await page.getByLabel("Group name 1", { exact: true }).fill("Renamed Alpha");
+  await page
+    .getByRole("button", { name: "Save group assignments", exact: true })
+    .click();
+  await page
+    .getByRole("dialog")
+    .getByRole("button", { name: "Confirm", exact: true })
+    .click();
+  expect(payload).toMatchObject({
+    configuration: {
+      groups: [
+        { key: "g-a", name: "Renamed Alpha", teamIds: [teamId(1), teamId(2)] },
+        { key: "g-b", name: "Beta", teamIds: [teamId(3), teamId(4)] },
+      ],
+    },
+  });
+});
+test("keeps read-only controls and drag sources disabled", async ({ page }) => {
+  await page.goto("/stage-groups?saved=1&readonly=1");
+  await expect(page.getByLabel("Group count", { exact: true })).toBeDisabled();
+  await expect(
+    page.getByRole("button", { name: "Select team Atlas", exact: true }),
+  ).toBeDisabled();
+  await expect(
+    page.getByRole("button", { name: "Drag team Atlas", exact: true }),
+  ).toBeDisabled();
+  await expect(
+    page.getByRole("button", { name: "Save group assignments", exact: true }),
+  ).toBeDisabled();
+  expect(await page.locator('.group-team-card[draggable="true"]').count()).toBe(
+    0,
+  );
+});
+test("supports native card dragging", async ({ page, isMobile }) => {
+  test.skip(isMobile, "Pointer handle and picker cover touch devices");
+  await page.setViewportSize({ width: 1280, height: 1100 });
+  await page.goto("/stage-groups");
+  await page.getByLabel("Group count", { exact: true }).selectOption("1");
+  await page
+    .getByRole("button", { name: "Generate groups", exact: true })
+    .click();
+  const group = page.getByRole("article", { name: "Group A", exact: true });
+  await page
+    .getByRole("button", { name: "Select team Atlas", exact: true })
+    .dragTo(group, { targetPosition: { x: 20, y: 20 } });
+  await expect(
+    group.getByRole("button", { name: "Select team Atlas", exact: true }),
+  ).toBeVisible();
+});

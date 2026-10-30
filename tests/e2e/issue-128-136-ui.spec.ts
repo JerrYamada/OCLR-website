@@ -89,17 +89,10 @@ test.describe("operations presentation batch", () => {
         exact: true,
       })
       .click();
-    const groups = page
-      .locator("section")
-      .filter({
-        has: page.getByRole("heading", {
-          name: "Approved Group Stage assignments",
-          exact: true,
-        }),
-      })
-      .last();
+    const groups = page.locator(".team-group-manager").first();
+    await groups.getByLabel("Group count", { exact: true }).selectOption("1");
     await groups
-      .getByRole("button", { name: "Add group", exact: true })
+      .getByRole("button", { name: "Generate groups", exact: true })
       .click();
     await groups
       .getByLabel("Group name 1", { exact: true })
@@ -107,10 +100,9 @@ test.describe("operations presentation batch", () => {
     await expect(
       groups.getByLabel("Group identifier 1", { exact: true }),
     ).toHaveCount(0);
-    for (const check of await groups
-      .locator('fieldset input[type="checkbox"]')
-      .all())
-      await check.check();
+    const picker = groups.getByRole("combobox", { name: /^Add team to/ });
+    await picker.selectOption(seeded.home.teamId);
+    await picker.selectOption(seeded.away.teamId);
     await groups
       .getByRole("button", { name: "Save group assignments", exact: true })
       .click();
