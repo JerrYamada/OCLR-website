@@ -25,7 +25,7 @@ function webpSize(path: string) {
   };
 }
 
-describe("Liru Wiki article (#334, #442)", () => {
+describe("Liru Wiki article (#334, #442, #536)", () => {
   it.each([
     ["en", en],
     ["zh-Hans", hans],
@@ -52,6 +52,7 @@ describe("Liru Wiki article (#334, #442)", () => {
         "expressions",
         "outfit-chinese",
         "outfit-chinese-palette",
+        "stickers",
         "palette",
         "usage",
         "credits",
@@ -69,6 +70,7 @@ describe("Liru Wiki article (#334, #442)", () => {
         "/mascot/liru/sheet-turnaround.webp",
         "/mascot/liru/sheet-expressions.webp",
         "/mascot/liru/sheet-outfit-chinese.webp",
+        "/mascot/liru/sheet-stickers.webp",
       ]);
       for (const figure of figures) {
         expect(figure.alt.length).toBeGreaterThan(10);
@@ -119,4 +121,52 @@ describe("Liru Wiki article (#334, #442)", () => {
       });
     },
   );
+});
+
+describe("Liru sticker pack (#536)", () => {
+  const manifest = JSON.parse(
+    readFileSync("public/mascot/liru/stickers/manifest.json", "utf8"),
+  ) as {
+    license: string;
+    stickers: {
+      id: string;
+      name: Record<string, string>;
+      alt: Record<string, string>;
+      files: Record<string, { png: string; webp: string }>;
+    }[];
+  };
+
+  it("lists every sticker with bilingual names, alt text and existing square files", () => {
+    expect(manifest.license).toBe("CC BY 4.0");
+    expect(manifest.stickers.map((s) => s.id)).toEqual([
+      "pick",
+      "ban",
+      "mod-nm",
+      "mod-hd",
+      "mod-hr",
+      "mod-dt",
+      "mod-fm",
+      "mod-tb",
+    ]);
+    for (const sticker of manifest.stickers) {
+      for (const locale of ["zh-Hans", "en"]) {
+        expect(sticker.name[locale]).not.toBe("");
+        expect(sticker.alt[locale].length).toBeGreaterThan(5);
+      }
+      expect(
+        Object.keys(sticker.files)
+          .map(Number)
+          .sort((a, b) => a - b),
+      ).toEqual([64, 128, 256, 512]);
+      for (const [size, files] of Object.entries(sticker.files)) {
+        expect(webpSize(`public/mascot/liru/stickers/${files.webp}`)).toEqual({
+          width: Number(size),
+          height: Number(size),
+        });
+        const png = readFileSync(`public/mascot/liru/stickers/${files.png}`);
+        expect(png.readUInt32BE(16)).toBe(Number(size));
+        expect(png.readUInt32BE(20)).toBe(Number(size));
+      }
+    }
+  });
 });
