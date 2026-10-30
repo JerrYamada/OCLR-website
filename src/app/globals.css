@@ -2415,7 +2415,7 @@ body:has(.presenter-view) .site-footer,
 }
 
 .profile-summary {
-  overflow: hidden;
+  overflow: visible;
 }
 .profile-cover {
   position: relative;
@@ -2423,14 +2423,19 @@ body:has(.presenter-view) .site-footer,
   align-items: flex-end;
   margin: calc(-1 * var(--space-panel)) calc(-1 * var(--space-panel)) 1rem;
   min-height: clamp(7rem, 18vw, 13rem);
-  overflow: hidden;
+  /* The cover stays unclipped so the overlaid BWS note can escape it; its own
+     top corners are rounded here instead. */
+  border-radius: var(--radius-panel) var(--radius-panel) 0 0;
   isolation: isolate;
 }
-.profile-cover img {
+/* Only the cover artwork itself is stretched over the banner; the overlaid
+   heading also contains an avatar <img>, which must keep its own sizing. */
+.profile-cover .profile-cover-image {
   position: absolute;
   inset: 0;
   width: 100%;
   height: 100%;
+  border-radius: inherit;
   object-fit: cover;
   z-index: -2;
 }
@@ -2440,6 +2445,7 @@ body:has(.presenter-view) .site-footer,
   position: absolute;
   inset: 0;
   z-index: -1;
+  border-radius: inherit;
   pointer-events: none;
   background: linear-gradient(
     90deg,
@@ -2454,6 +2460,206 @@ body:has(.presenter-view) .site-footer,
   min-width: 0;
   padding: 1rem var(--space-panel);
   color: #fff;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 0.85rem 1.5rem;
+}
+.profile-cover-content > * {
+  min-width: 0;
+}
+/* Compact BWS / weighted-pp card; dark glass over a cover, themed without one. */
+.bws-card {
+  position: relative;
+  display: flex;
+  align-items: stretch;
+  gap: 0.85rem;
+  margin-block: 0.75rem;
+  padding: 0.6rem 0.9rem;
+  border: 1px solid var(--site-border, var(--color-border));
+  border-radius: 0.9rem;
+  background: var(--site-raised, var(--color-raised));
+  color: var(--site-foreground, var(--color-foreground));
+}
+.bws-card-metric {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+.bws-card-label-row {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+.bws-card-label {
+  color: var(--site-muted, var(--color-muted));
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+}
+.bws-card-value-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.2rem 0.4rem;
+}
+.bws-card .bws-value {
+  margin: 0;
+  font-size: 1.5rem;
+  line-height: 1.15;
+}
+.bws-card-hint {
+  color: var(--site-muted, var(--color-muted));
+  font-size: 0.72rem;
+}
+.bws-card-state {
+  font-size: 0.8rem;
+  max-width: 15rem;
+}
+.bws-card-divider {
+  width: 1px;
+  align-self: stretch;
+  background: var(--site-border, var(--color-border));
+}
+.bws-card-note {
+  display: inline-flex;
+  flex: none;
+}
+/* Bare glyph: shared and appearance-specific button material (gradient,
+   purple glow, tall min-height, rounded box) must not leak into the note
+   trigger, so this reset out-specifies the themed `button` rules. */
+.bws-card .bws-card-note-trigger,
+html[data-appearance]
+  .themed-site
+  .bws-card
+  button.bws-card-note-trigger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.15rem;
+  height: 1.15rem;
+  min-width: 0;
+  min-height: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  background-image: none;
+  box-shadow: none;
+  color: var(--bws-note-color, var(--site-muted, var(--color-muted)));
+  font-size: 0;
+  font-weight: 400;
+  line-height: 0;
+  transform: none;
+  cursor: help;
+}
+.bws-card .bws-card-note-trigger:is(:hover, :focus-visible, :active),
+html[data-appearance]
+  .themed-site
+  .bws-card
+  button.bws-card-note-trigger:is(:hover, :focus-visible, :active) {
+  border: 0;
+  background: transparent;
+  background-image: none;
+  box-shadow: none;
+  color: var(--bws-note-hover, var(--site-foreground, var(--color-foreground)));
+  transform: none;
+}
+html[data-appearance]
+  .themed-site
+  .bws-card
+  button.bws-card-note-trigger:focus-visible {
+  outline: 2px solid var(--site-accent, var(--color-accent));
+  outline-offset: 2px;
+}
+.bws-card-note-icon {
+  display: block;
+}
+.bws-card-note-panel {
+  position: absolute;
+  right: 0;
+  bottom: calc(100% + 0.5rem);
+  left: 0;
+  z-index: 6;
+  padding: 0.75rem 0.85rem;
+  border: 1px solid var(--site-border, var(--color-border));
+  border-radius: 0.75rem;
+  background: var(--site-surface, var(--color-surface));
+  color: var(--site-foreground, var(--color-foreground));
+  box-shadow: 0 0.6rem 1.6rem rgb(0 0 0 / 45%);
+  max-height: min(24rem, 60vh);
+  overflow-y: auto;
+  text-align: left;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(0.25rem);
+  transition:
+    opacity 0.15s ease,
+    transform 0.15s ease,
+    visibility 0.15s;
+}
+.bws-card-note-panel p {
+  margin: 0 0 0.4rem;
+}
+.bws-card-note-panel p:last-child {
+  margin-bottom: 0;
+}
+.bws-card-note-panel code {
+  font-size: 0.72rem;
+}
+.bws-card-note:hover .bws-card-note-panel,
+.bws-card-note:focus-within .bws-card-note-panel {
+  opacity: 1;
+  visibility: visible;
+  transform: none;
+}
+.profile-cover-content .bws-card {
+  --bws-note-color: rgb(255 255 255 / 72%);
+  --bws-note-hover: #fff;
+  margin: 0 0 0 auto;
+  border-color: rgb(255 255 255 / 16%);
+  background: rgb(9 13 25 / 58%);
+  box-shadow: 0 0.35rem 1rem rgb(0 0 0 / 28%);
+  backdrop-filter: blur(10px);
+  color: #fff;
+}
+.profile-cover-content .bws-card-label,
+.profile-cover-content .bws-card-hint {
+  color: rgb(255 255 255 / 68%);
+}
+.profile-cover-content .bws-card-state {
+  color: rgb(255 255 255 / 84%);
+}
+.profile-cover-content .bws-card-divider {
+  background: rgb(255 255 255 / 22%);
+}
+@media (max-width: 40rem) {
+  .profile-cover-content {
+    align-items: stretch;
+  }
+  .profile-cover-content .bws-card {
+    margin-inline-start: 0;
+    width: 100%;
+  }
+  /* Too narrow for two metrics side by side: stack them and turn the
+     separator into a horizontal rule. */
+  .bws-card {
+    flex-direction: column;
+    gap: 0.45rem;
+  }
+  .bws-card-divider {
+    width: 100%;
+    height: 1px;
+  }
+  /* The card sits near the top on phones, so open the note downwards where
+     the page has room. */
+  .bws-card-note-panel {
+    top: calc(100% + 0.5rem);
+    bottom: auto;
+    max-height: 60vh;
+  }
 }
 .profile-statistics {
   display: grid;

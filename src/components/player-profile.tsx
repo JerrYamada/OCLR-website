@@ -57,18 +57,26 @@ export function PlayerProfile({
       {p.coverUrl ? (
         <div className="profile-cover">
           <Image
+            className="profile-cover-image"
             src={p.coverUrl}
             alt=""
             width={1200}
             height={300}
             unoptimized
           />
-          {heading && <div className="profile-cover-content">{heading}</div>}
+          {(heading || bws) && (
+            <div className="profile-cover-content">
+              {heading}
+              {bws && <BwsSummary value={bws} variant="compact" />}
+            </div>
+          )}
         </div>
       ) : (
-        heading
+        <>
+          {heading}
+          {bws && <BwsSummary value={bws} variant="compact" />}
+        </>
       )}
-      {bws && <BwsSummary value={bws} />}
       <dl className="profile-statistics">
         {[
           [
