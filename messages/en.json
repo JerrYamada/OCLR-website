@@ -3285,6 +3285,7 @@
     "mc71621bf25d2": "Hides half her face behind an open fan",
     "m0b4fe128308f": "Every sticker sits on the same transparent square canvas with a white rim, so one can replace another in a fixed-size slot. PNG and WebP are provided at 512, 256, 128 and 64 px.",
     "mf92c8361d562": "The stickers carry no team colour or text; show the team with the interface's existing red and blue borders.",
-    "m20ffbad5c5a1": "Scale them proportionally; do not stretch, recolour, crop the rim or flip them horizontally."
+    "m20ffbad5c5a1": "Scale them proportionally; do not stretch, recolour, crop the rim or flip them horizontally.",
+    "m406fe47a93b5": "No streaming API access has been created."
   }
 }

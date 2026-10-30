@@ -77,3 +77,21 @@ and automatic failure screenshots to avoid capturing credentials.
 New Chinese wording needs organizer review. Formal deployment/migration and real
 Streamer/Overlay/OBS use were not performed. Full desktop/mobile regression and
 the full-site remote matrix have no pass claim. The issue remains open for review.
+
+## PR review follow-up — 2026-10-30
+
+PR [#541](https://github.com/OCLR-dev/OCLR-website/pull/541) was reviewed for
+Streamer/session/scope boundaries, exact fixture-pool projection, publication,
+idle renewal, migration constraints and credential handling. The copied Developer
+API empty-state wording was corrected in all three locales. Main `72f40d54` was
+merged into the feature branch, preserving both sides of the locale conflicts.
+No Overlay changes, merge to main or deployment were performed.
+
+CI [40995169140](https://github.com/OCLR-dev/OCLR-website/actions/runs/40995169140)
+on `afb94562` passed verify (including the complete unit/integration suite), build
+and remote-e2e. Both core browser shards failed in desktop-auth and draft; the
+newly integrated main contains #539's fixes to those tests. This does not establish
+a passing run for the updated PR head. New CI results must be reported separately.
+
+After resolving the merge and correcting the empty state, `npm run check`,
+`npm run test:i18n` (4/4) and `git diff --check` passed locally.

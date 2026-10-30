@@ -232,7 +232,7 @@ export function StreamingAccess({
           </div>
         ) : (
           <p className="muted">
-            {tr("No developer API access has been created.")}
+            {tr("No streaming API access has been created.")}
           </p>
         )}
       </section>
