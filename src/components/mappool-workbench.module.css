@@ -1,0 +1,174 @@
+.workbench {
+  display: grid;
+  gap: 1.5rem;
+  min-width: 0;
+}
+.workbench h2 {
+  font-size: 1.15rem;
+  margin: 0 0 1rem;
+}
+.workbench h3 {
+  font-size: 1rem;
+}
+.importer {
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid var(--color-border);
+}
+.importer > form {
+  max-width: 46rem;
+  display: grid;
+  gap: 0.75rem;
+}
+.importer textarea {
+  resize: vertical;
+}
+.importer button {
+  justify-self: start;
+}
+.preview {
+  margin-top: 1.5rem;
+}
+.previewList,
+.candidates,
+.comments {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.previewList {
+  display: grid;
+  gap: 1rem;
+  margin: 1rem 0;
+}
+.previewList > li {
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--color-border);
+}
+.choice {
+  display: flex;
+  align-items: baseline;
+  gap: 0.75rem;
+  overflow-wrap: anywhere;
+}
+.choice input {
+  width: auto;
+}
+.previewMap {
+  margin: 0.75rem 0 0 2rem;
+  display: grid;
+  grid-template-columns: 1.6fr 1fr;
+  gap: 1rem;
+}
+.listHeading {
+  display: flex;
+  gap: 1rem;
+  align-items: baseline;
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
+.candidates > li {
+  padding: 1rem 0;
+  border-bottom: 1px solid var(--color-border);
+}
+.mapRow {
+  display: grid;
+  grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr) minmax(0, 0.8fr);
+  gap: 1rem;
+  align-items: start;
+}
+.identity {
+  display: flex;
+  align-items: start;
+  gap: 0.75rem;
+  min-width: 0;
+}
+.identity > :last-child {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.identity > :first-child {
+  width: 64px;
+  min-width: 64px;
+  height: 48px;
+}
+.identity img {
+  width: 64px;
+  height: 48px;
+  object-fit: cover;
+  flex-shrink: 0;
+  border-radius: 0.25rem;
+}
+.identity p,
+.parameters p,
+.mapRow p,
+.comments p {
+  margin: 0 0 0.25rem;
+}
+.parameters p {
+  display: flex;
+  gap: 0.5rem 0.75rem;
+  flex-wrap: wrap;
+  font-variant-numeric: tabular-nums;
+}
+.parameters span {
+  white-space: nowrap;
+}
+.snapshot {
+  margin-top: 0.5rem;
+}
+.snapshot summary,
+.discussion summary {
+  cursor: pointer;
+}
+.discussion {
+  margin-top: 0.75rem;
+}
+.thread {
+  max-width: 50rem;
+  margin-top: 1rem;
+  display: grid;
+  gap: 1rem;
+}
+.thread > button {
+  justify-self: start;
+}
+.thread form {
+  display: grid;
+  gap: 0.75rem;
+}
+.thread form button {
+  justify-self: start;
+}
+.comments {
+  display: grid;
+  gap: 1rem;
+}
+.commentBody {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+@media (max-width: 800px) {
+  .mapRow,
+  .previewMap {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .identity > :first-child {
+    width: 48px;
+    min-width: 48px;
+    height: 40px;
+  }
+  .identity img {
+    width: 48px;
+    height: 40px;
+  }
+  .mapRow {
+    gap: 0.75rem;
+  }
+  .previewMap {
+    margin-left: 0;
+  }
+  .thread form button,
+  .importer button {
+    width: 100%;
+  }
+}

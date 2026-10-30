@@ -86,6 +86,17 @@ export async function extendedRead(
       return (await import("./teams")).staffTeams(actor!, slug);
     case "staffDraft":
       return (await import("./draft")).staffDraft(actor!, slug);
+    case "selectionWorkspace":
+      return (await import("./mappool-workbench")).selectionWorkspace(
+        actor!,
+        slug,
+      );
+    case "candidateComments":
+      return (await import("./mappool-workbench")).candidateComments(
+        actor!,
+        slug,
+        target,
+      );
     case "mappoolWorkspace":
       return (await import("./mappools")).mappoolWorkspace(actor!, slug);
     case "staffFixtures":
