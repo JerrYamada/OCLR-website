@@ -26,6 +26,12 @@ export async function extendedRead(
   const actor = principal?.subject;
   const filters = Object.fromEntries(query);
   switch (id) {
+    case "nextStreamingRead":
+      return (await import("./streaming-read")).nextStreamingRead(
+        actor!,
+        slug,
+        filters,
+      );
     case "publicContributors":
       return (await import("./contributors")).publicContributors();
     case "contributorsForAdmin":

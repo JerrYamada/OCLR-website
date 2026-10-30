@@ -1863,3 +1863,76 @@ describe.skipIf(!base)("S3 Frost Waltz appearance constraint upgrade", () => {
       }
     }));
 });
+
+describe.skipIf(!base)("Streaming API upgrade (#540)", () => {
+  it("preserves Developer credentials, upgrades idle leases and repeats safely", async () =>
+    isolated(async (pool) => {
+      const folder = mkdtempSync(
+        join(tmpdir(), "oclr-streaming-upgrade-test-"),
+      );
+      try {
+        cpSync("drizzle", folder, { recursive: true });
+        const file = join(folder, "meta/_journal.json");
+        const journal = JSON.parse(readFileSync(file, "utf8"));
+        journal.entries = journal.entries.filter(
+          (entry: { idx: number }) => entry.idx < 61,
+        );
+        writeFileSync(file, JSON.stringify(journal));
+        await migrate(drizzle(pool), { migrationsFolder: folder });
+        await pool.query(
+          "INSERT INTO users (osu_id,username) VALUES (540001,'Synthetic Streamer')",
+        );
+        await pool.query(
+          "INSERT INTO sessions (token_hash,user_id,expires_at) VALUES ($1,540001,now()+interval '7 days')",
+          ["a".repeat(64)],
+        );
+        await pool.query(
+          "INSERT INTO staff_roles (user_id,role,granted_by) VALUES (540001,'streamer',540001)",
+        );
+        await pool.query(
+          "INSERT INTO edition_state (slug) VALUES ('streaming-test')",
+        );
+        await pool.query(
+          "INSERT INTO developer_api_tokens (token_hash,session_hash,user_id,origin,scopes,expires_at) VALUES ($1,$2,540001,'http://localhost:3000','[\"identity:read\"]',now()+interval '1 hour')",
+          ["b".repeat(64), "a".repeat(64)],
+        );
+        const preserved = [
+          "users",
+          "sessions",
+          "staff_roles",
+          "developer_api_tokens",
+        ];
+        const state = () =>
+          Promise.all(
+            preserved.map(
+              async (table) =>
+                (await pool.query(`SELECT * FROM ${table}`)).rows,
+            ),
+          );
+        const before = await state();
+        await migrate(drizzle(pool), { migrationsFolder: "./drizzle" });
+        await migrate(drizzle(pool), { migrationsFolder: "./drizzle" });
+        expect(await state()).toEqual(before);
+        await pool.query(
+          "INSERT INTO streaming_api_tokens (token_hash,session_hash,user_id,edition_slug,origin,scopes,created_at,last_used_at,expires_at) VALUES ($1,$2,540001,'streaming-test','http://localhost:3001','[\"streaming:read\"]',now()-interval '2 hours',now(),now()+interval '1 hour')",
+          ["c".repeat(64), "a".repeat(64)],
+        );
+        await expect(
+          pool.query(
+            "UPDATE streaming_api_tokens SET expires_at=last_used_at+interval '2 hours'",
+          ),
+        ).rejects.toMatchObject({ code: "23514" });
+        await expect(
+          pool.query(
+            "UPDATE streaming_api_tokens SET scopes='[\"identity:read\"]'",
+          ),
+        ).rejects.toMatchObject({ code: "23514" });
+        await pool.query("DELETE FROM sessions");
+        expect(
+          (await pool.query("SELECT * FROM streaming_api_tokens")).rows,
+        ).toEqual([]);
+      } finally {
+        rmSync(folder, { recursive: true, force: true });
+      }
+    }));
+});

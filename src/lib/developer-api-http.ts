@@ -24,7 +24,7 @@ const anonymousLimiter = new DeveloperApiLimiter(
     }
   ).oclrAnonymousReadWindows ??= new Map()),
 );
-function responseHeaders(request: Request, id: string) {
+function responseHeaders(request: Request, id: string, origins: string[]) {
   const headers = new Headers({
     "Cache-Control": "no-store",
     "X-Request-Id": id,
@@ -32,7 +32,7 @@ function responseHeaders(request: Request, id: string) {
     [readContractHeader]: readContractVersion,
   });
   const origin = request.headers.get("origin");
-  if (origin !== null && developerOrigins().includes(origin)) {
+  if (origin !== null && origins.includes(origin)) {
     headers.set("Access-Control-Allow-Origin", origin);
     headers.set(
       "Access-Control-Expose-Headers",
@@ -70,7 +70,10 @@ function failure(error: unknown, id: string, headers: Headers, head: boolean) {
         { status, headers },
       );
 }
-export type ReadResponseOptions<T> = {
+export type ReadResponseOptions<T, P = DeveloperReadPrincipal> = {
+  onSuccess?: () => Promise<void>;
+  origins?: () => string[];
+  authenticate?: (request: Request) => Promise<P>;
   anonymous?: boolean;
   query?: readonly string[];
   schema?: z.ZodType<T>;
@@ -80,14 +83,14 @@ export type ReadResponseOptions<T> = {
   binary?: boolean;
 };
 /** Optional bearer auth is still strict: an explicit invalid token never becomes anonymous. */
-export async function readDataResponse<T>(
+export async function readDataResponse<T, P = DeveloperReadPrincipal>(
   request: Request,
   scope: DeveloperApiScope,
   read: (
-    principal: DeveloperReadPrincipal | null,
+    principal: P | null,
     query: URLSearchParams,
   ) => ReadPayload<T> | Promise<ReadPayload<T>>,
-  options: ReadResponseOptions<T> = {},
+  options: ReadResponseOptions<T, P> = {},
 ) {
   const id = randomUUID();
   let headers = new Headers({
@@ -97,10 +100,11 @@ export async function readDataResponse<T>(
     [readContractHeader]: readContractVersion,
   });
   try {
-    headers = responseHeaders(request, id);
+    const origins = (options.origins ?? developerOrigins)();
+    headers = responseHeaders(request, id, origins);
     appUrl();
     const origin = request.headers.get("origin");
-    if (origin !== null && !developerOrigins().includes(origin))
+    if (origin !== null && !origins.includes(origin))
       throw new DeveloperApiError(
         403,
         "ORIGIN_NOT_ALLOWED",
@@ -149,7 +153,9 @@ export async function readDataResponse<T>(
     }
     const principal =
       !options.anonymous || request.headers.has("authorization")
-        ? await authenticateDeveloperRead(request, scope)
+        ? await (options.authenticate
+            ? options.authenticate(request)
+            : (authenticateDeveloperRead(request, scope) as Promise<P>))
         : null;
     if (!principal) anonymousLimiter.take("anonymous-reads", 600);
     const query = new URL(request.url).searchParams;
@@ -187,7 +193,10 @@ export async function readDataResponse<T>(
       const media = payload.data as ReadMedia;
       if (media.bytes.byteLength > (options.maxBytes ?? 8388608))
         throw new HttpError(413, "Media is too large.");
-      if (principal) await authenticateDeveloperRead(request, scope);
+      if (principal)
+        await (options.authenticate
+          ? options.authenticate(request)
+          : (authenticateDeveloperRead(request, scope) as Promise<P>));
       headers.set("Content-Type", media.contentType);
       headers.set("Content-Length", String(media.bytes.byteLength));
       headers.set("X-Content-Type-Options", "nosniff");
@@ -213,6 +222,7 @@ export async function readDataResponse<T>(
         "RESOURCE_TOO_LARGE",
         "This response is too large. Request a smaller collection page.",
       );
+    if (options.onSuccess) await options.onSuccess();
     headers.set("Content-Type", "application/json");
     return new Response(request.method === "HEAD" ? null : body, { headers });
   } catch (error) {

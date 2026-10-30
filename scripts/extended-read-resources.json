@@ -535,5 +535,17 @@
     "public": false,
     "query": [],
     "scope": "tournaments:private:read"
+  },
+  {
+    "module": "streaming-read",
+    "fn": "nextStreamingRead",
+    "model": "nextStreamingRead",
+    "id": "nextStreamingRead",
+    "path": "/me/tournaments/{edition}/streaming/next",
+    "args": ["actor", "slug", "filters"],
+    "public": false,
+    "query": ["afterFixtureId"],
+    "scope": "identity:read",
+    "issues": [540]
   }
 ]

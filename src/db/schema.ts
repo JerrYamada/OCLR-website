@@ -219,6 +219,77 @@ export const developerApiEvents = pgTable(
   ],
 );
 
+export const streamingApiTokens = pgTable(
+  "streaming_api_tokens",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    tokenHash: text("token_hash").notNull().unique(),
+    sessionHash: text("session_hash")
+      .notNull()
+      .references(() => sessions.tokenHash, { onDelete: "cascade" }),
+    userId: bigint("user_id", { mode: "number" })
+      .notNull()
+      .references(() => users.osuId, { onDelete: "cascade" }),
+    origin: text("origin").notNull(),
+    editionSlug: text("edition_slug")
+      .notNull()
+      .references(() => editionState.slug),
+    scopes: jsonb("scopes")
+      .$type<import("@/lib/streaming-api-model").StreamingApiScope[]>()
+      .notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    lastUsedAt: timestamp("last_used_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
+    revokedAt: timestamp("revoked_at", { withTimezone: true }),
+  },
+  (t) => [
+    index("streaming_api_tokens_user_idx").on(t.userId),
+    index("streaming_api_tokens_session_idx").on(t.sessionHash),
+    check("streaming_api_tokens_hash", sql`${t.tokenHash} ~ '^[0-9a-f]{64}$'`),
+    check(
+      "streaming_api_tokens_expiry",
+      sql`${t.expiresAt} > ${t.createdAt} AND ${t.lastUsedAt} >= ${t.createdAt} AND ${t.expiresAt} <= ${t.lastUsedAt} + interval '1 hour'`,
+    ),
+    check(
+      "streaming_api_tokens_scopes",
+      sql`jsonb_typeof(${t.scopes}) = 'array' AND jsonb_array_length(${t.scopes}) = 1 AND ${t.scopes} <@ '["streaming:read"]'::jsonb`,
+    ),
+  ],
+);
+// Retain authorization history after logout cascades the credential itself.
+export const streamingApiEvents = pgTable(
+  "streaming_api_events",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    actorId: bigint("actor_id", { mode: "number" }).references(
+      () => users.osuId,
+      { onDelete: "set null" },
+    ),
+    accessId: uuid("access_id").notNull(),
+    action: text("action").$type<"create" | "revoke">().notNull(),
+    detail: jsonb("detail")
+      .$type<{
+        before:
+          import("@/lib/streaming-api-model").StreamingTokenMetadata | null;
+        after: import("@/lib/streaming-api-model").StreamingTokenMetadata;
+      }>()
+      .notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (t) => [
+    check(
+      "streaming_api_events_action",
+      sql`${t.action} IN ('create', 'revoke')`,
+    ),
+  ],
+);
+
 export const registrationStatus = pgEnum("registration_status", [
   "pending",
   "deferred",

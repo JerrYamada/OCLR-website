@@ -52,3 +52,6 @@ real grants/OAuth/deployment and new Chinese wording acceptance remain separate.
   [S9 archive](s9-archive.md), [S10 archive](s10-archive.md).
 
 - [OCL Chess](ocl-chess.md) — shared pixel canvas, permissions, persistence and verification scope (#379).
+
+- [Streaming API](streaming-api.md) — edition-bound Streamer access, one-hour idle
+  lease, next fixture/pool/stage contract and future Overlay integration (#540).

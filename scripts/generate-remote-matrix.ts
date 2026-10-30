@@ -154,6 +154,9 @@ const rows = files.map((file) => {
     );
   const denied =
     desktopLiveOnly ||
+    file.includes("/api/streaming/") ||
+    file.includes("/streaming/[edition]/page") ||
+    file.endsWith("/streaming-access.tsx") ||
     /\/api\/games\/|\/auth\/|\/api\/health\/|\/api\/developer\/|\/registrations\/export\//.test(
       file,
     );
@@ -252,7 +255,9 @@ const rows = files.map((file) => {
   };
 });
 const pages = files
-  .filter((p) => p.endsWith("/page.tsx"))
+  .filter(
+    (p) => p.endsWith("/page.tsx") && !p.includes("/streaming/[edition]/page"),
+  )
   .map((p) => p.replace(/^src\/app/, "").replace(/\/page\.tsx$/, "") || "/");
 const reads = rows
   .filter(

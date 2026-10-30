@@ -289,3 +289,12 @@ additive 1.x minor remains compatible. New optional fields must preserve existin
 v1 projections; incompatible meaning/authorization changes require a new major
 contract. See the setup/troubleshooting guide for backend prerequisites and the
 separate local-versus-real-deployment acceptance boundary.
+
+## Streaming projection (#540, contract 1.4)
+
+The shared `nextStreamingRead` model is available to an appointed Streamer through
+`/me/tournaments/{edition}/streaming/next` with Developer `identity:read`, and to an
+independent streaming credential through `/streaming/tournaments/{edition}/next`.
+Both paths return the identical fixture/stage/mappools schema. The latter accepts
+only the edition-bound streaming audience and grants no other Developer reads.
+See [Streaming API](streaming-api.md) for selection, idle expiry and transport.
