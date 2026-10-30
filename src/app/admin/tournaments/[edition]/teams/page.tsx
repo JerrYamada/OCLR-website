@@ -1,3 +1,6 @@
+import { CaptainManager } from "@/components/captain-manager";
+import { captainIdentities } from "@/lib/frontend-read-models";
+import styles from "@/components/team-management.module.css";
 import { StageGroups } from "@/components/stage-groups";
 import { StaffReadOnlyContext } from "@/components/staff-read-only";
 import { staffFixtures } from "@/lib/fixtures";
@@ -25,6 +28,7 @@ async function Issue271Page({
     const actor = await requireStaff();
     const { edition } = await params;
     const setup = await captainSetup(actor, edition);
+    const identities = await captainIdentities(actor, edition);
     const data = await staffTeams(actor, edition);
     const competition = await staffFixtures(actor, edition);
     return (
@@ -58,10 +62,7 @@ async function Issue271Page({
               )}
             </p>
             <div className="actions">
-              <Link
-                className="button"
-                href={`/admin/tournaments/${edition}/captains`}
-              >
+              <Link className="button" href="#captains">
                 {tr("Appoint captains")}
               </Link>
               {!setup.candidates.length && (
@@ -77,7 +78,7 @@ async function Issue271Page({
         )}
         <section
           id="groups"
-          className="panel form-stack"
+          className={`form-stack ${styles.groups}`}
           aria-label={tr("Group assignments")}
         >
           <h2>{tr("Group assignments")}</h2>
@@ -95,112 +96,157 @@ async function Issue271Page({
             <p className="muted">{tr("No Group Stage configured yet.")}</p>
           )}
         </section>
-        <div className="stack">
-          {data.teams.map((t) => (
-            <article className="panel team-management-card" key={t.id}>
-              <div className="public-team-heading">
-                <TeamAvatar team={t} />
-                <h2>{t.name}</h2>
-              </div>
-              <p className="muted small">
-                {tr("Captain osu! ID ")}
-                {t.captainId} · {t.members.length} {tr(" member(s)")}
-                {t.capacity
-                  ? tr(" / capacity {value0}", { value0: t.capacity })
-                  : ""}{" "}
-                · {t.finalizedAt ? tr("finalized") : tr("not finalized")}
-              </p>
-              <ul>
-                {t.members.map((m) => (
-                  <li key={m.osuId}>
-                    {m.username} ({m.osuId})
-                  </li>
-                ))}
-              </ul>
-              <div className="actions">
-                <TeamEditor
-                  key={`${t.id}:${data.version}`}
-                  slug={edition}
-                  version={data.version}
-                  team={t}
-                  locked={data.locked}
-                />
-                <ConfirmMutation
-                  label={
-                    t.identityPublished
-                      ? tr("Hide team identity")
-                      : tr("Publish team identity")
-                  }
-                  title={tr("Change public team visibility?")}
-                  description={tr(
-                    "Only publish identities approved by the organizers. Rosters remain hidden until finalized and approved separately.",
-                  )}
-                  url={`/api/admin/tournaments/${edition}/teams`}
-                  payload={{
-                    command: {
-                      action: "publish",
-                      teamId: t.id,
-                      identityPublished: !t.identityPublished,
-                      rosterPublished: false,
-                    },
-                    expectedVersion: data.version,
+        <div className={styles.tableScroll}>
+          <table className={styles.teams}>
+            <caption>{tr("Team management")}</caption>
+            <thead>
+              <tr>
+                <th scope="col">{tr("Team")}</th>
+                <th scope="col">{tr("Captain")}</th>
+                <th scope="col">{tr("Members")}</th>
+                <th scope="col">{tr("Actions")}</th>
+              </tr>
+            </thead>
+            <tbody>
+              {data.teams.map((t) => (
+                <tr key={t.id}>
+                  <td>
+                    <div className="public-team-heading">
+                      <TeamAvatar team={t} />
+                      <strong>{t.name}</strong>
+                    </div>
+                  </td>
+                  <td>
+                    <a
+                      className="text-link"
+                      href={`https://osu.ppy.sh/users/${t.captainId}`}
+                    >
+                      {t.members.find((m) => m.osuId === t.captainId)
+                        ?.username ?? t.captainId}
+                    </a>
+                    <p className="small muted">{t.captainId}</p>
+                  </td>
+                  <td>
+                    <span>
+                      {t.members.length}
+                      {t.capacity ? ` / ${t.capacity}` : ""}
+                    </span>
+                    <p className="small muted">
+                      {t.finalizedAt ? tr("finalized") : tr("not finalized")}
+                    </p>
+                    <details>
+                      <summary>{tr("Members")}</summary>
+                      <ul>
+                        {t.members.map((m) => (
+                          <li key={m.osuId}>
+                            {m.username} ({m.osuId})
+                          </li>
+                        ))}
+                      </ul>
+                    </details>
+                  </td>
+                  <td>
+                    <div className="actions">
+                      <TeamEditor
+                        key={`${t.id}:${data.version}`}
+                        slug={edition}
+                        version={data.version}
+                        team={t}
+                        locked={data.locked}
+                      />
+                      <ConfirmMutation
+                        label={
+                          t.identityPublished
+                            ? tr("Hide team identity")
+                            : tr("Publish team identity")
+                        }
+                        title={tr("Change public team visibility?")}
+                        description={tr(
+                          "Only publish identities approved by the organizers. Rosters remain hidden until finalized and approved separately.",
+                        )}
+                        url={`/api/admin/tournaments/${edition}/teams`}
+                        payload={{
+                          command: {
+                            action: "publish",
+                            teamId: t.id,
+                            identityPublished: !t.identityPublished,
+                            rosterPublished: false,
+                          },
+                          expectedVersion: data.version,
 
-                    confirmed: true,
-                  }}
-                />
-                {t.finalizedAt && t.identityPublished && (
-                  <ConfirmMutation
-                    label={
-                      t.rosterPublished
-                        ? tr("Hide roster")
-                        : tr("Publish finalized roster")
-                    }
-                    title={tr("Change public roster visibility?")}
-                    description={tr(
-                      "This releases the finalized players’ and coaches’ osu! IDs and display names. Verify organizer approval.",
+                          confirmed: true,
+                        }}
+                      />
+                      {t.finalizedAt && t.identityPublished && (
+                        <ConfirmMutation
+                          label={
+                            t.rosterPublished
+                              ? tr("Hide roster")
+                              : tr("Publish finalized roster")
+                          }
+                          title={tr("Change public roster visibility?")}
+                          description={tr(
+                            "This releases the finalized players’ and coaches’ osu! IDs and display names. Verify organizer approval.",
+                          )}
+                          url={`/api/admin/tournaments/${edition}/teams`}
+                          payload={{
+                            command: {
+                              action: "publish",
+                              teamId: t.id,
+                              identityPublished: true,
+                              rosterPublished: !t.rosterPublished,
+                            },
+                            expectedVersion: data.version,
+
+                            confirmed: true,
+                          }}
+                        />
+                      )}
+                    </div>
+                    {data.coachesEnabled !== false && (
+                      <details>
+                        <summary>{tr("Coaches")}</summary>
+                        <TeamCoachManager
+                          key={`coaches:${t.id}`}
+                          slug={edition}
+                          version={data.version}
+                          teamId={t.id}
+                          coaches={t.coaches}
+                        />
+                      </details>
                     )}
-                    url={`/api/admin/tournaments/${edition}/teams`}
-                    payload={{
-                      command: {
-                        action: "publish",
-                        teamId: t.id,
-                        identityPublished: true,
-                        rosterPublished: !t.rosterPublished,
-                      },
-                      expectedVersion: data.version,
-
-                      confirmed: true,
-                    }}
-                  />
-                )}
-              </div>
-              {data.coachesEnabled !== false && (
-                <TeamCoachManager
-                  key={`coaches:${t.id}`}
-                  slug={edition}
-                  version={data.version}
-                  teamId={t.id}
-                  coaches={t.coaches}
-                />
-              )}
-            </article>
-          ))}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
-        {!data.locked && setup.captains.length > 0 && (
-          <TeamManager
-            key={data.version}
-            slug={edition}
-            version={data.version}
-            captains={setup.captains.map((c) => {
-              const t = data.teams.find((t) => t.captainId === c.userId);
-              return {
-                ...c,
-                name: t?.name ?? "",
-                capacity: t?.capacity ?? null,
-              };
-            })}
-          />
-        )}
+        <section id="captains" className={styles.configuration}>
+          <h2>{tr("Captains & player pool")}</h2>
+          <details open={!data.teams.length}>
+            <summary>{tr("Captains & player pool")}</summary>
+            <CaptainManager
+              slug={edition}
+              setup={setup}
+              identities={identities}
+            />
+          </details>
+          {!data.locked && setup.captains.length > 0 && (
+            <TeamManager
+              key={data.version}
+              slug={edition}
+              version={data.version}
+              captains={setup.captains.map((c) => {
+                const t = data.teams.find((t) => t.captainId === c.userId);
+                return {
+                  ...c,
+                  name: t?.name ?? "",
+                  capacity: t?.capacity ?? null,
+                };
+              })}
+            />
+          )}
+        </section>
       </>
     );
   });

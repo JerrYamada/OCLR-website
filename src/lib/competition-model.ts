@@ -56,6 +56,7 @@ const groupKeySchema = z
   .string()
   .regex(/^[a-z0-9][a-z0-9-]*$/)
   .max(60);
+export const maxStageGroups = 4;
 export const groupConfigurationInputSchema = z
   .object({
     version: z.string().trim().min(1).max(80).optional(),
@@ -74,7 +75,7 @@ export const groupConfigurationInputSchema = z
           .strict(),
       )
       .min(1)
-      .max(64),
+      .max(maxStageGroups),
   })
   .strict()
   .refine(
@@ -84,6 +85,7 @@ export const groupConfigurationInputSchema = z
       new Set(c.groups.flatMap((g) => g.teamIds)).size ===
         c.groups.flatMap((g) => g.teamIds).length,
   );
+// Saved configurations remain readable, including historical configurations above the write limit.
 export const groupConfigurationSchema =
   groupConfigurationInputSchema.safeExtend({
     version: z.string().trim().min(1).max(80),

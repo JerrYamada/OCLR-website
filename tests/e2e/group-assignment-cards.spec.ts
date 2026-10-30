@@ -7,7 +7,7 @@ import { seedBrowserEditions } from "./setup";
 import { seedResultReview } from "../fixtures/results";
 import { seedPublicDirectory } from "../fixtures/players";
 import { assertTestDatabase } from "../database";
-const origin = "http://127.0.0.1:3100";
+const origin = process.env.OCLR_TEST_ORIGIN || "http://127.0.0.1:3100";
 test.describe("count-first group assignment", () => {
   test.skip(!process.env.TEST_DATABASE_URL, "Requires isolated PostgreSQL");
   test.setTimeout(120000);
@@ -37,7 +37,19 @@ test.describe("count-first group assignment", () => {
         writes++;
     });
     await page.goto("/admin/tournaments/test-cup/teams");
+    await expect(
+      page.getByRole("table", { name: "Team management", exact: true }),
+    ).toBeVisible();
+    await expect(
+      page
+        .locator("#captains")
+        .getByText("Captains & player pool", { exact: true })
+        .first(),
+    ).toBeVisible();
     const board = page.locator(".group-assignment");
+    await expect(
+      board.getByLabel("Group count", { exact: true }).locator("option"),
+    ).toHaveText(["Choose group count", "No groups", "1", "2", "3", "4"]);
     await board.getByLabel("Group count", { exact: true }).selectOption("2");
     await board
       .getByRole("button", { name: "Generate groups", exact: true })
