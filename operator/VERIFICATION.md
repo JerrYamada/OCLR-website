@@ -60,3 +60,10 @@ Final follow-up unit/integration run: **219 files passed; 1,768 tests passed,
 that change was being added; the corrected committed source passed the final
 full run. Review also closes the shared lock descriptor in unprivileged git/npm
 children; installer syntax/preview tests passed again after that change.
+
+Provisioner isolation follow-up: control sources/helpers remain root-owned
+throughout dependency installation. Dependencies are staged separately with
+lifecycle scripts disabled; only node_modules is copied into the release.
+Installer syntax/preview tests passed, and a real temporary `npm ci --ignore-scripts`
+installation successfully ran the operator TypeScript loader. No host provisioning
+or real operator installation was performed by the agent.

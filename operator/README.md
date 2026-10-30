@@ -138,7 +138,9 @@ are available to systemd. It does not install a replacement database server.
 
 The explicit installer provisions the separate account, a private random package
 key, an example configuration, root-owned source/dependencies, shared lock access,
-unit and narrow sudoers. It runs npm as the backup account. It preserves existing
+unit and narrow sudoers. It keeps control files root-owned throughout provisioning. npm runs as the
+backup account in a separate dependency staging tree with lifecycle scripts
+disabled; only node_modules is copied into the immutable release. It preserves existing
 keys/configuration and refuses existing service/sudoers installations. It does
 not read runtime.env, create database roles, start the operator or restart the
 website. Review the output before proceeding.

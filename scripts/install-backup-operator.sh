@@ -72,15 +72,33 @@ install -d -o root -g root -m 0755 /etc/oclr-backup
 [[ ! -e /opt/oclr-backup/current && ! -L /opt/oclr-backup/current ]] || fail 'Preserve an existing operator release pointer.'
 release=/opt/oclr-backup/releases/$sha
 [[ ! -e "$release" ]] || fail 'This operator release already exists; preserve it and inspect configuration.'
-install -d -o oclr-backup -g oclr -m 0755 "$release"
-# Git runs as the installer, and npm scripts run only as the backup account.
+install -d -o root -g root -m 0755 "$release"
+# Control files and helpers always stay root-owned; npm never owns this tree.
 git_read archive "$sha" | tar --no-same-owner -xf - -C "$release"
-chown -hR oclr-backup:oclr "$release"
-runuser -u oclr-backup -- env -i HOME=/var/lib/oclr-backup USER=oclr-backup LOGNAME=oclr-backup PATH="$operator_path" NODE_ENV=development npm --prefix "$release" ci --include=dev 9>&-
-chown -hR root:root "$release"
 find "$release" -xdev -type d -exec chmod 0755 {} +
 find "$release" -xdev -type f -perm /111 -exec chmod 0755 {} +
 find "$release" -xdev -type f ! -perm /111 -exec chmod 0644 {} +
+stage=''
+sudoers=''
+cleanup() {
+  [[ -z "$stage" ]] || rm -rf -- "$stage"
+  [[ -z "$sudoers" ]] || rm -f -- "$sudoers"
+}
+trap cleanup EXIT
+stage=$(mktemp -d /opt/oclr-backup/.dependencies-XXXXXXXX)
+chown oclr-backup:oclr "$stage"
+git_read archive "$sha" package.json package-lock.json | tar --no-same-owner -xf - -C "$stage"
+chown -hR oclr-backup:oclr "$stage"
+# Install data only in a separate staging tree. No package lifecycle code runs.
+runuser -u oclr-backup -- env -i HOME=/var/lib/oclr-backup USER=oclr-backup LOGNAME=oclr-backup PATH="$operator_path" NODE_ENV=development npm --prefix "$stage" ci --include=dev --ignore-scripts 9>&-
+[[ -d "$stage/node_modules" && ! -L "$stage/node_modules" && ! -e "$release/node_modules" && ! -L "$release/node_modules" ]] || fail 'Expected a real staged dependency tree and an unused destination.'
+cp -a -- "$stage/node_modules" "$release/node_modules"
+chown -hR root:root "$release/node_modules"
+find "$release/node_modules" -xdev -type d -exec chmod 0755 {} +
+find "$release/node_modules" -xdev -type f -perm /111 -exec chmod 0755 {} +
+find "$release/node_modules" -xdev -type f ! -perm /111 -exec chmod 0644 {} +
+rm -rf -- "$stage"
+stage=''
 ln -s -- "$release" /opt/oclr-backup/current
 [[ -f "$release/operator/systemd/oclr-backup.service" && -f "$release/operator/operator.env.example" ]] || fail 'The selected release lacks the operator installation contract.'
 if [[ ! -e /etc/oclr-backup/package.key ]]; then
@@ -97,7 +115,6 @@ if [[ ! -e /etc/oclr-backup/operator.env ]]; then install -o root -g root -m 060
 sed "s|WorkingDirectory=/opt/oclr-backup$|WorkingDirectory=$release\\nEnvironment=PATH=$operator_path|" "$release/operator/systemd/oclr-backup.service" > /etc/systemd/system/oclr-backup.service
 chmod 0644 /etc/systemd/system/oclr-backup.service
 sudoers=$(mktemp)
-trap 'rm -f -- "$sudoers"' EXIT
 printf '%s\n' 'oclr-backup ALL=(root) NOPASSWD: /usr/bin/systemctl stop oclr.service, /usr/bin/systemctl start oclr.service' \
   'oclr-backup ALL=(oclr) NOPASSWD: /usr/bin/node /opt/oclr-backup/current/operator/media-fingerprint.mjs /var/lib/oclr/media' > "$sudoers"
 visudo -cf "$sudoers" >/dev/null
