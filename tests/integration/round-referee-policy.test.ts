@@ -102,6 +102,27 @@ describe.skipIf(!url)("round referee policies independent of fixtures", () => {
       .where(eq(mappoolEvents.action, "round_referee_policy"));
     expect(audits).toHaveLength(1);
   });
+  it("persists repeat Ban controls and rejects TB as a repeat exception", async () => {
+    await save(0, {
+      banCategoryRules: { allowRepeats: false, repeatExceptions: ["NM", "FM"] },
+    });
+    expect(
+      (await refereeWorkspace(referee, "test-cup", w.fixture.id)).policy
+        ?.banCategoryRules,
+    ).toEqual({ allowRepeats: false, repeatExceptions: ["NM", "FM"] });
+    await save(1, {
+      banCategoryRules: { allowRepeats: true, repeatExceptions: [] },
+    });
+    await expect(
+      save(2, {
+        banCategoryRules: { allowRepeats: false, repeatExceptions: ["TB"] },
+      }),
+    ).rejects.toMatchObject({ status: 400 });
+    expect(
+      (await refereeWorkspace(referee, "test-cup", w.fixture.id))
+        .policyRevision,
+    ).toBe(2);
+  });
   it("rejects referee, wrong edition and stale revisions", async () => {
     await expect(
       saveRoundRefereePolicy(referee, "test-cup", w.round.id, {

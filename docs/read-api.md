@@ -299,6 +299,16 @@ Both paths return the identical fixture/stage/mappools schema. The latter accept
 only the edition-bound streaming audience and grants no other Developer reads.
 See [Streaming API](streaming-api.md) for selection, idle expiry and transport.
 
+### Contract 1.7.0: repeated Mod Bans
+
+Referee policies add optional `banCategoryRules: { allowRepeats, repeatExceptions }`.
+It applies per team to active Ban selections across phases. Omission preserves
+legacy allowed-repeat behavior. Exceptions accept NM/HD/HR/DT/FM only; TB can
+never be banned. The field travels with the saved policy and session basis;
+existing revision/history protections remain unchanged. Desktop consumers using
+a strict policy schema must update their shared model before consuming the new
+field; it must not be stripped while claiming to enforce this policy.
+
 ### Contract 1.6.0: round referee policies
 
 The saved `mappoolWorkspace` adds optional `refereeRules`, containing each round's

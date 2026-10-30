@@ -1,6 +1,6 @@
 "use client";
 import { refereeMessage } from "@/i18n/referee";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useAppTranslations } from "@/i18n/shared";
 import {
   refereePolicySchema,
@@ -9,6 +9,8 @@ import {
 } from "@/lib/referee-model";
 import { commandMods, type RefereeCommandPolicy } from "@/lib/referee-commands";
 import { s11RefereeSteps, type RefereeDefaults } from "@/lib/referee-defaults";
+import { RefereeStepEditor } from "./referee-step-editor";
+import styles from "./referee-step-editor.module.css";
 
 export function RefereePolicyEditor({
   policy,
@@ -29,8 +31,16 @@ export function RefereePolicyEditor({
   const [placement, setPlacement] = useState(
     defaults && !policy ? "split" : "",
   );
-  const [steps, setSteps] = useState<RefereePolicy["steps"]>(
-    initialPolicy?.steps ?? [],
+  const nextStepKey = useRef(initialPolicy?.steps.length ?? 0);
+  const [steps, setSteps] = useState(() =>
+    (initialPolicy?.steps ?? []).map((step, key) => ({ key, step })),
+  );
+  const initialBanRules = initialPolicy?.banCategoryRules;
+  const [allowRepeatBan, setAllowRepeatBan] = useState(
+    initialBanRules?.allowRepeats ?? true,
+  );
+  const [repeatExceptions, setRepeatExceptions] = useState(
+    initialBanRules?.repeatExceptions ?? [],
   );
   const [roomSize, setRoomSize] = useState(
     policy?.commands?.roomSize.toString() ?? "",
@@ -72,7 +82,11 @@ export function RefereePolicyEditor({
     index: number,
     patch: Partial<RefereePolicy["steps"][number]>,
   ) {
-    setSteps((s) => s.map((v, i) => (i === index ? { ...v, ...patch } : v)));
+    setSteps((rows) =>
+      rows.map((row, i) =>
+        i === index ? { ...row, step: { ...row.step, ...patch } } : row,
+      ),
+    );
   }
   async function submit(e: React.FormEvent) {
     e.preventDefault();
@@ -105,8 +119,16 @@ export function RefereePolicyEditor({
         }
       : null;
     const parsed = refereePolicySchema.safeParse({
-      steps,
+      steps: steps.map((row) => row.step),
       commands,
+      ...(initialBanRules || !allowRepeatBan
+        ? {
+            banCategoryRules: {
+              allowRepeats: allowRepeatBan,
+              repeatExceptions,
+            },
+          }
+        : {}),
       ...(maxReplays === "" ? {} : { maxReplaysPerMap: Number(maxReplays) }),
     });
     if (!parsed.success) {
@@ -147,13 +169,17 @@ export function RefereePolicyEditor({
                 required
                 onChange={(event) => {
                   setPlacement(event.target.value);
+                  const generated = event.target.value
+                    ? s11RefereeSteps(
+                        defaults.wins,
+                        event.target.value as "split" | "opening",
+                      )
+                    : [];
                   setSteps(
-                    event.target.value
-                      ? s11RefereeSteps(
-                          defaults.wins,
-                          event.target.value as "split" | "opening",
-                        )
-                      : [],
+                    generated.map((step) => ({
+                      key: nextStepKey.current++,
+                      step,
+                    })),
                   );
                 }}
               >
@@ -167,152 +193,80 @@ export function RefereePolicyEditor({
               </select>
             </label>
           )}
-          {steps.map((step, index) => (
-            <div className="panel form-stack" key={index}>
-              <strong>{tr("Step {number}", { number: index + 1 })}</strong>
-              <label className="field">
-                <span>{tr("Action")}</span>
-                <select
-                  value={step.kind}
-                  onChange={(e) => {
-                    const kind = e.target.value as typeof step.kind;
-                    update(index, {
-                      kind,
-                      actor:
-                        kind === "ban"
-                          ? "firstBan"
-                          : kind === "tb"
-                            ? "neutral"
-                            : "firstPick",
-                      tiedAt: kind === "tb" ? 0 : null,
-                    });
-                  }}
-                >
-                  <option value="ban">{tr("Ban")}</option>
-                  <option value="pick">{tr("Pick")}</option>
-                  <option value="tb">TB</option>
-                </select>
-              </label>
-              <label className="field">
-                <span>{tr("Acting order")}</span>
-                <select
-                  value={step.actor}
-                  onChange={(e) =>
-                    update(index, {
-                      actor: e.target.value as typeof step.actor,
-                    })
-                  }
-                >
-                  {(step.kind === "ban"
-                    ? ["firstBan", "secondBan"]
-                    : step.kind === "tb"
-                      ? ["firstPick", "secondPick", "neutral"]
-                      : ["firstPick", "secondPick"]
-                  ).map((v) => (
-                    <option key={v} value={v}>
-                      {refereeMessage(tr, v)}
-                    </option>
+          <p className="muted small">
+            {tr(
+              "Ban steps allow every non-TB map by default. Open step limits only when this round needs an exception.",
+            )}
+          </p>
+          <fieldset className="form-stack">
+            <legend>{tr("Repeated Mod Bans")}</legend>
+            <label>
+              <input
+                type="checkbox"
+                checked={allowRepeatBan}
+                onChange={(event) => setAllowRepeatBan(event.target.checked)}
+              />{" "}
+              {tr("Allow each team to Ban the same Mod more than once")}
+            </label>
+            {!allowRepeatBan && (
+              <fieldset>
+                <legend>
+                  {tr("Allow repeated Bans for these categories")}
+                </legend>
+                <div className={styles.choices}>
+                  {(["NM", "HD", "HR", "DT", "FM"] as const).map((category) => (
+                    <button
+                      key={category}
+                      type="button"
+                      className="secondary"
+                      aria-pressed={repeatExceptions.includes(category)}
+                      onClick={() =>
+                        setRepeatExceptions((previous) =>
+                          previous.includes(category)
+                            ? previous.filter((value) => value !== category)
+                            : [...previous, category],
+                        )
+                      }
+                    >
+                      {category}
+                    </button>
                   ))}
-                </select>
-              </label>
-              <label className="field">
-                <span>{tr("Allowed categories (empty allows all)")}</span>
-                <select
-                  multiple
-                  value={step.categories}
-                  onChange={(e) =>
-                    update(index, {
-                      categories: Array.from(
-                        e.target.selectedOptions,
-                        (o) => o.value,
-                      ),
-                    })
-                  }
-                >
-                  {categories.map((category) => (
-                    <option key={category}>{category}</option>
-                  ))}
-                </select>
-              </label>
-              <label className="field">
-                <span>{tr("Allowed pool entries (optional)")}</span>
-                <select
-                  multiple
-                  value={step.entryIds}
-                  onChange={(e) =>
-                    update(index, {
-                      entryIds: Array.from(
-                        e.target.selectedOptions,
-                        (o) => o.value,
-                      ),
-                    })
-                  }
-                >
-                  {maps.map((m) => (
-                    <option key={m.id} value={m.id}>
-                      {m.category}
-                      {m.position} · {m.beatmapId}
-                    </option>
-                  ))}
-                </select>
-              </label>
-              {step.kind === "tb" && (
-                <label className="field">
-                  <span>{tr("Both teams must have this score before TB")}</span>
-                  <input
-                    type="number"
-                    min={0}
-                    max={98}
-                    required
-                    value={step.tiedAt ?? ""}
-                    onChange={(e) =>
-                      update(index, {
-                        tiedAt:
-                          e.target.value === "" ? null : Number(e.target.value),
-                      })
-                    }
-                  />
-                </label>
-              )}
-              {step.kind !== "ban" && (
-                <label>
-                  <input
-                    type="checkbox"
-                    checked={step.avoidRepeatCategory}
-                    onChange={(e) =>
-                      update(index, { avoidRepeatCategory: e.target.checked })
-                    }
-                  />{" "}
-                  {tr("This team cannot repeat a picked category")}
-                </label>
-              )}
-              <div className="actions">
-                <button
-                  type="button"
-                  className="secondary"
-                  disabled={index === 0}
-                  onClick={() =>
-                    setSteps((s) => {
-                      const a = [...s];
-                      [a[index - 1], a[index]] = [a[index], a[index - 1]];
-                      return a;
-                    })
-                  }
-                >
-                  {tr("Move up")}
-                </button>
-                <button
-                  type="button"
-                  className="secondary"
-                  onClick={() =>
-                    setSteps((s) => s.filter((_, i) => i !== index))
-                  }
-                >
-                  {tr("Remove step")}
-                </button>
-              </div>
-            </div>
-          ))}
+                </div>
+              </fieldset>
+            )}
+          </fieldset>
+          <ol
+            className={styles.list}
+            aria-label={tr("Finite Ban / Pick sequence")}
+          >
+            {steps.map(({ key, step }, index) => (
+              <RefereeStepEditor
+                key={key}
+                step={step}
+                index={index}
+                count={steps.length}
+                categories={categories}
+                maps={maps}
+                defaultTiedAt={(defaults?.wins ?? 1) - 1}
+                onChange={(patch) => update(index, patch)}
+                onMove={(direction) =>
+                  setSteps((previous) => {
+                    const next = [...previous];
+                    [next[index], next[index + direction]] = [
+                      next[index + direction],
+                      next[index],
+                    ];
+                    return next;
+                  })
+                }
+                onRemove={() =>
+                  setSteps((previous) =>
+                    previous.filter((_, position) => position !== index),
+                  )
+                }
+              />
+            ))}
+          </ol>
           <button
             type="button"
             className="secondary"
@@ -321,12 +275,15 @@ export function RefereePolicyEditor({
               setSteps((s) => [
                 ...s,
                 {
-                  kind: "ban",
-                  actor: "firstBan",
-                  categories: [],
-                  entryIds: [],
-                  avoidRepeatCategory: false,
-                  tiedAt: null,
+                  key: nextStepKey.current++,
+                  step: {
+                    kind: "ban",
+                    actor: "firstBan",
+                    categories: [],
+                    entryIds: [],
+                    avoidRepeatCategory: false,
+                    tiedAt: null,
+                  },
                 },
               ])
             }

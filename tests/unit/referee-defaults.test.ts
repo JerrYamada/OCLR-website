@@ -32,6 +32,18 @@ describe("S11 editable referee defaults", () => {
       });
       expect(defaults.commands).not.toHaveProperty("roomSize");
       expect(defaults.policy).not.toHaveProperty("maxReplaysPerMap");
+      expect(defaults.policy.banCategoryRules).toEqual({
+        allowRepeats: false,
+        repeatExceptions: ["NM", "FM"],
+      });
+      expect(
+        defaults.policy.steps
+          .filter((step) => step.kind === "ban")
+          .every(
+            (step) =>
+              step.categories.length === 0 && step.entryIds.length === 0,
+          ),
+      ).toBe(true);
       expect(defaults.commands.categoryMods.HD).toEqual({
         mods: ["HD"],
         freemod: false,

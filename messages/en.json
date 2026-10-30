@@ -3353,6 +3353,20 @@
     "m83580975d497": "S11 rules do not specify room size or the start countdown. The per-team disconnect replay allowance is not a per-map replay limit; leave it unset unless separately approved.",
     "mc4e370218a67": "Round referee policy saved.",
     "m2c92dc53ec7f": "Completed-fixture referee policies are protected; create a new round instead.",
-    "mcf07501b30f3": "Review category Ban limits, disconnect replays, pauses and EX conditions against the published rules."
+    "mcf07501b30f3": "Review category Ban limits, disconnect replays, pauses and EX conditions against the published rules.",
+    "m67e19d6b138b": "Ban steps allow every non-TB map by default. Open step limits only when this round needs an exception.",
+    "ma0672238dbd6": "Repeated Mod Bans",
+    "mae8cffe77b77": "Allow each team to Ban the same Mod more than once",
+    "ma99cacdafccf": "Allow repeated Bans for these categories",
+    "m7a41ce41a57f": "Step {number} action",
+    "m938c5cddcdb2": "Move step {number} up",
+    "m5e074139a465": "Move step {number} down",
+    "m156594f7b731": "Remove step {number}",
+    "m6404251132b0": "Step limits (configured)",
+    "m5d9013e6322d": "Step limits (optional)",
+    "m55ec2f535044": "Find a pool map",
+    "md5e2b2bb2303": "Allow all maps",
+    "m70a38d77c2b9": "This team has already banned this restricted category.",
+    "mefaa2447abfc": "Tiebreaker maps cannot be banned."
   }
 }

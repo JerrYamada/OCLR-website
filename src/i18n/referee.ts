@@ -118,6 +118,10 @@ export function refereeMessage(tr: AppTranslator, message: string): string {
       return tr("This map is not permitted for the current step.");
     case "This team has already picked this category.":
       return tr("This team has already picked this category.");
+    case "This team has already banned this restricted category.":
+      return tr("This team has already banned this restricted category.");
+    case "Tiebreaker maps cannot be banned.":
+      return tr("Tiebreaker maps cannot be banned.");
     case "Tiebreaker maps are reserved for their configured step.":
       return tr("Tiebreaker maps are reserved for their configured step.");
     case "Unable to reload the referee workspace.":

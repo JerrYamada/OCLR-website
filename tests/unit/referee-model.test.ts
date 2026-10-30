@@ -86,6 +86,91 @@ function act(i: RefereeModelInput, a: RefereeAction) {
   return append(i, validateRefereeAction(i, a));
 }
 describe("referee finite workflow", () => {
+  function bans(category = "HD") {
+    const i = input();
+    i.policy!.steps = ["firstBan", "secondBan", "firstBan", "secondBan"].map(
+      (actor) => ({
+        kind: "ban",
+        actor: actor as "firstBan" | "secondBan",
+        categories: [],
+        entryIds: [],
+        avoidRepeatCategory: false,
+        tiedAt: null,
+      }),
+    );
+    i.maps.forEach((map) => {
+      map.category = category;
+    });
+    return i;
+  }
+  it("enforces repeated Mod Bans per team, including later Ban phases", () => {
+    const i = bans();
+    i.policy!.banCategoryRules = {
+      allowRepeats: false,
+      repeatExceptions: ["NM", "FM"],
+    };
+    act(i, { action: "record_selection", entryId: id(10) });
+    act(i, { action: "record_selection", entryId: id(11) }); // Opponent may Ban HD too.
+    const before = structuredClone(i.events);
+    expect(() =>
+      act(i, { action: "record_selection", entryId: id(12) }),
+    ).toThrow("This team has already banned this restricted category.");
+    expect(i.events).toEqual(before);
+    i.maps[2].category = "HR";
+    expect(() =>
+      act(i, { action: "record_selection", entryId: id(12) }),
+    ).not.toThrow();
+  });
+  it.each(["NM", "FM"])(
+    "allows explicitly configured %s exceptions",
+    (category) => {
+      const i = bans(category);
+      i.policy!.banCategoryRules = {
+        allowRepeats: false,
+        repeatExceptions: ["NM", "FM"],
+      };
+      for (const entryId of [id(10), id(11), id(12)])
+        act(i, { action: "record_selection", entryId });
+      expect(projectReferee(i).activeSelections).toHaveLength(3);
+    },
+  );
+  it.each([
+    undefined,
+    { allowRepeats: true, repeatExceptions: [] },
+    { allowRepeats: true, repeatExceptions: ["HD"] },
+  ])("preserves allowed and legacy repeated Bans %j", (rules) => {
+    const i = bans();
+    i.policy!.banCategoryRules = rules as NonNullable<
+      RefereeModelInput["policy"]
+    >["banCategoryRules"];
+    for (const entryId of [id(10), id(11), id(12)])
+      act(i, { action: "record_selection", entryId });
+    expect(projectReferee(i).activeSelections).toHaveLength(3);
+  });
+  it("does not count withdrawn Bans or apply the Ban restriction to Picks", () => {
+    const i = bans();
+    i.policy!.banCategoryRules = { allowRepeats: false, repeatExceptions: [] };
+    act(i, { action: "record_selection", entryId: id(10) });
+    act(i, { action: "void_last" });
+    act(i, { action: "record_selection", entryId: id(11) });
+    i.orders.firstPickTeamId = a;
+    i.policy!.steps[1] = {
+      ...i.policy!.steps[1],
+      kind: "pick",
+      actor: "firstPick",
+    };
+    expect(() =>
+      act(i, { action: "record_selection", entryId: id(12) }),
+    ).not.toThrow();
+  });
+  it("always rejects a TB Ban, even with no TB step and repeats allowed", () => {
+    const i = bans("TB");
+    i.policy!.banCategoryRules = { allowRepeats: true, repeatExceptions: [] };
+    expect(() =>
+      act(i, { action: "record_selection", entryId: id(10) }),
+    ).toThrow("Tiebreaker maps cannot be banned.");
+    expect(i.events).toEqual([]);
+  });
   it("allows two replays per map and rejects a third without adding an attempt", () => {
     const i = input();
     i.policy!.maxReplaysPerMap = 2;
@@ -320,7 +405,7 @@ describe("referee finite workflow", () => {
     const i = input();
     expect(() =>
       act(i, { action: "record_selection", entryId: id(15) }),
-    ).toThrow("reserved");
+    ).toThrow("Tiebreaker maps cannot be banned.");
     act(i, { action: "record_selection", entryId: id(10) });
     expect(() =>
       act(i, { action: "record_selection", entryId: id(15) }),
