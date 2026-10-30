@@ -94,3 +94,15 @@ sudo commands are added. The targeted deployment/installer/helper suite passed
 the acl tools to exercise that test on Linux. Lint/types, Bash syntax and diff
 checks passed; production dependency audit found zero vulnerabilities. This is
 local synthetic verification, not a production backup/restore acceptance claim.
+
+Ledger permission preflight follow-up: a synthetic dedicated PostgreSQL role
+with schema USAGE but no ledger SELECT reproduces a failure after service control
+in the old worker. The updated worker checks the exact ledger columns after actor
+authorization and before service control. The regression asserts a failed
+`database-preflight` audit phase, original-preserved recovery and an empty mock
+service-command log. Granting ledger SELECT makes the query succeed. The same
+test then completes the existing encrypted backup/import/restore round trip and
+credential/grant invalidation checks. Eleven focused tests and lint/types passed
+under Node 24 against disposable isolated test databases. No production role
+grants, services or data were changed by the agent. This worker change needs a
+separate reviewed operator upgrade; website-only updates do not install it.
