@@ -3286,6 +3286,21 @@
     "m0b4fe128308f": "Every sticker sits on the same transparent square canvas with a white rim, so one can replace another in a fixed-size slot. PNG and WebP are provided at 512, 256, 128 and 64 px.",
     "mf92c8361d562": "The stickers carry no team colour or text; show the team with the interface's existing red and blue borders.",
     "m20ffbad5c5a1": "Scale them proportionally; do not stretch, recolour, crop the rim or flip them horizontally.",
-    "m406fe47a93b5": "No streaming API access has been created."
+    "m406fe47a93b5": "No streaming API access has been created.",
+    "mffdaeb060104": "Backup service is unavailable.",
+    "ma36a188c8154": "Backup request could not be completed.",
+    "mde67fa7e6aea": "Backups contain private site data. Restore replaces the entire database and signs everyone out. All staff grants require reauthorization. Matching media files are required separately.",
+    "m85fb487f030a": "Create backup",
+    "m03b1860d40f7": "Upload backup for validation",
+    "m967bd624c2d5": "Review restore",
+    "m75c634bb2fca": "Confirm full database restore",
+    "m373a9d11ae17": "The service will stop during restore. Type REPLACE to confirm replacement of the current database.",
+    "m5b55363005a0": "Confirm restore",
+    "me6ded7baa1e6": "Database backups",
+    "maf92524e4c08": "Invalid request.",
+    "m085dded9e477": "Backup file is too large.",
+    "m661ff40a07e0": "Queued",
+    "mf4ccae29e1bb": "Running",
+    "meeab9cd4421b": "Validated"
   }
 }

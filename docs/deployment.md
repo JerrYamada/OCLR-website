@@ -572,3 +572,15 @@ legacy season-valued site settings render as `default` without rewriting data or
 audit history. No migration is needed. See the [selection and compatibility
 policy](localization.md#season-theme-selection-policy-445) for route inheritance,
 explicit repair of old global values, remote reads and broadcast isolation.
+
+## Global Admin database backups (#369)
+
+The optional [separate backup operator](../operator/README.md) supplies encrypted
+whole-database exports and validated isolated restore jobs through `/admin/backups`.
+It requires a separately installed account, private Unix socket, operator-held key
+and database ownership, and shares the existing updater lock. Installation is an
+explicit operator task. The web runtime receives no database administration key.
+Database packages exclude durable media bytes and require an exact matching
+media-tree fingerprint before restoration. Sessions and tokens are cleared and
+staff grants revoked after restore; recovery Admins must reauthorize staff.
+See the operator guide for limits, retention, stopped-service cutover and recovery.
