@@ -5880,3 +5880,22 @@ button.staff-role-save {
   padding: 1rem;
   border: 1px solid var(--color-border);
 }
+
+/* Keep staff header actions inside tablet-width viewports. */
+@media (min-width: 951px) and (max-width: 1100px) {
+  html[data-appearance] .themed-site.private-site .nav-wrap {
+    gap: 0.75rem;
+  }
+  html[data-appearance] .themed-site.private-site .main-nav {
+    gap: 0.5rem;
+  }
+}
+
+.team-group-manager {
+  margin: 0;
+  gap: 0.75rem;
+}
+.team-group-manager > :is(h3, p),
+.team-management-card > .public-team-heading {
+  margin: 0;
+}

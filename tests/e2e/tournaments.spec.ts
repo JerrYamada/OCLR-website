@@ -42,6 +42,7 @@ test.describe("browser-managed authoritative tournament editions", () => {
     expect(original.edition).toMatchObject({
       slug,
       name,
+      coachesEnabled: false,
       summary: "",
       season: null,
       published: false,
@@ -78,7 +79,9 @@ test.describe("browser-managed authoritative tournament editions", () => {
     await page
       .getByRole("button", { name: "Save general settings", exact: true })
       .click();
-    await expect(page.getByRole("status")).toContainText("saved");
+    await expect(
+      page.getByRole("status").filter({ hasText: "saved" }),
+    ).toContainText("saved");
     await page.reload();
     await expect(page.getByLabel("Season identifier (optional)")).toHaveValue(
       "Test season",
@@ -226,7 +229,9 @@ test.describe("browser-managed authoritative tournament editions", () => {
       await page
         .getByRole("button", { name: "Save general settings", exact: true })
         .click();
-      await expect(page.getByRole("status")).toContainText("saved");
+      await expect(
+        page.getByRole("status").filter({ hasText: "saved" }),
+      ).toContainText("saved");
       await expect(page.getByRole("dialog")).toHaveCount(0);
       await tab("Rules & eligibility");
       await page
@@ -247,7 +252,9 @@ test.describe("browser-managed authoritative tournament editions", () => {
       await page
         .getByRole("button", { name: "Save rules & eligibility", exact: true })
         .click();
-      await expect(page.getByRole("status")).toContainText("saved");
+      await expect(
+        page.getByRole("status").filter({ hasText: "saved" }),
+      ).toContainText("saved");
       await tab("Milestones");
       await page
         .getByRole("button", { name: "Add milestone", exact: true })
@@ -276,7 +283,9 @@ test.describe("browser-managed authoritative tournament editions", () => {
       await page
         .getByRole("button", { name: "Save milestones", exact: true })
         .click();
-      await expect(page.getByRole("status")).toContainText("saved");
+      await expect(
+        page.getByRole("status").filter({ hasText: "saved" }),
+      ).toContainText("saved");
       state = await current();
       expect(state.edition.schedule).toEqual([
         {
@@ -326,13 +335,17 @@ test.describe("browser-managed authoritative tournament editions", () => {
           exact: true,
         })
         .click();
-      await expect(page.getByRole("status")).toContainText("saved");
+      await expect(
+        page.getByRole("status").filter({ hasText: "saved" }),
+      ).toContainText("saved");
       await tab("Publication");
       await page
         .getByRole("button", { name: "Publish tournament", exact: true })
         .click();
       await page.getByRole("button", { name: "Confirm", exact: true }).click();
-      await expect(page.getByRole("status")).toHaveText("Publication updated.");
+      await expect(
+        page.getByRole("status").filter({ hasText: "Publication updated." }),
+      ).toHaveText("Publication updated.");
       const guestPage = await guest.newPage();
       await guestPage.goto(`/tournaments/${slug}/rules`);
       await expect(
@@ -363,7 +376,9 @@ test.describe("browser-managed authoritative tournament editions", () => {
           exact: true,
         })
         .click();
-      await expect(page.getByRole("status")).toContainText("saved");
+      await expect(
+        page.getByRole("status").filter({ hasText: "saved" }),
+      ).toContainText("saved");
       state = await current();
       expect(state.edition.registration.enabled).toBe(true);
       expect(
@@ -426,7 +441,9 @@ test.describe("browser-managed authoritative tournament editions", () => {
           exact: true,
         })
         .click();
-      await expect(page.getByRole("status")).toContainText("saved");
+      await expect(
+        page.getByRole("status").filter({ hasText: "saved" }),
+      ).toContainText("saved");
       await tab("Rules & eligibility");
       await page.getByText("Rules release", { exact: true }).click();
       await page
@@ -438,7 +455,9 @@ test.describe("browser-managed authoritative tournament editions", () => {
       await page
         .getByRole("button", { name: "Save rules & eligibility", exact: true })
         .click();
-      await expect(page.getByRole("status")).toContainText("saved");
+      await expect(
+        page.getByRole("status").filter({ hasText: "saved" }),
+      ).toContainText("saved");
       await tab("Registration");
       await page
         .getByLabel("Question 1 label", { exact: true })
@@ -449,7 +468,9 @@ test.describe("browser-managed authoritative tournament editions", () => {
           exact: true,
         })
         .click();
-      await expect(page.getByRole("status")).toContainText("saved");
+      await expect(
+        page.getByRole("status").filter({ hasText: "saved" }),
+      ).toContainText("saved");
       await playerPage.reload();
       await playerPage.getByText("My application", { exact: true }).click();
       await expect(
@@ -541,7 +562,9 @@ test.describe("browser-managed authoritative tournament editions", () => {
         .getByRole("button", { name: "Unpublish tournament", exact: true })
         .click();
       await page.getByRole("button", { name: "Confirm", exact: true }).click();
-      await expect(page.getByRole("status")).toHaveText("Publication updated.");
+      await expect(
+        page.getByRole("status").filter({ hasText: "Publication updated." }),
+      ).toHaveText("Publication updated.");
       expect(
         (await guest.request.get(`/api/tournaments/${slug}`)).status(),
       ).toBe(404);

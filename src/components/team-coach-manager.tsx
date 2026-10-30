@@ -22,6 +22,7 @@ export function TeamCoachManager({
   const [id, setId] = useState(""),
     [requestPending, setPending] = useState(false),
     [error, setError] = useState("");
+  const [notice, setNotice] = useState("");
   const pending = requestPending || refreshing;
   const [activeCoach, setActiveCoach] = useState<number | "add" | null>(null);
   async function save(action: "add_coach" | "remove_coach", userId: number) {
@@ -29,6 +30,7 @@ export function TeamCoachManager({
     setActiveCoach(action === "add_coach" ? "add" : userId);
     setPending(true);
     setError("");
+    setNotice("");
     try {
       const response = await fetch(`/api/admin/tournaments/${slug}/teams`, {
         method: "POST",
@@ -45,6 +47,9 @@ export function TeamCoachManager({
         refresh();
         throw new Error(result.error);
       }
+      setNotice(
+        action === "add_coach" ? tr("Coach added.") : tr("Coach removed."),
+      );
       setId("");
       refresh();
     } catch (e) {
@@ -121,6 +126,11 @@ export function TeamCoachManager({
             </button>
           </div>
         </form>
+        {notice && (
+          <p className="notice small" role="status">
+            {notice}
+          </p>
+        )}
         {error && (
           <p className="notice error-text" role="alert">
             {tr(error)}

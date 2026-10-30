@@ -260,7 +260,7 @@ describe.skipIf(!url)(
         (await fixtureForReview(referee, "test-cup", fixture.id)).fixture.id,
       ).toBe(fixture.id);
     });
-    it("rejects invalid/unconfirmed fields, unpublished teams and cross-round/edition identities", async () => {
+    it("rejects invalid/unconfirmed fields and cross-round/edition identities", async () => {
       for (const change of [
         { homeTeamId: awayId },
         { timeZone: "Invalid/Zone" },
@@ -277,9 +277,10 @@ describe.skipIf(!url)(
         .update(teams)
         .set({ rosterPublished: false })
         .where(eq(teams.id, homeId));
-      await expect(
-        fixtureCommand(admin, "test-cup", body()),
-      ).rejects.toMatchObject({ status: 400 });
+      expect(
+        (await fixtureCommand(admin, "test-cup", body())).fixtures[0]
+          .publishedAt,
+      ).toBeNull();
       await db()
         .update(teams)
         .set({ rosterPublished: true })

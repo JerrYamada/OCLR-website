@@ -298,3 +298,14 @@ independent streaming credential through `/streaming/tournaments/{edition}/next`
 Both paths return the identical fixture/stage/mappools schema. The latter accepts
 only the edition-bound streaming audience and grants no other Developer reads.
 See [Streaming API](streaming-api.md) for selection, idle expiry and transport.
+
+### Contract 1.5.0: team configuration
+
+The saved edition configuration adds optional `coachesEnabled`; newly created
+editions store `false`. S11 without an explicit value defaults to disabled, while
+other existing editions retain coaching. The staff team workspace projects the
+effective setting. Staff fixture management includes active unpublished team
+choices marked `unpublished`, solely for authorized private configuration.
+Public fixture/result and group publication still require official finalized,
+published teams. Remote frontends need this backend contract for these controls;
+older backends do not supply the new setup behavior.

@@ -176,7 +176,7 @@ async function Issue271Page({
               </div>
               {data.coachesEnabled !== false && (
                 <TeamCoachManager
-                  key={`coaches:${t.id}:${data.version}`}
+                  key={`coaches:${t.id}`}
                   slug={edition}
                   version={data.version}
                   teamId={t.id}
