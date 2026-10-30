@@ -49,16 +49,16 @@ test.describe("team configuration batch #543–#546", () => {
       0,
     );
     const groups = page.locator(".team-group-manager").first();
+    await groups.getByLabel("Group count", { exact: true }).selectOption("1");
     await groups
-      .getByRole("button", { name: "Add group", exact: true })
+      .getByRole("button", { name: "Generate groups", exact: true })
       .click();
     await groups
       .getByLabel("Group name 1", { exact: true })
       .fill("Synthetic group A");
-    for (const checkbox of await groups
-      .locator('.team-group-options input[type="checkbox"]')
-      .all())
-      await checkbox.check();
+    const picker = groups.getByRole("combobox", { name: /^Add team to/ });
+    await picker.selectOption(seeded.home.teamId);
+    await picker.selectOption(seeded.away.teamId);
     await groups
       .getByRole("button", { name: "Save group assignments", exact: true })
       .click();

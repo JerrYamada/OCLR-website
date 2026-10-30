@@ -675,3 +675,193 @@
     width: 100%;
   }
 }
+
+/* Group assignment: count, unassigned pool, then independent drop destinations. */
+.group-assignment .group-count-controls {
+  display: flex;
+  align-items: end;
+  flex-wrap: wrap;
+  gap: 0.75rem 1rem;
+}
+.group-count-controls > .field {
+  width: 9rem;
+}
+.group-count-controls > .small {
+  align-self: center;
+  margin-left: auto;
+}
+.group-assignment-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 1fr));
+  gap: 1rem;
+  align-items: start;
+}
+.group-unassigned,
+.group-assignment-card {
+  display: grid;
+  align-content: start;
+  min-width: 0;
+  gap: 0.75rem;
+  border: 1px solid var(--site-border);
+  border-radius: 0.75rem;
+  padding: 1rem;
+  transition:
+    border-color 0.15s,
+    background-color 0.15s;
+}
+.group-unassigned {
+  background: var(--site-tint);
+}
+.group-assignment-card {
+  background: var(--site-surface);
+}
+.group-card-heading {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+  justify-content: space-between;
+}
+.group-card-heading h3,
+.group-assignment :is(p, ul) {
+  margin: 0;
+}
+.group-assignment .group-team-list {
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 0.5rem;
+  min-width: 0;
+}
+.group-team-pool {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr));
+}
+.group-team-card {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  min-width: 0;
+  border: 1px solid var(--site-border);
+  border-radius: 0.5rem;
+  background: var(--site-surface);
+  padding: 0.25rem;
+  transition:
+    border-color 0.15s,
+    opacity 0.15s;
+}
+.group-team-card[data-selected] {
+  border-color: var(--site-accent);
+  box-shadow: 0 0 0 1px var(--site-accent);
+}
+.group-team-card[data-dragging] {
+  opacity: 0.55;
+}
+.themed-site .group-team-card .group-team-select {
+  display: flex;
+  flex: 1;
+  min-width: 0;
+  align-items: center;
+  gap: 0.5rem;
+  background: transparent;
+  color: var(--site-foreground);
+  border-color: transparent;
+  box-shadow: none;
+  padding: 0.35rem;
+  text-align: start;
+  border-radius: 0.35rem;
+}
+.group-team-select > span:last-child {
+  display: grid;
+  gap: 0.2rem;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.group-team-select strong {
+  font-size: 0.85rem;
+}
+.group-team-select small {
+  color: var(--site-muted);
+  font-size: 0.75rem;
+}
+.group-team-select .team-monogram {
+  width: 2rem;
+  height: 2rem;
+  flex-shrink: 0;
+  border-radius: 0.4rem;
+  font-size: 0.75rem;
+}
+.themed-site .group-team-card :is(.group-team-grip, .group-team-return) {
+  width: 2.75rem;
+  min-width: 2.75rem;
+  padding: 0.25rem;
+  flex-shrink: 0;
+  box-shadow: none;
+  border-color: transparent;
+}
+.group-team-grip {
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+}
+.group-team-grip:active {
+  cursor: grabbing;
+}
+.group-assignment [data-drag-over] {
+  border-color: var(--site-accent);
+  background: var(--site-tint);
+  box-shadow: inset 0 0 0 1px var(--site-accent);
+}
+.group-drop-hint {
+  display: grid;
+  place-items: center;
+  min-height: 4rem;
+  border: 1px dashed var(--site-border);
+  border-radius: 0.5rem;
+}
+.group-selected {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+.group-selected > span {
+  flex: 1;
+}
+.group-team-picker {
+  margin-top: 0.25rem;
+}
+.group-save-controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1rem;
+  border-top: 1px solid var(--site-border);
+  padding-top: 1rem;
+}
+.group-resize-confirm.form-stack {
+  margin: 0;
+  gap: 0.75rem;
+}
+.group-resize-confirm .actions {
+  margin: 0;
+}
+@media (max-width: 600px) {
+  .group-assignment .group-count-controls {
+    align-items: end;
+  }
+  .group-count-controls > .small {
+    flex-basis: 100%;
+    margin-left: 0;
+  }
+  .group-save-controls {
+    align-items: stretch;
+    flex-direction: column;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .group-assignment-card,
+  .group-unassigned,
+  .group-team-card {
+    transition: none;
+  }
+}

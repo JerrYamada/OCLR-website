@@ -16,6 +16,7 @@ import {
   editionRevisions,
   editionState,
   registrations,
+  playerNames,
   staffRoles,
   tournamentStages,
   users,
@@ -54,7 +55,9 @@ describe.skipIf(!url)("unused blank tournament draft deletion", () => {
   });
   beforeEach(async () => {
     vi.stubEnv("OCLR_DATA_SOURCE", "database");
-    await db().execute(sql`TRUNCATE edition_state, users CASCADE`);
+    await db().execute(
+      sql`TRUNCATE edition_state, users, player_names CASCADE`,
+    );
     await db().insert(users).values([admin, scoped]);
     await createTournament(admin, {
       slug,
@@ -304,6 +307,7 @@ describe.skipIf(!url)("unused blank tournament draft deletion", () => {
     "stage",
     "award",
     "revoked-role",
+    "retained-name-evidence",
     "event",
   ])("protects existing %s data", async (kind) => {
     if (kind === "registration")
@@ -327,6 +331,14 @@ describe.skipIf(!url)("unused blank tournament draft deletion", () => {
         role: "admin",
         grantedBy: admin.osuId,
         revokedAt: new Date(),
+      });
+    if (kind === "retained-name-evidence")
+      await db().insert(playerNames).values({
+        osuId: scoped.osuId,
+        username: "Synthetic retained archive name",
+        source: "archive_player",
+        editionSlug: slug,
+        reference: "Synthetic!A2",
       });
     if (kind === "event")
       await db().insert(editionEvents).values({
