@@ -63,7 +63,10 @@ describe("shared public and staff BWS display", () => {
       '<span class="bws-value-hash">#</span>10,000</strong>',
     );
     expect(html).toContain("pp");
-    expect(html).toContain("1,234.57");
+    expect(html).toContain(
+      '<span class="bws-value-hash">#</span>10,000</strong>',
+    );
+    expect(html).toContain('class="bws-value">1,234</strong>');
     expect(html).not.toContain("BW-rank");
     expect(html).not.toContain("BW-PP");
     expect(html).toContain("Badge eligibility pending staff review");

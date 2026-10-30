@@ -2814,9 +2814,6 @@ html[data-appearance]
   gap: 0.5rem;
   min-width: 0;
 }
-.profile-details > .profile-previous-names {
-  flex-basis: 100%;
-}
 .profile-details dt {
   flex-shrink: 0;
 }

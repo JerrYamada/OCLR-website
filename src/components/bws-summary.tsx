@@ -145,7 +145,9 @@ function CompactBwsSummary({
               {number(Math.floor(value.adjustedPp), 0)}
             </strong>
           ) : pending && value.rawPp !== null ? (
-            <strong className="bws-value">{number(value.rawPp, 2)}</strong>
+            <strong className="bws-value">
+              {number(Math.floor(value.rawPp), 0)}
+            </strong>
           ) : (
             <span className="bws-card-state">
               {value.ppStatus === "pending"

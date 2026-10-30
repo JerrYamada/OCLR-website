@@ -164,12 +164,6 @@ export function PlayerProfile({
             {p.bot === null ? tr("Unavailable") : p.bot ? tr("Yes") : tr("No")}
           </dd>
         </div>
-        {p.previousUsernames.length > 0 && (
-          <div className="profile-previous-names">
-            <dt>{tr("Previous usernames")}</dt>
-            <dd>{p.previousUsernames.join(", ")}</dd>
-          </div>
-        )}
       </dl>
       <footer className="profile-summary-footer">
         {tr("Last updated")} <time dateTime={p.fetchedAt}>{p.fetchedAt}</time>

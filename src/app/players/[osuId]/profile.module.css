@@ -16,6 +16,64 @@
   min-width: 0;
 }
 
+.nameRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.2rem 0.6rem;
+}
+
+.nameRow h1 {
+  margin: 0;
+}
+
+/* Previous aliases sit next to the name; long lists collapse into a disclosure. */
+.previousNames {
+  position: relative;
+  font-size: 0.8rem;
+  color: var(--site-muted, var(--color-muted));
+  overflow-wrap: anywhere;
+}
+
+.previousNames summary {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  cursor: pointer;
+  list-style: none;
+}
+
+.previousNames summary::-webkit-details-marker {
+  display: none;
+}
+
+.previousNamesIcon {
+  width: 0.9rem;
+  height: 0.9rem;
+  flex: none;
+}
+
+.previousNamesList {
+  position: absolute;
+  z-index: 6;
+  inset-block-start: calc(100% + 0.35rem);
+  inset-inline-start: 0;
+  display: grid;
+  gap: 0.15rem;
+  min-width: 9rem;
+  max-width: min(20rem, calc(100vw - 2rem));
+  margin: 0;
+  padding: 0.55rem 0.75rem;
+  border: 1px solid var(--site-border, var(--color-border));
+  border-radius: 0.6rem;
+  background: var(--site-surface, var(--color-surface));
+  color: var(--site-foreground, var(--color-foreground));
+  box-shadow: 0 0.5rem 1.4rem rgb(0 0 0 / 35%);
+  font-size: 0.8rem;
+  list-style: none;
+  text-shadow: none;
+}
+
 .headingText h1 {
   margin: 0;
   font-size: clamp(1.5rem, 3vw, 2.25rem);
@@ -45,6 +103,16 @@
 :global(.profile-cover-content) .headingText h1 {
   color: #fff;
   text-shadow: 0 1px 4px rgb(0 0 0 / 65%);
+}
+
+:global(.profile-cover-content) .previousNames {
+  color: rgb(255 255 255 / 78%);
+  text-shadow: 0 1px 3px rgb(0 0 0 / 65%);
+}
+
+:global(.profile-cover-content) .previousNamesList {
+  color: var(--site-foreground, var(--color-foreground));
+  text-shadow: none;
 }
 
 :global(.profile-cover-content) .headingText p {

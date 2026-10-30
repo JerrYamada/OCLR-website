@@ -1,5 +1,6 @@
 import { PlayerProfile } from "@/components/player-profile";
 import { Avatar } from "@/components/avatar";
+import { collapseAliases, previousUsernames } from "@/lib/player-aliases";
 import { RoundRatings } from "@/components/round-ratings";
 import { getAppTranslations } from "@/i18n/server";
 import { frontendProfile } from "@/lib/frontend-data";
@@ -58,6 +59,14 @@ async function ProfileContent({
             },
           }))
       : [];
+  // osu! supplies the aliases on the fetched profile; roster/archive names add to them.
+  const aliases = previousUsernames(
+    profile?.previousUsernames ?? [],
+    data.identity.names.map((name) => name.username),
+    data.identity.currentUsername ?? data.identity.username,
+  );
+  const aliasesInline = aliases.join(", ");
+  const collapsedAliases = collapseAliases(aliases);
   const heading = (
     <header className={styles.heading}>
       <a
@@ -74,16 +83,58 @@ async function ProfileContent({
         />
       </a>
       <div className={styles.headingText}>
-        <h1>
-          <a
-            href={data.identity.canonicalUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className={styles.identityLink}
-          >
-            {data.identity.username}
-          </a>
-        </h1>
+        <div className={styles.nameRow}>
+          <h1>
+            <a
+              href={data.identity.canonicalUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className={styles.identityLink}
+            >
+              {data.identity.username}
+            </a>
+          </h1>
+          {aliases.length > 0 &&
+            (collapsedAliases ? (
+              <details className={styles.previousNames}>
+                <summary>
+                  {tr("Previous usernames")} (+{aliases.length})
+                  <svg
+                    className={styles.previousNamesIcon}
+                    viewBox="0 0 16 16"
+                    aria-hidden="true"
+                    focusable="false"
+                  >
+                    <circle
+                      cx="8"
+                      cy="8"
+                      r="6.4"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="1.2"
+                    />
+                    <circle cx="8" cy="4.9" r="0.95" fill="currentColor" />
+                    <path
+                      d="M8 7.1v4.2"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="1.2"
+                      strokeLinecap="round"
+                    />
+                  </svg>
+                </summary>
+                <ul className={styles.previousNamesList}>
+                  {aliases.map((name) => (
+                    <li key={name}>{name}</li>
+                  ))}
+                </ul>
+              </details>
+            ) : (
+              <span className={styles.previousNames}>
+                {tr("Previous usernames")}: {aliasesInline}
+              </span>
+            ))}
+        </div>
         <p className="muted">
           {country && (
             <>
@@ -125,13 +176,7 @@ async function ProfileContent({
             profile: {
               ...data.snapshot.profile,
               username: data.identity.username,
-              previousUsernames: data.identity.names
-                .map((n) => n.username)
-                .filter(
-                  (name) =>
-                    name.toLowerCase() !==
-                    data.identity.currentUsername?.toLowerCase(),
-                ),
+              previousUsernames: aliases,
             },
           }}
           bws={data.bws}
