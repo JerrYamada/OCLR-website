@@ -7,6 +7,7 @@ import type { BwsSummary as BwsData } from "@/lib/bws-model";
 import Image from "next/image";
 import type { ReactNode } from "react";
 import type { ProfileSnapshot } from "@/lib/osu-profile-model";
+import { calculateOii, oiiMode } from "@/lib/oii";
 export function PlayerProfile({
   snapshot,
   bws,
@@ -47,6 +48,8 @@ export function PlayerProfile({
   const p = snapshot.profile;
   const s = p.statistics;
   const history = p.rankHistory?.data ?? null;
+  // The improvement index describes the ruleset the rank history belongs to.
+  const oii = calculateOii(s.pp, s.playTimeSeconds, oiiMode(snapshot));
   // The card id reuses the mappool beatmap-id pill with the player's rank tier
   // gradient; the ink comes from the project's WCAG contrast choice.
   const idPalette = rankTierPalette(s.globalRankPercent);
@@ -77,6 +80,7 @@ export function PlayerProfile({
                   variant="compact"
                   countryRank={s.countryRank}
                   globalRankPercent={s.globalRankPercent}
+                  oii={oii}
                 />
               )}
             </div>
@@ -91,6 +95,7 @@ export function PlayerProfile({
               variant="compact"
               countryRank={s.countryRank}
               globalRankPercent={s.globalRankPercent}
+              oii={oii}
             />
           )}
         </>

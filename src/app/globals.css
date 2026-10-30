@@ -2674,6 +2674,16 @@ html[data-appearance]
   --rank-tier-from: #bab3ab;
   --rank-tier-to: #dddddd;
 }
+/* Improvement index: the same rolling gradient as the rank tiers, coloured by
+   whether the player is ahead of (green) or behind (red) the play-time curve. */
+.bws-card .bws-value--oii-up {
+  --rank-tier-from: #5edc5b;
+  --rank-tier-to: #caf881;
+}
+.bws-card .bws-value--oii-down {
+  --rank-tier-from: #d32f2f;
+  --rank-tier-to: #fd5392;
+}
 /* On the light panel (no cover art) the pale tier stops vanish against the
    card, so the standalone card dims them; cover cards keep osu!'s palette. */
 html:not([data-theme="dark"])

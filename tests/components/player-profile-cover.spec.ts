@@ -21,3 +21,15 @@ for (const viewport of [
     expect(avatarBox.y).toBeGreaterThanOrEqual(pillBox.y + pillBox.height);
   });
 }
+
+test("the improvement index carries the faster-than-typical colour band", async ({
+  page,
+}) => {
+  await page.goto("/player-profile-cover");
+  const metric = page.locator(".bws-card-metric").last();
+  await expect(metric.locator(".bws-card-label")).toHaveText("OII");
+  const value = metric.locator(".bws-value");
+  await expect(value).toHaveText("1.35");
+  await expect(value).toHaveClass(/bws-value--oii-up/);
+  await expect(value).toHaveClass(/bws-value--rank-tier/);
+});

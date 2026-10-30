@@ -120,11 +120,21 @@ function CompactBwsSummary({
   value,
   countryRank,
   globalRankPercent,
+  oii,
 }: {
   value: Summary;
   countryRank: number | null;
   globalRankPercent: number | null;
+  oii: number | null;
 }) {
+  // The index carries the rank-tier gradient only where it says something:
+  // above 1.1 the player is progressing faster than the curve, below 0.9 slower.
+  const oiiTier =
+    oii !== null && oii > 1.1
+      ? " bws-value--oii-up"
+      : oii !== null && oii < 0.9
+        ? " bws-value--oii-down"
+        : "";
   const tier = globalRankTier(globalRankPercent);
   const tr = useAppTranslations();
   const number = (v: number, digits: number) =>
@@ -213,6 +223,38 @@ function CompactBwsSummary({
           )}
         </div>
       </div>
+      <span className="bws-card-divider" aria-hidden="true" />
+      <div className="bws-card-metric">
+        <div className="bws-card-label-row">
+          <span className="bws-card-label">{tr("OII")}</span>
+          <div className="bws-card-note">
+            <InfoTrigger onOpenLabel={tr("Explanation")} />
+            <div className="bws-card-note-panel" role="note">
+              <p className="small muted">
+                <code>{"expected play hours / play hours"}</code>
+              </p>
+              <p className="small muted">
+                {tr(
+                  "OII compares the play time this pp usually needs with the account's actual play time. Above 1.1 means faster than typical, below 0.9 slower.",
+                )}
+              </p>
+            </div>
+          </div>
+        </div>
+        <div className="bws-card-value-row">
+          {oii !== null ? (
+            <strong
+              className={`bws-value${oiiTier ? ` bws-value--rank-tier${oiiTier}` : ""}`}
+            >
+              {number(oii, 2)}
+            </strong>
+          ) : (
+            <span className="bws-card-state" role="status">
+              —
+            </span>
+          )}
+        </div>
+      </div>
     </section>
   );
 }
@@ -222,11 +264,13 @@ export function BwsSummary({
   variant = "detail",
   countryRank = null,
   globalRankPercent = null,
+  oii = null,
 }: {
   value: Summary;
   variant?: "detail" | "compact";
   countryRank?: number | null;
   globalRankPercent?: number | null;
+  oii?: number | null;
 }) {
   const tr = useAppTranslations();
   if (variant === "compact")
@@ -235,6 +279,7 @@ export function BwsSummary({
         value={value}
         countryRank={countryRank}
         globalRankPercent={globalRankPercent}
+        oii={oii}
       />
     );
   return (

@@ -3457,6 +3457,9 @@
     "mc5c7c2bb8ce3": "No editable pools. Create a pool in mappool management first.",
     "m2c3062520291": "This pool is public. Added maps will be visible immediately.",
     "m2fb863294365": "Candidate category changed. Refresh the list.",
-    "md492453f11de": "This map already exists in that Mod category."
+    "md492453f11de": "This map already exists in that Mod category.",
+    "ma61174f8783c": "Player ID copied.",
+    "m95ba4ea33661": "OII compares the play time this pp usually needs with the account's actual play time. Above 1.1 means faster than typical, below 0.9 slower.",
+    "m28b81be4b1d3": "OII"
   }
 }
