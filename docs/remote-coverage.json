@@ -492,10 +492,11 @@
       "file": "src/app/admin/tournaments/[edition]/settings/page.tsx",
       "kind": "page",
       "authority": "saved-read",
-      "operations": ["staffAccess", "tournamentForAdmin"],
+      "operations": ["staffAccess", "staffFixtures", "tournamentForAdmin"],
       "commands": "Denied in remote mode; connection management and preference cookies remain separate",
       "metadata": "Same file; shared request adapter for dynamic data",
       "services": [
+        "src/lib/fixtures.ts#staffFixtures",
         "src/lib/auth/staff.ts#staffAccess",
         "src/lib/tournaments.ts#tournamentForAdmin"
       ],

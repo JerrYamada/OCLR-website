@@ -5,6 +5,7 @@ import { captureResponsiveLayout } from "./responsive";
 import { assertTestDatabase } from "../database";
 import { randomUUID } from "node:crypto";
 import { test, expect } from "@playwright/test";
+const origin = process.env.OCLR_TEST_ORIGIN || "http://127.0.0.1:3100";
 import AxeBuilder from "@axe-core/playwright";
 import { eq, sql } from "drizzle-orm";
 import { db, closeDb } from "../../src/db";
@@ -82,20 +83,20 @@ test.describe("staff fixtures and referee assignments over HTTP", () => {
     const pool = maps.pools.find((p) => p.roundId === round.id)!;
     const referee = await browser.newContext({
       storageState: englishStorage,
-      baseURL: "http://127.0.0.1:3100",
+      baseURL: origin,
     });
     const guest = await browser.newContext({
       storageState: englishStorage,
-      baseURL: "http://127.0.0.1:3100",
+      baseURL: origin,
     });
     const mapper = await browser.newContext({
       storageState: englishStorage,
-      baseURL: "http://127.0.0.1:3100",
+      baseURL: origin,
     });
     await referee.addCookies([refCookie]);
     await mapper.addCookies([mapperCookie]);
     const endpoint = "/api/admin/tournaments/test-cup/matches";
-    const headers = { origin: "http://127.0.0.1:3100" };
+    const headers = { origin };
     try {
       expect((await guest.request.get(endpoint)).status()).toBe(401);
       expect((await mapper.request.get(endpoint)).status()).toBe(403);
@@ -298,11 +299,9 @@ test.describe("staff fixtures and referee assignments over HTTP", () => {
       ).json();
       expect(afterUnavailable.context.result).toBeNull();
       expect(afterUnavailable.source).toBeNull();
-      await page
-        .getByRole("tab", { name: "Competition configuration", exact: true })
-        .click();
+      await page.goto("/admin/tournaments/test-cup/settings#competition");
       const rules = page
-        .locator("section.settings-card")
+        .locator("#competition > section")
         .filter({
           has: page.getByRole("heading", {
             name: `${round.name}: approved competition rules`,
@@ -310,7 +309,25 @@ test.describe("staff fixtures and referee assignments over HTTP", () => {
           }),
         })
         .last();
-      await rules.getByLabel("Configure approved scoring rules").check();
+      await expect(rules.getByRole("checkbox")).toHaveCount(0);
+      await expect(
+        rules.getByLabel("Points for a win", { exact: true }),
+      ).toBeVisible();
+      const scoringBox = await rules
+        .getByRole("heading", {
+          name: "Configure approved scoring rules",
+          exact: true,
+        })
+        .boundingBox();
+      const rankingBox = await rules
+        .getByRole("heading", {
+          name: "Configure approved group ranking rules",
+          exact: true,
+        })
+        .boundingBox();
+      if (isMobile) expect(rankingBox!.y).toBeGreaterThan(scoringBox!.y);
+      else expect(rankingBox!.x).toBeGreaterThan(scoringBox!.x);
+
       await expect(
         rules.getByLabel("Approved scoring rules version"),
       ).toHaveCount(0);
@@ -343,6 +360,13 @@ test.describe("staff fixtures and referee assignments over HTTP", () => {
       await rules
         .getByRole("combobox", { name: /^Substitution policy/ })
         .selectOption("false");
+      if (await rules.getByLabel("Points for a win", { exact: true }).count()) {
+        await rules.getByLabel("Points for a win", { exact: true }).fill("3");
+        await rules.getByLabel("Points for a loss", { exact: true }).fill("0");
+        await rules
+          .getByLabel("Ranking criteria, in order")
+          .fill("points, wins, map_difference, maps_won");
+      }
       await rules
         .getByRole("button", { name: "Save approved round rules" })
         .click();
@@ -357,7 +381,7 @@ test.describe("staff fixtures and referee assignments over HTTP", () => {
         playersPerTeam: 2,
       });
       // Route content can arrive before Next.js finishes streaming metadata.
-      await expect(page).toHaveTitle("Competition fixtures");
+      await expect(page).toHaveTitle("Tournament settings");
       expect(
         (
           await new AxeBuilder({ page })
@@ -370,6 +394,18 @@ test.describe("staff fixtures and referee assignments over HTTP", () => {
           () => document.documentElement.scrollWidth <= innerWidth,
         ),
       ).toBe(true);
+      await page
+        .locator("#competition")
+        .screenshot({ path: info.outputPath("competition-settings.png") });
+      await page.goto("/admin/tournaments/test-cup/matches?view=configuration");
+      await expect(page).toHaveURL(/settings#competition$/);
+      await page.goto("/admin/tournaments/test-cup/matches");
+      await expect(
+        page.getByRole("tab", {
+          name: "Competition configuration",
+          exact: true,
+        }),
+      ).toHaveCount(0);
       await page.getByRole("tab", { name: "Schedule", exact: true }).click();
       await page.evaluate(() => window.scrollTo(0, 0));
       await captureResponsiveLayout(page, info, "fixtures");
@@ -569,20 +605,20 @@ test.describe("staff fixtures and referee assignments over HTTP", () => {
     );
     const referee = await browser.newContext({
       storageState: englishStorage,
-      baseURL: "http://127.0.0.1:3100",
+      baseURL: origin,
     });
     const second = await browser.newContext({
       storageState: englishStorage,
-      baseURL: "http://127.0.0.1:3100",
+      baseURL: origin,
     });
     const guest = await browser.newContext({
       storageState: englishStorage,
-      baseURL: "http://127.0.0.1:3100",
+      baseURL: origin,
     });
     await referee.addCookies([firstCookie]);
     await second.addCookies([secondCookie]);
     const endpoint = "/api/admin/tournaments/test-cup/matches";
-    const headers = { origin: "http://127.0.0.1:3100" };
+    const headers = { origin };
     try {
       await page.goto("/admin/tournaments/test-cup/matches");
       await page

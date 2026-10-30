@@ -1,3 +1,4 @@
+import { redirect } from "next/navigation";
 import { FixtureManager } from "@/components/fixture-manager";
 import { StreamingManager } from "@/components/streaming-manager";
 import { PageHeading } from "@/components/ui";
@@ -15,8 +16,10 @@ export async function generateMetadata() {
 
 async function Issue271Page({
   params,
+  searchParams,
 }: {
   params: Promise<{ edition: string }>;
+  searchParams: Promise<{ view?: string }>;
 }) {
   const tr = await getAppTranslations();
 
@@ -41,6 +44,11 @@ async function Issue271Page({
       );
     }
     const data = await staffFixtures(actor, edition);
+    if (
+      (await searchParams)?.view === "configuration" &&
+      (data.canManage || data.canViewAll)
+    )
+      redirect(`/admin/tournaments/${edition}/settings#competition`);
     return (
       <>
         <PageHeading

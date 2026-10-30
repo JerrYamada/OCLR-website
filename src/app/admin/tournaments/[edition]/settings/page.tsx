@@ -1,3 +1,5 @@
+import { CompetitionSettings } from "@/components/competition-settings";
+import { staffFixtures } from "@/lib/fixtures";
 import { TournamentEditor } from "@/components/tournament-editor";
 import { PageHeading } from "@/components/ui";
 import { getAppTranslations } from "@/i18n/server";
@@ -21,6 +23,7 @@ async function Issue271Page({
     const { edition } = await params;
     const actor = await requireStaff();
     const data = await tournamentForAdmin(actor, edition);
+    const competition = await staffFixtures(actor, edition);
     return (
       <>
         <PageHeading
@@ -37,6 +40,7 @@ async function Issue271Page({
             readiness: data.readiness,
           }}
         />
+        <CompetitionSettings slug={edition} data={competition} />
       </>
     );
   });
