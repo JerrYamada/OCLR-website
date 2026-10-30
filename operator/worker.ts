@@ -1,5 +1,6 @@
 /** Run only by the separately installed operator, under the updater's flock. */
 import { Client } from "pg";
+import { operatorHealthTarget } from "./health";
 import { request as healthRequest } from "node:http";
 import { spawnSync } from "node:child_process";
 import {
@@ -169,6 +170,12 @@ try {
   const free = statfsSync(root);
   if (free.bavail * free.bsize < MAX_BYTES * 4)
     throw Error("Insufficient disk space");
+  const health = operatorHealthTarget({
+    healthUrl: process.env.OCLR_OPERATOR_HEALTH_URL,
+    bindHost: process.env.OCLR_BIND_HOST,
+    port: process.env.PORT,
+    appUrl: process.env.APP_URL,
+  });
   phase = "authorization";
   const current = await connection();
   try {
@@ -382,25 +389,8 @@ try {
     tool("sudo", ["-n", "/usr/bin/systemctl", "start", service]);
     stopped = false;
     phase = "health";
-    const healthUrl = process.env.OCLR_OPERATOR_HEALTH_URL;
-    if (
-      !healthUrl ||
-      !["127.0.0.1", "localhost", "[::1]"].includes(new URL(healthUrl).hostname)
-    )
-      throw Error("Configure local health URL");
     let healthy = false;
-    const healthTarget = new URL(healthUrl);
-    if (
-      healthTarget.protocol !== "http:" ||
-      healthTarget.username ||
-      healthTarget.password ||
-      healthTarget.search ||
-      healthTarget.hash
-    )
-      throw Error("Use a plain loopback health origin");
-    const canonicalHost = process.env.APP_URL
-      ? new URL(process.env.APP_URL).host
-      : healthTarget.host;
+    const { url: healthTarget, canonicalHost } = health;
     for (let attempt = 0; attempt < 30; attempt++) {
       healthy = await new Promise<boolean>((resolve) => {
         const request = healthRequest(

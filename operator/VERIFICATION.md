@@ -67,3 +67,10 @@ lifecycle scripts disabled; only node_modules is copied into the release.
 Installer syntax/preview tests passed, and a real temporary `npm ci --ignore-scripts`
 installation successfully ran the operator TypeScript loader. No host provisioning
 or real operator installation was performed by the agent.
+
+Private-listener configuration follow-up: health probes now support the explicitly
+configured private IPv4 listener only when that IP is assigned to this app host
+and its port matches. Other hosts, wildcard/public targets and non-health URLs
+are rejected before stopping the service. Three focused target-validation tests
+and the real isolated PostgreSQL round trip passed; installer/helper regressions
+also passed. No live listener, firewall or production service was changed.

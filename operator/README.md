@@ -30,6 +30,8 @@ OCLR_OPERATOR_DATABASE_URL=postgresql://OPERATOR@DB_HOST/DB_NAME?sslmode=disable
 OCLR_OPERATOR_RUNTIME_ROLE=oclr_runtime
 OCLR_OPERATOR_RELEASE_FILE=/opt/oclr/current/.oclr-release
 APP_URL=https://YOUR_OCLR_HOST
+OCLR_BIND_HOST=127.0.0.1
+PORT=3000
 OCLR_OPERATOR_HEALTH_URL=http://127.0.0.1:3000/api/health
 OCLR_ENVIRONMENT=production
 OCLR_SERVICE=oclr.service
@@ -182,3 +184,23 @@ the backup/authentication/schema contract still require a separately reviewed
 operator upgrade; do not assume an older operator understands a new credential
 family. The first-install script intentionally refuses to overwrite an existing
 operator installation.
+
+## Health target for a private app listener
+
+Copy the app's actual `OCLR_BIND_HOST` and `PORT` into operator.env. For a
+loopback app listener, keep the loopback health URL. If Next listens only on a
+private IPv4 address, use that exact address in all three values, for example:
+
+```ini
+OCLR_BIND_HOST=10.20.0.5
+PORT=3000
+OCLR_OPERATOR_HEALTH_URL=http://10.20.0.5:3000/api/health
+```
+
+The address must be assigned to an interface on the application host, match the
+explicit bind value and use the configured app port. Other private hosts, public
+addresses, wildcard targets, credentials, query strings and non-health paths are
+rejected before service maintenance. Do not change the website to 0.0.0.0 merely
+to make this check work. `APP_URL` remains the public HTTPS origin and supplies
+the canonical Host header. Write literal values in EnvironmentFile; do not use
+`$VAR` substitutions.
