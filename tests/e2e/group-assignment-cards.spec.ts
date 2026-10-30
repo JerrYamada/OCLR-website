@@ -37,6 +37,15 @@ test.describe("count-first group assignment", () => {
         writes++;
     });
     await page.goto("/admin/tournaments/test-cup/teams");
+    await expect(
+      page.getByRole("table", { name: "Team management", exact: true }),
+    ).toBeVisible();
+    await expect(
+      page
+        .locator("#captains")
+        .getByText("Captains & player pool", { exact: true })
+        .first(),
+    ).toBeVisible();
     const board = page.locator(".group-assignment");
     await expect(
       board.getByLabel("Group count", { exact: true }).locator("option"),

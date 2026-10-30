@@ -1,4 +1,5 @@
 "use client";
+import styles from "./team-management.module.css";
 import { ReadOnlyFields } from "./staff-read-only";
 import { useAppTranslations } from "@/i18n/shared";
 
@@ -24,57 +25,75 @@ export function TeamManager({
 
   return (
     <ReadOnlyFields>
-      <section className="panel form-stack">
+      <section className="form-stack">
         <h2>{tr("Configure captain teams")}</h2>
         <p className="muted small">
           {tr(
             "Use approved team names. Roster capacity includes the captain; leave it blank when not confirmed. Public identities update on Save.",
           )}
         </p>
-        {values.map((c, index) => (
-          <fieldset key={c.userId}>
-            <legend>
-              {c.username} ({c.userId})
-            </legend>
-            <label className="field">
-              <span>{tr("Approved team name")}</span>
-              <input
-                value={c.name}
-                maxLength={80}
-                onChange={(e) =>
-                  setValues(
-                    values.map((v, i) =>
-                      i === index ? { ...v, name: e.target.value } : v,
-                    ),
-                  )
-                }
-              />
-            </label>
-            <label className="field spaced">
-              <span>{tr("Roster capacity (optional)")}</span>
-              <input
-                type="number"
-                min={1}
-                max={256}
-                value={c.capacity ?? ""}
-                onChange={(e) =>
-                  setValues(
-                    values.map((v, i) =>
-                      i === index
-                        ? {
-                            ...v,
-                            capacity: e.target.value
-                              ? Number(e.target.value)
-                              : null,
-                          }
-                        : v,
-                    ),
-                  )
-                }
-              />
-            </label>
-          </fieldset>
-        ))}
+        <div className={styles.tableScroll}>
+          <table className={styles.teams}>
+            <thead>
+              <tr>
+                <th scope="col">{tr("Captain")}</th>
+                <th scope="col">{tr("Approved team name")}</th>
+                <th scope="col">{tr("Roster capacity (optional)")}</th>
+              </tr>
+            </thead>
+            <tbody>
+              {values.map((c, index) => (
+                <tr key={c.userId}>
+                  <th scope="row">
+                    {c.username}
+                    <p className="small muted">{c.userId}</p>
+                  </th>
+                  <td>
+                    <label className="field">
+                      <span>{tr("Approved team name")}</span>
+                      <input
+                        value={c.name}
+                        maxLength={80}
+                        onChange={(e) =>
+                          setValues(
+                            values.map((v, i) =>
+                              i === index ? { ...v, name: e.target.value } : v,
+                            ),
+                          )
+                        }
+                      />
+                    </label>
+                  </td>
+                  <td>
+                    <label className="field spaced">
+                      <span>{tr("Roster capacity (optional)")}</span>
+                      <input
+                        type="number"
+                        min={1}
+                        max={256}
+                        value={c.capacity ?? ""}
+                        onChange={(e) =>
+                          setValues(
+                            values.map((v, i) =>
+                              i === index
+                                ? {
+                                    ...v,
+                                    capacity: e.target.value
+                                      ? Number(e.target.value)
+                                      : null,
+                                  }
+                                : v,
+                            ),
+                          )
+                        }
+                      />
+                    </label>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
         <ConfirmMutation
           requireConfirmation={false}
           label={tr("Save team configuration")}

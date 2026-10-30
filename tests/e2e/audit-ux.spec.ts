@@ -87,7 +87,7 @@ test.describe("automatic staff auditing", () => {
     await page
       .getByRole("link", { name: "Appoint captains", exact: true })
       .click();
-    await expect(page).toHaveURL(new RegExp(captainPage + "$"));
+    await expect(page).toHaveURL(/\/teams#captains$/);
     await expect(
       page.getByRole("img", { name: "Taiwan flag", exact: true }),
     ).toHaveCount(3);
@@ -160,9 +160,8 @@ test.describe("automatic staff auditing", () => {
     await names.nth(1).fill("Synthetic Setup Team B");
     await page.getByRole("button", { name: "Save team configuration" }).click();
     await expect(
-      page.getByRole("heading", {
-        name: "Synthetic Setup Team A",
-        exact: true,
+      page.getByRole("row", {
+        name: /Synthetic Setup Team A/,
       }),
     ).toBeVisible();
     await expect(page.getByRole("dialog")).toHaveCount(0);
