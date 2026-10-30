@@ -362,8 +362,8 @@ test("uses real remote grants for core SSR/navigation without local DB or OAuth,
     }),
   ).toBeVisible();
   await expect(
-    page.getByRole("region", { name: "Published participation", exact: true }),
-  ).toContainText("Historical archive");
+    page.getByRole("region", { name: "Competition record", exact: true }),
+  ).toBeVisible();
   await page.goto("/remote");
   await page
     .getByRole("link", { name: "Internal tournaments", exact: true })

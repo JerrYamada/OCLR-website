@@ -112,7 +112,7 @@ test.describe("current edition coaches", () => {
       ).toBeVisible();
       await expect(
         publicPage.getByRole("region", {
-          name: "Published participation",
+          name: "Competition record",
           exact: true,
         }),
       ).toContainText("Coach");
