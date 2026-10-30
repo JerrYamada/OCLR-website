@@ -5,6 +5,8 @@ import { authorizedPage } from "@/lib/auth/page";
 import { requireUser } from "@/lib/auth/user";
 import { mappoolWorkspace } from "@/lib/mappools";
 import { remotePage } from "@/lib/remote-page";
+import { getEdition } from "@/lib/content";
+import { canRead, staffAccess } from "@/lib/auth/staff";
 
 export async function generateMetadata() {
   const tr = await getAppTranslations();
@@ -21,7 +23,15 @@ async function Issue271Page({
     const tr = await getAppTranslations();
     const { edition } = await params;
     // Reuse the authoritative workspace and its edition-scoped permission check.
-    const { rounds } = await mappoolWorkspace(await requireUser(), edition);
+    const actor = await requireUser();
+    const workspace = await mappoolWorkspace(actor, edition);
+    const { rounds } = workspace;
+    const tournament = await getEdition(edition);
+    const canManageRefereePolicy = canRead(
+      await staffAccess(actor),
+      "manage_fixtures",
+      edition,
+    );
     const query = await searchParams;
     const selected = rounds.find((round) => round.id === query.round);
     return (
@@ -33,6 +43,9 @@ async function Issue271Page({
         <RoundManager
           slug={edition}
           rounds={rounds}
+          refereeData={workspace}
+          season={tournament?.season}
+          canManageRefereePolicy={canManageRefereePolicy}
           initialRoundId={selected?.id}
           initialStage={
             selected?.stage ??

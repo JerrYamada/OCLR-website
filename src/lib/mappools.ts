@@ -1,4 +1,5 @@
 import { db } from "@/db";
+import type { RoundRefereeRule } from "./round-referee-policy";
 import {
   editionState,
   fixtures,
@@ -7,6 +8,7 @@ import {
   mappoolReplays,
   mappools,
   resultRevisions,
+  refereeRoundPolicies,
   tournamentRounds,
   tournamentStages,
 } from "@/db/schema";
@@ -251,7 +253,34 @@ async function databaseMappoolWorkspace(actor: User, slug: string) {
             )
             .orderBy(mappoolEntries.category, mappoolEntries.position)
         : [];
-      return { rounds, pools, entries };
+      const refereeRules = await tx
+        .select({
+          roundId: tournamentRounds.id,
+          policy: refereeRoundPolicies.policy,
+          revision: refereeRoundPolicies.revision,
+          rules: tournamentRounds.scoringRules,
+        })
+        .from(tournamentRounds)
+        .leftJoin(
+          refereeRoundPolicies,
+          eq(refereeRoundPolicies.roundId, tournamentRounds.id),
+        )
+        .where(eq(tournamentRounds.editionSlug, slug));
+      return {
+        rounds,
+        pools,
+        entries,
+        ...({
+          refereeRules: refereeRules.map(
+            ({ roundId, policy, revision, rules }) => ({
+              roundId,
+              policy,
+              revision: revision ?? 0,
+              series: rules?.series ?? null,
+            }),
+          ),
+        } as { refereeRules?: RoundRefereeRule[] }),
+      };
     },
     { isolationLevel: "repeatable read" },
   );
@@ -631,6 +660,10 @@ export async function mappoolCommand(
           );
         // The edition and round locks serialize this with normal pool/fixture
         // creation. Existing restrictive FKs also protect against direct writes.
+        const [refereePolicy] = await tx
+          .delete(refereeRoundPolicies)
+          .where(eq(refereeRoundPolicies.roundId, round.id))
+          .returning();
         await tx
           .delete(tournamentRounds)
           .where(eq(tournamentRounds.id, round.id));
@@ -638,7 +671,7 @@ export async function mappoolCommand(
           editionSlug: slug,
           actorId: actor.osuId,
           action: "round_delete",
-          before: round,
+          before: { ...round, refereePolicy: refereePolicy ?? null },
           // This existing event store requires an after object. An explicit
           // tombstone keeps the stable entity ID without inventing a live row.
           after: { id: round.id, deleted: true },
