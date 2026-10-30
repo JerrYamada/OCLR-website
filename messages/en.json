@@ -3301,6 +3301,8 @@
     "m085dded9e477": "Backup file is too large.",
     "m661ff40a07e0": "Queued",
     "mf4ccae29e1bb": "Running",
-    "meeab9cd4421b": "Validated"
+    "meeab9cd4421b": "Validated",
+    "m3bdae4099c10": "Red Team",
+    "m11a866af58ff": "Blue Team"
   }
 }

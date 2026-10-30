@@ -186,7 +186,7 @@ function FixtureForm({
           <legend>{tr("Teams")}</legend>
           <div className="form-grid">
             <label className="field">
-              <span>{tr("Home team")}</span>
+              <span>{tr("Red Team")}</span>
               <select
                 value={homeTeamId}
                 onChange={(e) => setHome(e.target.value)}
@@ -196,7 +196,7 @@ function FixtureForm({
               </select>
             </label>
             <label className="field">
-              <span>{tr("Away team")}</span>
+              <span>{tr("Blue Team")}</span>
               <select
                 value={awayTeamId}
                 onChange={(e) => setAway(e.target.value)}
