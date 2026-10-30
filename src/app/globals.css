@@ -5867,3 +5867,16 @@ button.staff-role-save {
     display: grid;
   }
 }
+
+.team-group-options {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr));
+  gap: 0.5rem 1rem;
+}
+.team-group-manager fieldset {
+  display: grid;
+  gap: 0.75rem;
+  margin: 0;
+  padding: 1rem;
+  border: 1px solid var(--color-border);
+}

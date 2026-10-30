@@ -20,6 +20,10 @@ Administrators can add or remove coaches by verified osu! UID in the same team w
 
 Coach cards and edition-bound profiles become public only when the edition, captain, team identity and finalized roster are published. Changes to an already published roster's coaches take effect immediately; hiding the roster, captain, team or edition hides those assignments. The public participant count still counts accepted player registrations only. Archived teams retain assignment history but do not expose coaches publicly. Coach administration remains available after draft finalization because it does not alter the playing roster or draft snapshots.
 
+## Group assignments
+
+Configure stage-scoped groups at **Team management → Group assignments** before arranging fixtures (#545). The fixture configuration links to this workspace. Saving and publishing still use the existing versioned `stage_groups` command; group identifiers, membership, standings and publication rules are unchanged. Each team can belong to one group per stage. Unassigned teams are listed explicitly, and a team already selected in another group cannot be selected twice.
+
 ## Authoritative draft engine
 
 Both the active captain and authorized staff use **the same** `pickPlayer` command and `/api/tournaments/[edition]/draft/picks` endpoint. A request contains only session ID, expected revision, turn index, candidate ID and idempotency key. Actor, action mode and receiving captain/team are derived on the server. One transaction locks edition/session, validates the frozen pool and current turn/capacity, inserts the uniquely constrained pick and membership, advances the turn/revision and records the actual actor/mode in the private audit. Captain status never grants staff control.

@@ -1,3 +1,6 @@
+import { StageGroups } from "@/components/stage-groups";
+import { StaffReadOnlyContext } from "@/components/staff-read-only";
+import { staffFixtures } from "@/lib/fixtures";
 import { ConfirmMutation } from "@/components/confirm-mutation";
 import { TeamAvatar } from "@/components/team-avatar";
 import { TeamCoachManager } from "@/components/team-coach-manager";
@@ -23,6 +26,7 @@ async function Issue271Page({
     const { edition } = await params;
     const setup = await captainSetup(actor, edition);
     const data = await staffTeams(actor, edition);
+    const competition = await staffFixtures(actor, edition);
     return (
       <>
         <PageHeading
@@ -71,6 +75,26 @@ async function Issue271Page({
             </div>
           </section>
         )}
+        <section
+          id="groups"
+          className="panel form-stack"
+          aria-label={tr("Group assignments")}
+        >
+          <h2>{tr("Group assignments")}</h2>
+          {competition.stages
+            .filter((s) => s.kind === "group")
+            .map((stage) => (
+              <StaffReadOnlyContext
+                key={`${stage.id}:${stage.version}`}
+                value={!competition.canManage}
+              >
+                <StageGroups slug={edition} stage={stage} data={competition} />
+              </StaffReadOnlyContext>
+            ))}
+          {!competition.stages.some((s) => s.kind === "group") && (
+            <p className="muted">{tr("No Group Stage configured yet.")}</p>
+          )}
+        </section>
         <div className="stack">
           {data.teams.map((t) => (
             <article className="panel team-management-card" key={t.id}>
