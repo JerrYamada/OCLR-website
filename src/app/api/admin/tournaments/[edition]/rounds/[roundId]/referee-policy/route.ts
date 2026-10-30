@@ -19,6 +19,7 @@ export async function POST(
       await readJson(request),
     );
     revalidatePath(`/admin/tournaments/${edition}`, "layout");
+    revalidatePath(`/tournaments/${edition}`, "layout");
     return NextResponse.json(result, {
       headers: { "Cache-Control": "no-store" },
     });

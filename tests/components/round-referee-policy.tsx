@@ -7,16 +7,18 @@ import {
 import { RoundManager } from "../../src/components/round-manager";
 import { StaffReadOnlyContext } from "../../src/components/staff-read-only";
 import { s11RefereeDefaults } from "../../src/lib/referee-defaults";
+import type { RefereePolicy } from "../../src/lib/referee-model";
 import en from "../../messages/en.json";
 import hans from "../../messages/zh-Hans.json";
 import hant from "../../messages/zh-Hant.json";
 import "../../src/app/globals.css";
+import "../../src/app/public-tournament.css";
 import "../../src/app/workspace.css";
 const params = new URLSearchParams(location.search);
 const wins = params.has("bo13") ? 7 : 6;
 const defaults = s11RefereeDefaults("11", { type: "first_to", wins })!;
 const roundId = "00000000-0000-4000-8000-000000000001";
-const savedPolicy = {
+const savedPolicy: RefereePolicy = {
   ...defaults.policy,
   banCategoryRules: undefined,
   commands: {
@@ -30,6 +32,13 @@ const savedPolicy = {
   },
   maxReplaysPerMap: 3,
 };
+if (params.has("nm-override") && savedPolicy.commands)
+  savedPolicy.commands.categoryMods.NM = { mods: ["HD"], freemod: true };
+if (params.has("custom-ban"))
+  savedPolicy.banCategoryRules = {
+    allowRepeats: false,
+    repeatExceptions: ["HD"],
+  };
 const router = {
   back() {},
   forward() {},
@@ -87,7 +96,11 @@ createRoot(document.getElementById("root")!).render(
                   roundId,
                   revision: params.has("saved") ? 4 : 0,
                   policy: params.has("saved") ? savedPolicy : null,
-                  series: { type: "first_to", wins },
+                  series: params.has("no-scoring")
+                    ? null
+                    : params.has("fixed")
+                      ? { type: "fixed_maps", count: 6, allowDraw: true }
+                      : { type: "first_to", wins },
                 },
               ],
             }}
