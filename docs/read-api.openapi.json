@@ -14030,6 +14030,7 @@
                   { "type": "null" }
                 ]
               },
+              "coachesEnabled": { "type": "boolean" },
               "published": { "type": "boolean" },
               "status": {
                 "type": "string",

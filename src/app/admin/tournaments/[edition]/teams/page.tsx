@@ -73,7 +73,7 @@ async function Issue271Page({
         )}
         <div className="stack">
           {data.teams.map((t) => (
-            <article className="panel" key={t.id}>
+            <article className="panel team-management-card" key={t.id}>
               <div className="public-team-heading">
                 <TeamAvatar team={t} />
                 <h2>{t.name}</h2>
@@ -150,13 +150,15 @@ async function Issue271Page({
                   />
                 )}
               </div>
-              <TeamCoachManager
-                key={`coaches:${t.id}:${data.version}`}
-                slug={edition}
-                version={data.version}
-                teamId={t.id}
-                coaches={t.coaches}
-              />
+              {data.coachesEnabled !== false && (
+                <TeamCoachManager
+                  key={`coaches:${t.id}:${data.version}`}
+                  slug={edition}
+                  version={data.version}
+                  teamId={t.id}
+                  coaches={t.coaches}
+                />
+              )}
             </article>
           ))}
         </div>

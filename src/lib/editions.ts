@@ -96,6 +96,7 @@ export const editionSchema = z
       .strict()
       .default({ logo: null, background: null, keyVisual: null }),
     defaultAppearance: z.enum(appearances).nullable().optional(),
+    coachesEnabled: z.boolean().optional(),
     archive: historicalArchiveSchema.optional(),
     published: z.boolean(),
     status: z.enum(["upcoming", "live", "completed"]),
@@ -304,4 +305,11 @@ export function formatDate(
     .value.replace(/^GMT/, "UTC")
     .replace(/^UTC[+-]0(?::00)?$/, "UTC");
   return `${formatted} (${offset})`;
+}
+
+/** Existing editions retain coaching; S11 and newly created editions opt out. */
+export function coachingEnabled(
+  edition: Pick<Edition, "slug" | "coachesEnabled">,
+) {
+  return edition.coachesEnabled ?? edition.slug !== "s11";
 }
