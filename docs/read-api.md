@@ -299,6 +299,15 @@ Both paths return the identical fixture/stage/mappools schema. The latter accept
 only the edition-bound streaming audience and grants no other Developer reads.
 See [Streaming API](streaming-api.md) for selection, idle expiry and transport.
 
+### Contract 1.6.0: round referee policies
+
+The saved `mappoolWorkspace` adds optional `refereeRules`, containing each round's
+stable ID, saved policy/revision and configured series. The field is optional for
+older backend compatibility; it is never a write capability. Round management
+uses these saved records for the policy editor and preserves the read-only
+Developer/remote channel. The generated OpenAPI and runtime contracts share the
+same additive projection. S11 templates are unsaved UI drafts, not saved API data.
+
 ### Contract 1.5.0: team configuration
 
 The saved edition configuration adds optional `coachesEnabled`; newly created

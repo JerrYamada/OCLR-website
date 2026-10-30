@@ -16,7 +16,6 @@ import { refereeCommands } from "@/lib/referee-commands";
 import { RefereeIrc } from "./referee-irc";
 import { RefereeCommands } from "./referee-commands";
 import { RefereeReconciliation } from "./referee-reconciliation";
-import { RefereePolicyEditor } from "./referee-policy-editor";
 import styles from "./referee-panel.module.css";
 
 type Action = RefereeCommand extends infer C
@@ -393,19 +392,12 @@ export function RefereePanel({
             }}
           />
           {data.canConfigure && !simulation && (
-            <RefereePolicyEditor
-              key={data.policyRevision}
-              policy={data.policy}
-              maps={data.maps}
-              busy={busy || uncertain}
-              onSave={async (policy) => {
-                await send({
-                  action: "configure_policy",
-                  expectedPolicyRevision: data.policyRevision,
-                  policy,
-                });
-              }}
-            />
+            <Link
+              className="button secondary"
+              href={`/admin/tournaments/${slug}/rounds?round=${data.round.id}`}
+            >
+              {tr("Configure round referee policy")}
+            </Link>
           )}
         </section>
         <section

@@ -6,6 +6,7 @@ import type { MappoolWorkspace } from "@/lib/mappools";
 import { WorkspaceTabs } from "./workspace-tabs";
 import { ConfirmMutation } from "./confirm-mutation";
 import styles from "./round-manager.module.css";
+import { RoundRefereePolicy } from "./round-referee-policy";
 type Round = MappoolWorkspace["rounds"][number];
 
 function RoundForm({
@@ -95,11 +96,17 @@ export function RoundManager({
   rounds: allRounds,
   initialStage,
   initialRoundId,
+  refereeData,
+  season,
+  canManageRefereePolicy = false,
 }: {
   slug: string;
   rounds: MappoolWorkspace["rounds"];
   initialStage: "group" | "knockout";
   initialRoundId?: string;
+  refereeData?: Pick<MappoolWorkspace, "refereeRules" | "pools" | "entries">;
+  season?: string | null;
+  canManageRefereePolicy?: boolean;
 }) {
   const tr = useAppTranslations();
   const id = useId();
@@ -276,6 +283,33 @@ export function RoundManager({
                         });
                       }}
                     />
+                    {canManageRefereePolicy &&
+                      refereeData?.refereeRules?.find(
+                        (rule) => rule.roundId === round.id,
+                      ) && (
+                        <RoundRefereePolicy
+                          key={`${round.id}-${refereeData.refereeRules.find((rule) => rule.roundId === round.id)!.revision}`}
+                          slug={slug}
+                          season={season}
+                          rule={refereeData.refereeRules.find(
+                            (rule) => rule.roundId === round.id,
+                          )!}
+                          maps={refereeData.entries
+                            .filter((entry) =>
+                              refereeData.pools.some(
+                                (pool) =>
+                                  pool.id === entry.poolId &&
+                                  pool.roundId === round.id,
+                              ),
+                            )
+                            .map(({ id, beatmapId, category, position }) => ({
+                              id,
+                              beatmapId,
+                              category,
+                              position,
+                            }))}
+                        />
+                      )}
                   </section>
                 )}
               </li>

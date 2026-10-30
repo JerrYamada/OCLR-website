@@ -27,6 +27,7 @@ import {
 } from "./auth/staff";
 import { scoringRulesSchema } from "./competition-model";
 import { remoteMode } from "./data-source";
+import { persistRoundRefereePolicy } from "./round-referee-policy";
 import { fixtureForReview } from "./fixtures";
 import { HttpError } from "./http";
 import {
@@ -508,87 +509,14 @@ export async function refereeCommand(
     let firstPickTeamId = workspace.session?.firstPickTeamId ?? null;
     let payload: RefereeEventPayload;
     if (command.action === "configure_policy") {
-      await assertCapability(actor, "manage_fixtures", slug, tx);
-      if (workspace.policyRevision !== command.expectedPolicyRevision)
-        throw new HttpError(
-          409,
-          "The round referee policy changed. Refresh before saving.",
-        );
-      if (workspace.projection.activeSelections.length)
-        throw new HttpError(
-          409,
-          "Withdraw recorded steps before changing the referee policy.",
-        );
-      const roundPoolEntries = await tx
-        .select({ id: mappoolEntries.id })
-        .from(mappoolEntries)
-        .innerJoin(mappools, eq(mappools.id, mappoolEntries.poolId))
-        .where(
-          and(
-            eq(mappools.roundId, workspace.round.id),
-            eq(mappools.editionSlug, slug),
-          ),
-        );
-      if (
-        command.policy.steps.some((step) =>
-          step.entryIds.some(
-            (id) => !roundPoolEntries.some((entry) => entry.id === id),
-          ),
-        )
-      )
-        throw new HttpError(
-          400,
-          "Referee policy entries must belong to this round.",
-        );
-      const tiebreakIndex = command.policy.steps.findIndex(
-        (step) => step.kind === "tb",
+      const newRevision = await persistRoundRefereePolicy(
+        tx,
+        actor,
+        slug,
+        workspace.round.id,
+        command.expectedPolicyRevision,
+        command.policy,
       );
-      if (tiebreakIndex >= 0) {
-        const tiedAt = command.policy.steps[tiebreakIndex].tiedAt!;
-        const precedingPicks = command.policy.steps
-          .slice(0, tiebreakIndex)
-          .filter((step) => step.kind === "pick").length;
-        if (
-          precedingPicks < tiedAt * 2 ||
-          (workspace.series?.type === "first_to" &&
-            tiedAt !== workspace.series.wins - 1)
-        )
-          throw new HttpError(
-            400,
-            "The tiebreak condition is incompatible with the round series.",
-          );
-      }
-      if (
-        command.policy.steps.some((step) =>
-          step.categories.some(
-            (category) =>
-              !["NM", "HD", "HR", "DT", "FM", "TB"].includes(category),
-          ),
-        )
-      )
-        throw new HttpError(
-          400,
-          "Choose valid pool categories for the referee policy.",
-        );
-      const newRevision = workspace.policyRevision + 1;
-      await tx
-        .insert(refereeRoundPolicies)
-        .values({
-          roundId: workspace.round.id,
-          editionSlug: slug,
-          revision: newRevision,
-          policy: command.policy,
-          updatedBy: actor.osuId,
-        })
-        .onConflictDoUpdate({
-          target: refereeRoundPolicies.roundId,
-          set: {
-            revision: newRevision,
-            policy: command.policy,
-            updatedBy: actor.osuId,
-            updatedAt: new Date(),
-          },
-        });
       const next = await readRefereeWorkspace(tx, actor, slug, fixtureId);
       // The first session inherits the policy just saved, not the previous empty policy.
       // Existing session settings are explicit saved choices and remain unchanged.

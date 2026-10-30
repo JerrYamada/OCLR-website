@@ -4878,6 +4878,25 @@
     "mappoolWorkspace": {
       "type": "object",
       "properties": {
+        "refereeRules": {
+          "anyOf": [
+            { "type": "null", "x-oclr-undefined": true },
+            {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "roundId": { "type": "string" },
+                  "revision": { "type": "number" },
+                  "policy": { "$ref": "#/$defs/Read641b9f91c2cb" },
+                  "series": { "$ref": "#/$defs/Read9ee538274272" }
+                },
+                "required": ["roundId", "revision", "policy", "series"],
+                "additionalProperties": false
+              }
+            }
+          ]
+        },
         "rounds": {
           "type": "array",
           "items": {

@@ -1,4 +1,5 @@
 import { randomUUID } from "node:crypto";
+import { readContractVersion } from "../../src/lib/read-api-version";
 import { emptyRefereeSettings } from "../../src/lib/referee-commands";
 import * as poolsModule from "../../src/lib/mappools";
 import {
@@ -159,7 +160,9 @@ describe.skipIf(!url)("streaming read channel #540", () => {
     expect(body.data.stage.round.id).toBe(roundId);
     expect(body.data.mappools).toEqual([]);
     expect(response.headers.get("cache-control")).toBe("no-store");
-    expect(response.headers.get("x-oclr-read-contract")).toBe("1.5.0");
+    expect(response.headers.get("x-oclr-read-contract")).toBe(
+      readContractVersion,
+    );
     expect(body.data).toEqual(
       JSON.parse(JSON.stringify(await nextStreamingRead(subject!, slug))),
     );
