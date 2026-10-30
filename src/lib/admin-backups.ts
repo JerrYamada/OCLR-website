@@ -1,3 +1,4 @@
+import { databaseIdentity } from "../../operator/identity";
 import { request } from "node:http";
 import { requireUser } from "./auth/user";
 import { staffAccess } from "./auth/staff";
@@ -25,6 +26,12 @@ export async function operatorRequest(
   const socketPath = process.env.OCLR_OPERATOR_SOCKET;
   if (!socketPath?.startsWith("/"))
     throw new HttpError(503, "Backup service is unavailable.");
+  let identity: string;
+  try {
+    identity = databaseIdentity(process.env.DATABASE_URL || "");
+  } catch {
+    throw new HttpError(503, "Backup service is unavailable.");
+  }
   return new Promise<Buffer>((resolve, reject) => {
     const req = request(
       {
@@ -33,6 +40,7 @@ export async function operatorRequest(
         method,
         headers: {
           "X-OCLR-Actor": String(actor),
+          "X-OCLR-Database": identity,
           "Content-Length": body?.length || 0,
         },
       },

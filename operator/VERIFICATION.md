@@ -9,6 +9,8 @@ was accessed.
   database renames. Service control and HTTP health are synthetic. It checks
   authenticated corruption rejection, media mismatch preserving the current
   database, business-data restoration and session/staff-grant invalidation.
+- Deployment-lock rejection regression: 1 test passed; queued jobs remain retryable
+  when flock rejects acquisition, and terminal handling runs once.
 - Localization: 4 tests passed; new Simplified/Traditional Chinese wording awaits
   organizer review.
 - Full unit/integration run: 1,759 passed, 1 skipped, one new route-inventory
@@ -16,7 +18,11 @@ was accessed.
   the affected read-API DX file passed all 3 tests.
 - Initial desktop/mobile backup browser checks: 4 passed (confirmation gate,
   geometry and direct ordinary-user request denial). The final full browser run
-  is tracked on the PR separately.
+  was stopped after five failures outside the backup page: admin-navigation,
+  admin-polish, application-profile, archive-artwork and archive-map-metadata.
+  Result: 33 passed, 5 failed, 1 interrupted, 1,019 not run. This is **not a full
+  browser pass**. The final targeted backup run passed 4 tests, including desktop,
+  mobile, light/dark and direct-request denial.
 - Production dependency audit: 0 vulnerabilities.
 - Lint/typecheck, production build and whitespace checks passed during the batch;
   final commit and CI evidence are recorded on the PR/issue.

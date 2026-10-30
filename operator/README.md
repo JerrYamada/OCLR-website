@@ -4,6 +4,9 @@ This service runs on the app host as a separate `oclr-backup` account. The
 website connects through a mode-0660 Unix socket and never receives the
 operator database credentials or encryption key. Every website request requires
 a fresh global Admin check; edition Admin and Developer/remote reads are denied.
+The socket also compares credential-free database identity hashes so a runtime
+cannot accidentally submit work to an operator configured for another database.
+Use the same canonical database host spelling and port in both configurations.
 The worker rechecks the actor against the current database before doing work.
 
 ## Operator preparation
@@ -12,6 +15,7 @@ Installation and real restores require separately authorized operator work.
 Install this reviewed source and its locked npm dependencies into
 `/opt/oclr-backup`, owned by root and not writable by either service account.
 Use Node 24, PostgreSQL client tools matching the server, and util-linux flock.
+Install with `npm ci --include=dev`; the separately installed operator uses tsx.
 Provision a private mode-0700 `/var/lib/oclr-backup`, owned by `oclr-backup`.
 Install the example systemd service with a root-owned mode-0600 environment file:
 

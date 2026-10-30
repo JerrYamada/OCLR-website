@@ -14,6 +14,7 @@ import {
   statfsSync,
 } from "node:fs";
 import { join, resolve } from "node:path";
+import { databaseIdentity } from "./identity";
 import { MAX_BYTES } from "./package";
 const root = process.env.OCLR_OPERATOR_DATA!,
   socket = process.env.OCLR_OPERATOR_SOCKET!,
@@ -48,6 +49,11 @@ createServer(async (req, res) => {
   res.setHeader("X-Content-Type-Options", "nosniff");
   try {
     const url = new URL(req.url!, "http://operator");
+    if (
+      req.headers["x-oclr-database"] !==
+      databaseIdentity(process.env.OCLR_OPERATOR_DATABASE_URL || "")
+    )
+      throw Error("Database target mismatch");
     const actor = Number(req.headers["x-oclr-actor"]);
     if (!Number.isSafeInteger(actor) || actor < 1) throw Error();
     if (req.method === "GET" && url.pathname === "/jobs") {
@@ -156,6 +162,17 @@ createServer(async (req, res) => {
         mode: 0o600,
         flag: "wx",
       });
+      appendFileSync(
+        join(root, "audit.jsonl"),
+        JSON.stringify({
+          id,
+          actor,
+          action,
+          state: "queued",
+          at: job.createdAt,
+        }) + "\n",
+        { mode: 0o600, flush: true },
+      );
       const child = spawn(
         "flock",
         [
@@ -171,14 +188,30 @@ createServer(async (req, res) => {
       );
       child.on("error", () => finish());
       child.on("exit", () => finish());
+      let finished = false;
       function finish() {
+        if (finished) return;
+        finished = true;
         busy = false;
         const p = join(root, id + ".json");
         const j = JSON.parse(readFileSync(p, "utf8"));
         if (["queued", "running"].includes(j.state)) {
+          j.recovery =
+            j.state === "queued" ? "original-preserved" : "operator-required";
           j.state = "failed";
-          j.recovery = "operator-required";
           writeFileSync(p, JSON.stringify(j), { mode: 0o600 });
+          appendFileSync(
+            join(root, "audit.jsonl"),
+            JSON.stringify({
+              id,
+              actor,
+              action,
+              state: j.state,
+              recovery: j.recovery,
+              at: new Date().toISOString(),
+            }) + "\n",
+            { mode: 0o600, flush: true },
+          );
         }
       }
       res.statusCode = 202;
