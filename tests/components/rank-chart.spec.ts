@@ -48,3 +48,16 @@ test("statistics sit beside the chart and stack on narrow screens", async ({
   );
   expect(overflow).toBeLessThanOrEqual(0);
 });
+
+test("the line uses most of the chart height", async ({ page }) => {
+  await page.goto("/rank-chart");
+  const svg = (await page.locator(".rank-chart-svg").boundingBox())!;
+  const line = await page.locator(".rank-chart-line").evaluate((element) => {
+    const { x, y, width, height } = (element as SVGGraphicsElement).getBBox();
+    return { x, y, width, height };
+  });
+  // A fixed margin around the rank range left over a third of the box empty on
+  // histories whose ranks barely move; the plot should stay mostly filled.
+  expect(line.height).toBeGreaterThan(svg.height * 0.7);
+  expect(line.y).toBeLessThan(svg.height * 0.15);
+});

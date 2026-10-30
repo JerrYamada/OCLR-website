@@ -24,6 +24,7 @@ export const profileResponse = {
     ranked_score: "9007199254740993",
     total_score: 987654321,
     maximum_combo: 456,
+    total_hits: 789012,
     level: { current: 75, progress: 42 },
     grade_counts: { ssh: 1, ss: 2, sh: 3, s: 4, a: 5 },
   },

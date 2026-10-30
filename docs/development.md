@@ -30,6 +30,10 @@ Sign-in needs the osu! callback registered as `APP_URL/auth/osu/callback` for th
 
 While the dev server listens on the network, any device that can reach it also reaches unminified source, dev error overlays and unpublished demo data. Use this on a trusted network only, and return `APP_URL` to `http://localhost:3000` afterwards.
 
+If the browser still reports `ERR_TOO_MANY_REDIRECTS` for a non-private development hostname after that restart, it is probably replaying a permanent canonical redirect cached before this rule existed. Open the address in a private window or clear cached data for that origin; restarting the server does not evict a cached `308`. Development canonical redirects for non-private hosts are temporary (`307`) with `Cache-Control: no-store`, but a previously cached entry survives until the browser drops it.
+
+If the page instead keeps reloading with no HTTP redirect in the Network panel, stop the dev server, remove `.next` (`rm -rf .next`), and run `npm run dev` again. A stale Turbopack HMR version cache can keep sending `HMR hash mismatch` reloads; removing the dev build output resets it.
+
 ## Local frontend database and demo content
 
 For frontend work without an organizer database, use the existing Docker installation:

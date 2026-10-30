@@ -76,7 +76,7 @@ test.describe("Dashboard UID participation history", () => {
       (await page.goto(`/players/${historyUid}?edition=history-ten`))?.status(),
     ).toBe(200);
     await expect(
-      page.locator('section[aria-labelledby="participation"] > ul > li'),
+      page.locator('section[aria-labelledby="competition-record"] > ul > li'),
     ).toHaveCount(2);
     await seedEditions([
       {

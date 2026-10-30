@@ -1,6 +1,10 @@
+import { PlayerCompetition } from "@/components/player-competition";
+import { PlayerMapPerformance } from "@/components/player-map-performance";
 import { PlayerProfile } from "@/components/player-profile";
 import { Avatar } from "@/components/avatar";
 import { collapseAliases, previousUsernames } from "@/lib/player-aliases";
+import { playerCompetitionRecord } from "@/lib/player-competition";
+import { playerMapPerformance } from "@/lib/player-map-performance";
 import { RoundRatings } from "@/components/round-ratings";
 import { getAppTranslations } from "@/i18n/server";
 import { frontendProfile } from "@/lib/frontend-data";
@@ -148,6 +152,12 @@ async function ProfileContent({
       </div>
     </header>
   );
+  const [competition, mapPerformance] = data.participation.length
+    ? await Promise.all([
+        playerCompetitionRecord(data.participation),
+        playerMapPerformance(data.participation),
+      ])
+    : [null, null];
   return (
     <div
       className={
@@ -190,101 +200,8 @@ async function ProfileContent({
       {typeof query.edition === "string" && (
         <RoundRatings data={ratingHistory} slug={query.edition} />
       )}
-      <section className="spaced" aria-labelledby="participation">
-        <h2 id="participation">{tr("Published participation")}</h2>
-        {!data.participation.length && (
-          <p className="notice">
-            {tr("No published tournament participation is available.")}
-          </p>
-        )}
-        <ul
-          className={
-            data.participation.length ? `panel ${styles.history}` : undefined
-          }
-        >
-          {data.participation.map((p) => (
-            <li
-              className={styles.record}
-              key={JSON.stringify([
-                p.editionSlug,
-                p.username,
-                p.role,
-                p.team?.id,
-              ])}
-            >
-              <div className={styles.edition}>
-                <h3>
-                  <Link
-                    href={`/tournaments/${p.editionSlug}`}
-                    className="context-link"
-                  >
-                    {p.editionName}
-                  </Link>
-                </h3>
-                {p.participation === "historical" && (
-                  <span className="muted small">
-                    {tr("Historical archive")}
-                  </span>
-                )}
-              </div>
-              <div className={styles.identity}>
-                <span>{p.username}</span>
-                <span className="badge">
-                  {p.participation === "historical"
-                    ? p.role === "captain"
-                      ? "Captain"
-                      : p.role === "coach"
-                        ? tr("Coach")
-                        : p.role === "free_agent"
-                          ? tr("Free agent")
-                          : (p.sourceRole ??
-                            (p.tier != null && p.tier > 0
-                              ? `Tier ${p.tier}`
-                              : tr("Player")))
-                    : p.participation === "coach"
-                      ? tr("Coach")
-                      : p.captain
-                        ? "Captain"
-                        : p.participation === "finalized_roster"
-                          ? tr("Finalized roster player")
-                          : tr("Accepted player")}
-                </span>
-              </div>
-              <div className={styles.team}>
-                {p.coachedTeams?.map((t) => (
-                  <div key={t.id}>
-                    <span className="badge">{tr("Coach")}</span>{" "}
-                    <Link
-                      className="context-link"
-                      href={`/tournaments/${p.editionSlug}/teams/${t.id}`}
-                    >
-                      {t.name}
-                    </Link>
-                  </div>
-                ))}
-                {p.participation !== "coach" &&
-                  (p.team ? (
-                    <Link
-                      href={`/tournaments/${p.editionSlug}/teams/${p.team.id}`}
-                      className="context-link"
-                    >
-                      {p.team.name}
-                    </Link>
-                  ) : (
-                    <span className="muted small">
-                      {tr("Team awaiting publication")}
-                    </span>
-                  ))}
-                {p.placing != null && (
-                  <span className="muted small">
-                    {tr("Recorded placing")}: {p.placing}
-                  </span>
-                )}
-              </div>
-            </li>
-          ))}
-        </ul>
-      </section>
+      {competition && <PlayerCompetition record={competition} />}
+      {mapPerformance && <PlayerMapPerformance record={mapPerformance} />}
     </div>
   );
 }

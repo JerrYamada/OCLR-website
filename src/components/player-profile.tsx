@@ -3,10 +3,12 @@ import { BwsSummary } from "./bws-summary";
 import { RankChart } from "./rank-chart";
 import { rankTierPalette } from "@/lib/rank-tier";
 import { PlayerIdBadge } from "./player-id-badge";
+import { ProfileLevel } from "./profile-level";
 import type { BwsSummary as BwsData } from "@/lib/bws-model";
 import Image from "next/image";
 import type { ReactNode } from "react";
 import type { ProfileSnapshot } from "@/lib/osu-profile-model";
+import { calculateOii, oiiMode } from "@/lib/oii";
 export function PlayerProfile({
   snapshot,
   bws,
@@ -47,9 +49,12 @@ export function PlayerProfile({
   const p = snapshot.profile;
   const s = p.statistics;
   const history = p.rankHistory?.data ?? null;
+  // The improvement index describes the ruleset the rank history belongs to.
+  const oii = calculateOii(s.pp, s.playTimeSeconds, oiiMode(snapshot));
   // The card id reuses the mappool beatmap-id pill with the player's rank tier
   // gradient; the ink comes from the project's WCAG contrast choice.
   const idPalette = rankTierPalette(s.globalRankPercent);
+  const level = s.level?.current ?? null;
   return (
     <section
       className="panel profile-summary"
@@ -60,6 +65,11 @@ export function PlayerProfile({
       <PlayerIdBadge osuId={p.osuId} palette={idPalette} />
       {p.coverUrl ? (
         <div className="profile-cover">
+          {/* Inside the cover so the card's open notes (later in the tree and
+              z-index 6) still paint above this badge. */}
+          {level !== null && (
+            <ProfileLevel level={level} progress={s.level?.progress ?? null} />
+          )}
           <Image
             className="profile-cover-image"
             src={p.coverUrl}
@@ -77,6 +87,7 @@ export function PlayerProfile({
                   variant="compact"
                   countryRank={s.countryRank}
                   globalRankPercent={s.globalRankPercent}
+                  oii={oii}
                 />
               )}
             </div>
@@ -84,6 +95,9 @@ export function PlayerProfile({
         </div>
       ) : (
         <>
+          {level !== null && (
+            <ProfileLevel level={level} progress={s.level?.progress ?? null} />
+          )}
           {heading}
           {bws && (
             <BwsSummary
@@ -91,6 +105,7 @@ export function PlayerProfile({
               variant="compact"
               countryRank={s.countryRank}
               globalRankPercent={s.globalRankPercent}
+              oii={oii}
             />
           )}
         </>
@@ -116,21 +131,13 @@ export function PlayerProfile({
                 : `${number(s.accuracy, 2)}%`,
             ],
             ["Play count", number(s.playCount)],
+            [
+              "Total hits",
+              s.totalHits === null ? tr("Unavailable") : number(s.totalHits),
+            ],
             ["Play time", playTime(s.playTimeSeconds)],
             ["Ranked score", score(s.rankedScore)],
             ["Total score", score(s.totalScore)],
-            [
-              "Maximum combo",
-              s.maximumCombo === null
-                ? tr("Unavailable")
-                : `${number(s.maximumCombo)}×`,
-            ],
-            [
-              "Level",
-              s.level?.current === null || s.level?.current === undefined
-                ? tr("Unavailable")
-                : `${number(s.level.current)}${s.level.progress !== null ? ` (${number(s.level.progress)}%)` : ""}`,
-            ],
           ].map(([label, value]) => (
             <div key={label}>
               <dt>{tr(label)}</dt>

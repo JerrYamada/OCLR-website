@@ -27,11 +27,10 @@ createRoot(document.getElementById("root")!).render(
               {[
                 ["Accuracy", "97.25%"],
                 ["Play count", "48,120"],
+                ["Total hits", "9,876,543"],
                 ["Play time", "302 days 4 hours"],
                 ["Ranked score", "9,007,199,254,740,993"],
                 ["Total score", "987,654,321"],
-                ["Maximum combo", "1,234×"],
-                ["Level", "75 (42%)"],
               ].map(([label, value]) => (
                 <div key={label}>
                   <dt>{label}</dt>

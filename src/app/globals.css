@@ -2465,7 +2465,7 @@ html[data-appearance]
   background-image: var(--profile-id-gradient);
   background-size: 200% 200%;
   background-position: 100% 100%;
-  animation: bws-rank-tier-roll 7s linear infinite;
+  animation: bws-rank-tier-roll 3.5s linear infinite;
 }
 .profile-summary button.profile-id-badge:is(:hover, :focus-visible),
 html[data-appearance]
@@ -2506,6 +2506,122 @@ html[data-appearance]
     background-size: 100% 100%;
   }
 }
+/* Level readout pinned to the opposite corner from the id pill, following
+   osu!'s profile detail bar: a slim progress bar next to a hexagonal level
+   badge. The badge carries its own dark plate so it stays legible on any cover
+   artwork; the ring and the bar fill are tinted by the level tier. */
+.profile-level {
+  /* No z-index on purpose: the badge is a positioned element painted before
+     the stats card, so the card and its open notes still cover it. */
+  position: absolute;
+  inset-block-start: 0.75rem;
+  inset-inline-end: 0.75rem;
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  color: #fff;
+  pointer-events: none;
+}
+.profile-level-bar {
+  display: block;
+  width: 6.5rem;
+  height: 0.25rem;
+  border-radius: 999px;
+  background-color: rgb(9 13 25 / 62%);
+  box-shadow: inset 0 0 0 1px rgb(255 255 255 / 14%);
+  overflow: hidden;
+}
+.profile-level-bar-fill {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background-image: linear-gradient(
+    90deg,
+    var(--level-from, #c566ed),
+    var(--level-to, #dfabfb)
+  );
+  transition: width 0.3s ease;
+}
+.profile-level-badge {
+  /* Keep the number's stacking level local to the badge so it cannot compete
+     with the stats card and its notes. */
+  position: relative;
+  isolation: isolate;
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 2.875rem;
+  height: 2.875rem;
+}
+.profile-level-plate,
+.profile-level-ring {
+  grid-area: 1 / 1;
+  width: 100%;
+  height: 100%;
+  -webkit-mask-size: 100% 100%;
+  mask-size: 100% 100%;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+}
+.profile-level-plate {
+  background-color: rgb(9 13 25 / 58%);
+  -webkit-mask-image: var(--level-plate);
+  mask-image: var(--level-plate);
+}
+/* The ring shares the rank values' rolling gradient: two colour cycles at
+   200% so the band travels one full period and loops without a jump. */
+.profile-level-ring {
+  -webkit-mask-image: var(--level-ring);
+  mask-image: var(--level-ring);
+  background-image: linear-gradient(
+    105deg,
+    var(--level-from, #c566ed) 0%,
+    var(--level-to, #dfabfb) 25%,
+    var(--level-from, #c566ed) 50%,
+    var(--level-to, #dfabfb) 75%,
+    var(--level-from, #c566ed) 100%
+  );
+  background-size: 200% 200%;
+  background-position: 100% 100%;
+  animation: bws-rank-tier-roll 3.5s linear infinite;
+}
+.profile-level-number {
+  /* The masked plate and ring establish their own stacking contexts, so the
+     number needs a stacking level of its own to stay in front of them. */
+  position: relative;
+  z-index: 1;
+  grid-area: 1 / 1;
+  color: #fff;
+  font-size: 1.15rem;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+/* Phones keep the pair but scale it down; osu! itself drops the bar here. */
+@media (max-width: 48rem) {
+  .profile-level {
+    gap: 0.4rem;
+  }
+  .profile-level-bar {
+    width: 4rem;
+  }
+  .profile-level-badge {
+    width: 2.375rem;
+    height: 2.375rem;
+  }
+  .profile-level-number {
+    font-size: 0.95rem;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .profile-level-bar-fill {
+    transition: none;
+  }
+  .profile-level-ring {
+    animation: none;
+    background-size: 100% 100%;
+  }
+}
 .profile-cover {
   position: relative;
   display: flex;
@@ -2516,6 +2632,11 @@ html[data-appearance]
      top corners are rounded here instead. */
   border-radius: var(--radius-panel) var(--radius-panel) 0 0;
   isolation: isolate;
+  /* `isolation` makes this a stacking context, so without a z-index the whole
+     cover — including an open BWS note that reaches down over the rank chart —
+     would paint underneath the later profile body. The cover box itself only
+     overlaps the body through that note. */
+  z-index: 1;
 }
 /* Only the cover artwork itself is stretched over the banner; the overlaid
    heading also contains an avatar <img>, which must keep its own sizing. */
@@ -2624,7 +2745,7 @@ html[data-appearance]
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
-  animation: bws-rank-tier-roll 7s linear infinite;
+  animation: bws-rank-tier-roll 3.5s linear infinite;
 }
 @keyframes bws-rank-tier-roll {
   from {
@@ -2668,6 +2789,16 @@ html[data-appearance]
 .bws-card .bws-value--tier-iron {
   --rank-tier-from: #bab3ab;
   --rank-tier-to: #dddddd;
+}
+/* Improvement index: the same rolling gradient as the rank tiers, coloured by
+   whether the player is ahead of (green) or behind (red) the play-time curve. */
+.bws-card .bws-value--oii-up {
+  --rank-tier-from: #5edc5b;
+  --rank-tier-to: #caf881;
+}
+.bws-card .bws-value--oii-down {
+  --rank-tier-from: #d32f2f;
+  --rank-tier-to: #fd5392;
 }
 /* On the light panel (no cover art) the pale tier stops vanish against the
    card, so the standalone card dims them; cover cards keep osu!'s palette. */
@@ -2846,7 +2977,7 @@ html[data-appearance]
 
 .rank-chart {
   position: relative;
-  min-height: 220px;
+  min-height: 184px;
   touch-action: pan-y;
 }
 .rank-chart-svg {
@@ -2856,7 +2987,7 @@ html[data-appearance]
   overflow: visible;
 }
 .rank-chart-blank {
-  height: 220px;
+  height: 184px;
 }
 .rank-chart-grid {
   stroke: var(--site-border, var(--color-border));

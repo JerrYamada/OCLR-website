@@ -127,7 +127,7 @@ test.describe("published osu! profiles", () => {
       page.getByRole("link", { name: "← Tournament players", exact: true }),
     ).toHaveAttribute("href", "/tournaments/test-cup/players");
     await expect(
-      page.getByRole("heading", { name: "Published participation" }),
+      page.getByRole("heading", { name: "Competition record" }),
     ).toBeVisible();
     const operator = await browser.newContext({
       storageState: englishStorage,

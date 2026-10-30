@@ -7,8 +7,13 @@ import { useAppTranslations } from "@/i18n/shared";
  * a five-digit rank, mirroring the osu! profile rank chart. */
 type RankPoint = { day: number; rank: number };
 
-const HEIGHT = 220;
-const PAD = { top: 14, right: 10, bottom: 14, left: 10 };
+const HEIGHT = 184;
+const PAD = { top: 5, right: 10, bottom: 6, left: 10 };
+/** Share of the rank span kept as breathing room above and below the line, so
+ * the best and worst samples never sit flush against the frame edges. Scaling
+ * it to the span keeps the plot filled instead of reserving a fixed margin that
+ * looks empty whenever the history barely moves. */
+const LOG_HEADROOM = 0.02;
 
 function toPoints(data: readonly number[], globalRank: number | null) {
   const points: RankPoint[] = [];
@@ -74,14 +79,16 @@ export function RankChart({
     const ranks = points.map((point) => point.rank);
     const rawLo = Math.min(...ranks);
     const rawHi = Math.max(...ranks);
-    const lo = Math.max(1, Math.floor(rawLo * 0.92));
-    const hi = Math.max(lo + 1, Math.ceil(rawHi * 1.08));
+    const logSpan = Math.max(Math.log10(rawHi / rawLo), 0.05);
+    const headroom = logSpan * LOG_HEADROOM;
+    const logLo = Math.log10(rawLo) - headroom;
+    const logHi = Math.log10(rawHi) + headroom;
+    const lo = Math.max(1, Math.floor(10 ** logLo));
+    const hi = Math.max(lo + 1, Math.ceil(10 ** logHi));
     const minDay = points[0].day;
     const span = minDay === 0 ? -1 : minDay;
     const innerWidth = width - PAD.left - PAD.right;
     const innerHeight = HEIGHT - PAD.top - PAD.bottom;
-    const logLo = Math.log10(lo);
-    const logHi = Math.log10(hi);
     const toX = (day: number) =>
       PAD.left + ((day - minDay) / (0 - span)) * innerWidth;
     const toY = (rank: number) => {
@@ -144,6 +151,18 @@ export function RankChart({
 
   const activePoint = active ? points[active.index] : null;
 
+  // A tap has no hover to end: touch pointers fire `pointerleave` right after
+  // `pointerup`, which used to drop the readout instantly. Keep a touch pick
+  // until the next tap outside the chart instead.
+  useEffect(() => {
+    if (!active) return;
+    const dismiss = (event: PointerEvent) => {
+      if (!hostRef.current?.contains(event.target as Node)) setActive(null);
+    };
+    document.addEventListener("pointerdown", dismiss);
+    return () => document.removeEventListener("pointerdown", dismiss);
+  }, [active]);
+
   return (
     <div className="rank-chart" ref={hostRef}>
       {geometry ? (
@@ -156,7 +175,12 @@ export function RankChart({
           aria-label={`${tr("Global rank")}: #${number(points[points.length - 1].rank)}`}
           onPointerMove={(event) => pick(event.clientX)}
           onPointerDown={(event) => pick(event.clientX)}
-          onPointerLeave={() => setActive(null)}
+          onPointerLeave={(event) => {
+            // Touch releases the pointer after every tap; a mouse leaving is
+            // the only real "stop inspecting" signal.
+            if (event.pointerType !== "touch") setActive(null);
+          }}
+          onPointerCancel={() => setActive(null)}
         >
           <defs>
             <linearGradient id={gradientId} x1="0" x2="0" y1="0" y2="1">

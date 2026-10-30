@@ -22,6 +22,7 @@ const bundle = await build({
     "tests/components/statistics-manager.tsx",
     "tests/components/rank-chart.tsx",
     "tests/components/player-id-badge.tsx",
+    "tests/components/player-profile-cover.tsx",
   ],
   alias: { "next/image": resolve("tests/components/next-image.ts") },
   external: ["/rookie-stage.svg"],
@@ -83,6 +84,8 @@ createServer((request, response) => {
                             ? "statistics-explorer"
                             : request.url?.startsWith("/player-id-badge")
                               ? "player-id-badge"
+                              : request.url?.startsWith("/player-profile-cover")
+                              ? "player-profile-cover"
                               : request.url?.startsWith("/rank-chart")
                                 ? "rank-chart"
                                 : "player-message-board";

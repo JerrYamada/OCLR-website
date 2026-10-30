@@ -325,6 +325,7 @@ export const savedOsuProfileSchema = z
         rankedScore: nullableText,
         totalScore: nullableText,
         maximumCombo: nullableInteger,
+        totalHits: nullableInteger,
         level: z
           .object({ current: nullableInteger, progress: nullableMetric })
           .strip()
