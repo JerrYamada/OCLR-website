@@ -3318,6 +3318,9 @@
     "m55e80cf337a9": "Unpublished teams can be saved in private fixtures for testing. Reporting and publication still require finalized, published teams.",
     "m338072b79a81": "Choose different active teams from this edition, or leave participants TBD. Published fixtures require finalized, published teams.",
     "m476c81cad5e9": "Coach added.",
-    "m19aed18780d3": "Coach removed."
+    "m19aed18780d3": "Coach removed.",
+    "m98c7524bddd6": "The backup operator has not been configured. Ask the server operator to complete the one-time installation.",
+    "m0194f3b8d5b9": "The backup operator rejected the connection. Ask the server operator to check the database target and configuration.",
+    "ma2c201428dc9": "Checking backup service."
   }
 }

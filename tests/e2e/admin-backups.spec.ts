@@ -62,7 +62,10 @@ test.describe("Admin backup boundary and confirmation", () => {
       fullPage: true,
     });
   });
-  test("direct requests reject ordinary users", async ({ context }) => {
+  test("direct requests reject ordinary users", async ({
+    context,
+    baseURL,
+  }) => {
     await context.addCookies([await seedSession(999002)]);
     expect((await context.request.get("/api/admin/backups")).status()).toBe(
       403,
@@ -70,9 +73,59 @@ test.describe("Admin backup boundary and confirmation", () => {
     expect(
       (
         await context.request.post("/api/admin/backups?action=backup", {
-          headers: { origin: "http://127.0.0.1:3100" },
+          headers: { origin: baseURL! },
         })
       ).status(),
     ).toBe(403);
+  });
+});
+
+test.describe("Backup operator availability", () => {
+  test.skip(!process.env.TEST_DATABASE_URL, "Requires isolated PostgreSQL");
+  test.afterAll(async () => closeDb());
+  test("explains missing installation, disables actions and recovers without stretching the button", async ({
+    page,
+    context,
+    isMobile,
+  }) => {
+    await context.addCookies([await seedSession(isMobile ? 70001 : 60001)]);
+    let available = false;
+    await page.route("**/api/admin/backups", (route) =>
+      route.fulfill(
+        available
+          ? { json: [] }
+          : {
+              status: 503,
+              json: {
+                code: "not_configured",
+                error: "Backup service is unavailable.",
+              },
+            },
+      ),
+    );
+    await page.goto("/admin/backups");
+    const missing = page
+      .getByRole("alert")
+      .filter({ hasText: "one-time installation" });
+    await expect(missing).toBeVisible();
+    const create = page.getByRole("button", { name: "Create backup" });
+    await expect(create).toBeDisabled();
+    await expect(page.locator("input[type=file]")).toBeDisabled();
+    const box = await create.boundingBox();
+    expect(box!.height).toBeLessThanOrEqual(64);
+    expect(
+      await page.evaluate(
+        () => document.documentElement.scrollWidth <= innerWidth,
+      ),
+    ).toBe(true);
+    available = true;
+    await expect(create).toBeEnabled({ timeout: 10000 });
+    await expect(missing).toHaveCount(0);
+    await context.addCookies([
+      { name: "oclr-theme", value: "dark", domain: "127.0.0.1", path: "/" },
+    ]);
+    await page.reload();
+    await expect(create).toBeEnabled();
+    expect((await create.boundingBox())!.height).toBeLessThanOrEqual(64);
   });
 });
