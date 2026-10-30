@@ -32,6 +32,19 @@ export const emptyRefereeSettings: RefereeSettings = {
   startSeconds: null,
   roomSize: null,
 };
+
+/** Use the configured season, never the route slug, for the room prefix. */
+export function defaultRefereeRoomName(
+  season: string | null,
+  teams: readonly { name: string }[],
+): string {
+  if (teams.length !== 2) return "";
+  const seasonNumber = season?.trim().match(/^s?(\d+)$/i)?.[1];
+  const prefix = seasonNumber ? `OCLR S${seasonNumber}` : "OCLR";
+  return `${prefix}: (${teams[0].name}) vs (${teams[1].name})`
+    .replace(/[\p{Cc}\p{Cf}\u2028\u2029]/gu, " ")
+    .slice(0, 200);
+}
 export const commandMods = [
   "EZ",
   "HD",

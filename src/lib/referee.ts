@@ -30,6 +30,7 @@ import { remoteMode } from "./data-source";
 import { fixtureForReview } from "./fixtures";
 import { HttpError } from "./http";
 import {
+  defaultRefereeRoomName,
   emptyRefereeSettings,
   refereeSettingsSchema,
 } from "./referee-commands";
@@ -342,12 +343,10 @@ export async function readRefereeWorkspace(
     })),
     defaultSettings: {
       ...emptyRefereeSettings,
-      roomName:
-        orderedTeams.length === 2
-          ? `${slug}: (${orderedTeams[0].name}) vs (${orderedTeams[1].name})`
-              .replace(/[\p{Cc}\p{Cf}\u2028\u2029]/gu, " ")
-              .slice(0, 200)
-          : "",
+      roomName: defaultRefereeRoomName(
+        edition.configuration.season,
+        orderedTeams,
+      ),
       timerSeconds: policy?.commands?.prepareSeconds ?? null,
       startSeconds: policy?.commands?.startSeconds ?? null,
       roomSize: policy?.commands?.roomSize ?? null,
