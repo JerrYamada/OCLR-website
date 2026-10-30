@@ -77,9 +77,7 @@ test.describe("operations presentation batch", () => {
       });
       return;
     }
-    await page
-      .getByRole("tab", { name: "Competition configuration", exact: true })
-      .click();
+    await page.goto("/admin/tournaments/test-cup/settings#competition");
     await expect(
       page.getByRole("button", { name: "Add group", exact: true }),
     ).toHaveCount(0);
