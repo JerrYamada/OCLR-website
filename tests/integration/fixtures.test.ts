@@ -576,6 +576,30 @@ describe.skipIf(!url)(
         }),
       ).rejects.toMatchObject({ status: 400 });
     });
+    it("rejects direct requests for more than four groups without changing the stage", async () => {
+      const initial = await fixtureCommand(admin, "test-cup", body());
+      const stage = initial.stages.find((s) => s.kind === "group")!;
+      await expect(
+        fixtureCommand(admin, "test-cup", {
+          ...confirm,
+          action: "stage_groups",
+          stageId: stage.id,
+          expectedVersion: stage.version,
+          configuration: {
+            groups: Array.from({ length: 5 }, (_, index) => ({
+              name: `Group ${index}`,
+              teamIds: [randomUUID(), randomUUID()],
+            })),
+          },
+          published: false,
+        }),
+      ).rejects.toMatchObject({ status: 400 });
+      const after = (await staffFixtures(admin, "test-cup")).stages.find(
+        (s) => s.id === stage.id,
+      )!;
+      expect(after.version).toBe(stage.version);
+      expect(after.groupConfiguration).toEqual(stage.groupConfiguration);
+    });
     it("generates stable unique group identifiers and rejects stale concurrent additions", async () => {
       const initial = await fixtureCommand(admin, "test-cup", body());
       const stage = initial.stages.find((s) => s.kind === "group")!;

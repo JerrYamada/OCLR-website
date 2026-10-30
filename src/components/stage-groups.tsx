@@ -7,6 +7,7 @@ import {
   type PointerEvent,
 } from "react";
 import { useAppTranslations } from "@/i18n/shared";
+import { maxStageGroups } from "@/lib/competition-model";
 import type { FixtureWorkspace } from "@/lib/fixtures";
 import { ReadOnlyFields, useStaffReadOnly } from "./staff-read-only";
 import { ConfirmMutation } from "./confirm-mutation";
@@ -36,7 +37,10 @@ export function StageGroups({
     stage.groupConfiguration?.groups ?? [],
   );
   const [count, setCount] = useState(
-    stage.groupConfiguration?.groups.length.toString() ?? "",
+    stage.groupConfiguration &&
+      stage.groupConfiguration.groups.length <= maxStageGroups
+      ? stage.groupConfiguration.groups.length.toString()
+      : "",
   );
   const [pendingCount, setPendingCount] = useState<number | null>(null);
   const [published, setPublished] = useState(Boolean(stage.groupsPublishedAt));
@@ -54,6 +58,7 @@ export function StageGroups({
     published !== Boolean(stage.groupsPublishedAt);
   const unappliedCount = count !== "" && Number(count) !== groups.length;
   const invalid =
+    groups.length > maxStageGroups ||
     groups.some(
       (g) => !g.name.trim() || g.teamIds.length < 2 || g.teamIds.length > 128,
     ) ||
@@ -98,7 +103,7 @@ export function StageGroups({
       readOnly ||
       !Number.isInteger(nextCount) ||
       nextCount < 0 ||
-      nextCount > 64
+      nextCount > maxStageGroups
     )
       return;
     setGroups((old) =>
@@ -274,7 +279,7 @@ export function StageGroups({
             >
               <option value="">{tr("Choose group count")}</option>
               <option value="0">{tr("No groups")}</option>
-              {Array.from({ length: 64 }, (_, index) => (
+              {Array.from({ length: maxStageGroups }, (_, index) => (
                 <option key={index + 1} value={index + 1}>
                   {index + 1}
                 </option>
