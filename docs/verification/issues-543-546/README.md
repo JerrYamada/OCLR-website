@@ -64,5 +64,21 @@ this loopback database and PostgreSQL tools on PATH.
 - `git diff --check` passed. Commit-specific CI is reported on the PR/issues;
   local results are not a CI or deployment claim.
 
-New Chinese interface wording awaits organizer review. Merge does not establish
-production deployment or release acceptance; issue closure remains separate.
+## Organizer review and CI follow-up — 2026-10-30
+
+The organizer explicitly approved the new Chinese interface wording and
+authorized CI repairs, automatic PR/merge, and closure of #543–#546 after
+acceptance. This replaces the earlier pending wording review.
+
+The operator integration fixture now supplies `sslmode=disable` when the isolated
+test connection omits an explicit mode, matching the synthetic CI PostgreSQL
+service. Caller-supplied modes are retained. Production operator validation and
+runtime configuration are unchanged. Using the same mode-omitting test URL that
+previously left the backup queued, the backup integration and authorization,
+locking and package checks all passed: four files, six tests. Focused ESLint and
+`git diff --check` passed. No production build or browser rerun is needed for
+this test-only connection setup change.
+
+Exact CI results and closure evidence are recorded on the four issues. Pending,
+skipped and full-regression coverage remain distinct from passing core checks.
+No production deployment or real credentials/data operation was performed.
