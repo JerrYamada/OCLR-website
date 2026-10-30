@@ -118,6 +118,17 @@ describe("referee finite workflow", () => {
     [b, b],
   ])("keeps ban %s and pick %s independent", (ban, pick) => {
     const i = input();
+    expect(
+      validateRefereeAction(i, {
+        action: "set_order",
+        firstBanTeamId: ban,
+        firstPickTeamId: pick,
+      }),
+    ).toEqual({
+      type: "order_set",
+      firstBanTeamId: ban,
+      firstPickTeamId: pick,
+    });
     i.orders = { firstBanTeamId: ban, firstPickTeamId: pick };
     expect(projectReferee(i).nextStep?.teamId).toBe(ban);
     act(i, { action: "record_selection", entryId: id(10) });

@@ -474,12 +474,6 @@ export function RefereePanel({
                   disabled={disabled || stale}
                   onChange={(e) => {
                     setFirstBan(e.target.value);
-                    setFirstPick(
-                      e.target.value
-                        ? (data.teams.find((t) => t.id !== e.target.value)
-                            ?.id ?? "")
-                        : "",
-                    );
                     setIrcSelection(null);
                   }}
                 >
@@ -502,12 +496,6 @@ export function RefereePanel({
                   disabled={disabled || stale}
                   onChange={(e) => {
                     setFirstPick(e.target.value);
-                    setFirstBan(
-                      e.target.value
-                        ? (data.teams.find((t) => t.id !== e.target.value)
-                            ?.id ?? "")
-                        : "",
-                    );
                     setIrcSelection(null);
                   }}
                 >
