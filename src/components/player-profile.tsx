@@ -1,6 +1,8 @@
 import { useAppTranslations } from "@/i18n/shared";
 import { BwsSummary } from "./bws-summary";
 import { RankChart } from "./rank-chart";
+import { rankTierPalette } from "@/lib/rank-tier";
+import { PlayerIdBadge } from "./player-id-badge";
 import type { BwsSummary as BwsData } from "@/lib/bws-model";
 import Image from "next/image";
 import type { ReactNode } from "react";
@@ -45,6 +47,9 @@ export function PlayerProfile({
   const p = snapshot.profile;
   const s = p.statistics;
   const history = p.rankHistory?.data ?? null;
+  // The card id reuses the mappool beatmap-id pill with the player's rank tier
+  // gradient; the ink comes from the project's WCAG contrast choice.
+  const idPalette = rankTierPalette(s.globalRankPercent);
   return (
     <section
       className="panel profile-summary"
@@ -52,6 +57,7 @@ export function PlayerProfile({
         value0: "osu!",
       })}
     >
+      <PlayerIdBadge osuId={p.osuId} palette={idPalette} />
       {p.coverUrl ? (
         <div className="profile-cover">
           <Image
@@ -70,6 +76,7 @@ export function PlayerProfile({
                   value={bws}
                   variant="compact"
                   countryRank={s.countryRank}
+                  globalRankPercent={s.globalRankPercent}
                 />
               )}
             </div>
@@ -83,6 +90,7 @@ export function PlayerProfile({
               value={bws}
               variant="compact"
               countryRank={s.countryRank}
+              globalRankPercent={s.globalRankPercent}
             />
           )}
         </>

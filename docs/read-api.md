@@ -164,7 +164,9 @@ whitelist the normalized osu! profile fields and verify osuId/mode against the
 cache key. An optional `profile.rankHistory` carries the requested ruleset's
 daily global ranks (oldest first, unranked days omitted) for the players-page
 rank chart; rows saved before it was retained, and older v1 backends, return
-`null`. Error/stale cache state remains explicit. Missing or malformed saved
+`null`. `statistics.globalRankPercent` (0..1) is the share of the ranked
+population above the player, used for the tiered rank colours; it is `null` for
+rows saved before it was retained and for older v1 backends. Error/stale cache state remains explicit. Missing or malformed saved
 profiles return 404 `PROFILE_SNAPSHOT_NOT_FOUND` on the standalone staff resource.
 A published participant without a profile still returns 200 with identity and
 `snapshot: null`; missing directory statistics have state `missing`. Historical

@@ -316,6 +316,7 @@ export const savedOsuProfileSchema = z
     statistics: z
       .object({
         globalRank: nullableInteger,
+        globalRankPercent: nullableMetric,
         countryRank: nullableInteger,
         pp: nullableMetric,
         accuracy: nullableMetric,

@@ -30,21 +30,47 @@
 /* Previous aliases sit next to the name; long lists collapse into a disclosure. */
 .previousNames {
   position: relative;
+  display: inline-flex;
   font-size: 0.8rem;
   color: var(--site-muted, var(--color-muted));
   overflow-wrap: anywhere;
 }
 
-.previousNames summary {
+/* A disclosure button, not a themed control: appearances style every button,
+   so the reset has to out-rank those rules. */
+.previousNames button.previousNamesTrigger,
+:global(html[data-appearance])
+  :global(.themed-site)
+  .heading
+  button.previousNamesTrigger {
   display: inline-flex;
   align-items: center;
   gap: 0.3rem;
-  cursor: pointer;
-  list-style: none;
+  min-width: 0;
+  min-height: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: none;
+  background-image: none;
+  box-shadow: none;
+  color: inherit;
+  font: inherit;
+  line-height: inherit;
+  transform: none;
+  cursor: help;
 }
 
-.previousNames summary::-webkit-details-marker {
-  display: none;
+.previousNames button.previousNamesTrigger:is(:hover, :focus-visible, :active) {
+  background: none;
+  background-image: none;
+  box-shadow: none;
+  border: 0;
+  transform: none;
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 0.18rem;
 }
 
 .previousNamesIcon {
@@ -53,17 +79,24 @@
   flex: none;
 }
 
+.previousNames:hover .previousNamesList,
+.previousNames:focus-within .previousNamesList {
+  display: grid;
+}
+
 .previousNamesList {
+  display: none;
   position: absolute;
   z-index: 6;
-  inset-block-start: calc(100% + 0.35rem);
+  inset-block-start: 100%;
   inset-inline-start: 0;
-  display: grid;
   gap: 0.15rem;
   min-width: 9rem;
   max-width: min(20rem, calc(100vw - 2rem));
   margin: 0;
   padding: 0.55rem 0.75rem;
+  /* Flush under the trigger: a visual gap would drop the hover while the
+     pointer crosses it. */
   border: 1px solid var(--site-border, var(--color-border));
   border-radius: 0.6rem;
   background: var(--site-surface, var(--color-surface));

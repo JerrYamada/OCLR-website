@@ -13,7 +13,6 @@
     ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
     sans-serif;
   --radius-panel: 0.75rem;
-  --space-page: clamp(2rem, 4vw, 3rem);
   --space-panel: 1.5rem;
   --space-workspace: 2rem;
   --button-height: 2.75rem;
@@ -213,7 +212,7 @@ button:hover {
 }
 .page {
   min-height: 60vh;
-  padding-block: var(--space-page) 4rem;
+  padding-block: 1.5rem 4rem;
 }
 .page-heading {
   margin-bottom: 2rem;
@@ -377,9 +376,6 @@ button:hover {
   }
   .container {
     width: calc(100% - 2.5rem);
-  }
-  .page {
-    padding-top: 2rem;
   }
   .site-footer {
     width: calc(100% - 2.5rem);
@@ -2415,7 +2411,100 @@ body:has(.presenter-view) .site-footer,
 }
 
 .profile-summary {
+  position: relative;
   overflow: visible;
+}
+/* Player id pill, borrowed from the mappool beatmap-id badge: same pill
+   metrics and copy affordance, anchored to the card corner and tinted with the
+   player's rank tier gradient. */
+.profile-summary button.profile-id-badge,
+html[data-appearance] .themed-site .profile-summary button.profile-id-badge {
+  position: absolute;
+  z-index: 3;
+  inset-block-start: 0.75rem;
+  inset-inline-start: 0.75rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  min-width: 0;
+  min-height: 0;
+  padding: 0.1rem 0.6rem;
+  border: 0;
+  border-radius: 999px;
+  background-color: var(--site-raised, var(--color-raised));
+  background-image: var(--profile-id-gradient, none);
+  box-shadow: 0 0.2rem 0.6rem rgb(0 0 0 / 28%);
+  color: var(--profile-id-ink, var(--site-foreground, var(--color-foreground)));
+  font-family: inherit;
+  font-size: 0.8rem;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.35;
+  transform: none;
+  cursor: pointer;
+  transition: filter 0.15s ease;
+}
+.profile-id-badge--tier {
+  /* Same 15deg diagonal and travel direction as the rank values. */
+  --profile-id-gradient: linear-gradient(
+    105deg,
+    var(--rank-tier-from) 0%,
+    var(--rank-tier-to) 25%,
+    var(--rank-tier-from) 50%,
+    var(--rank-tier-to) 75%,
+    var(--rank-tier-from) 100%
+  );
+}
+/* The appearance rules also reset `background` (and thus its size), so the
+   scrolling layer needs the same specificity as the resets above. */
+.profile-summary button.profile-id-badge--tier,
+html[data-appearance]
+  .themed-site
+  .profile-summary
+  button.profile-id-badge--tier {
+  background-image: var(--profile-id-gradient);
+  background-size: 200% 200%;
+  background-position: 100% 100%;
+  animation: bws-rank-tier-roll 7s linear infinite;
+}
+.profile-summary button.profile-id-badge:is(:hover, :focus-visible),
+html[data-appearance]
+  .themed-site
+  .profile-summary
+  button.profile-id-badge:is(:hover, :focus-visible) {
+  background-color: var(--site-raised, var(--color-raised));
+  background-image: var(--profile-id-gradient, none);
+  border: 0;
+  color: var(--profile-id-ink, var(--site-foreground, var(--color-foreground)));
+  transform: none;
+  filter: brightness(1.08);
+}
+.profile-summary button.profile-id-badge:focus-visible {
+  outline: 2px solid var(--profile-id-ink, #ffffff);
+  outline-offset: 2px;
+}
+.profile-id-badge-icon {
+  flex: none;
+  opacity: 0.7;
+}
+.profile-id-badge--copied .profile-id-badge-icon {
+  opacity: 1;
+}
+.profile-id-badge-error {
+  max-width: 12rem;
+  font-weight: 600;
+  white-space: normal;
+  text-align: start;
+}
+@media (prefers-reduced-motion: reduce) {
+  .profile-summary button.profile-id-badge--tier,
+  html[data-appearance]
+    .themed-site
+    .profile-summary
+    button.profile-id-badge--tier {
+    animation: none;
+    background-size: 100% 100%;
+  }
 }
 .profile-cover {
   position: relative;
@@ -2447,11 +2536,12 @@ body:has(.presenter-view) .site-footer,
   z-index: -1;
   border-radius: inherit;
   pointer-events: none;
+  /* Soft left scrim keeps the overlaid heading legible without dimming the art. */
   background: linear-gradient(
     90deg,
-    rgb(0 0 0 / 88%) 0%,
-    rgb(0 0 0 / 72%) 32%,
-    rgb(0 0 0 / 38%) 62%,
+    rgb(0 0 0 / 58%) 0%,
+    rgb(0 0 0 / 46%) 32%,
+    rgb(0 0 0 / 24%) 62%,
     rgb(0 0 0 / 0%) 92%
   );
 }
@@ -2515,6 +2605,78 @@ body:has(.presenter-view) .site-footer,
   font-size: 0.72em;
   font-weight: 550;
 }
+/* Rank tiers: osu! describes a standing by the share of the leaderboard above
+   it, so the number carries a gradient instead of the plain value colour. */
+.bws-card .bws-value--rank-tier {
+  /* Axis: from 15deg above the left edge, through the centre, to 15deg below
+     the right edge (90deg is horizontal, +15deg tilts it down). Two colour
+     cycles let the band travel one full period and loop without a jump. */
+  background-image: linear-gradient(
+    105deg,
+    var(--rank-tier-from) 0%,
+    var(--rank-tier-to) 25%,
+    var(--rank-tier-from) 50%,
+    var(--rank-tier-to) 75%,
+    var(--rank-tier-from) 100%
+  );
+  background-size: 200% 200%;
+  background-position: 100% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: bws-rank-tier-roll 7s linear infinite;
+}
+@keyframes bws-rank-tier-roll {
+  from {
+    /* Lower background-position scrolls the band down-right. */
+    background-position: 100% 100%;
+  }
+  to {
+    background-position: 0% 0%;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .bws-card .bws-value--rank-tier {
+    animation: none;
+    background-size: 100% 100%;
+  }
+}
+.bws-card .bws-value--tier-radiant {
+  --rank-tier-from: #ed82ff;
+  --rank-tier-to: #97dcff;
+}
+.bws-card .bws-value--tier-rhodium {
+  --rank-tier-from: #a0cf96;
+  --rank-tier-to: #d9f8d3;
+}
+.bws-card .bws-value--tier-platinum {
+  --rank-tier-from: #52e0df;
+  --rank-tier-to: #a8f0ef;
+}
+.bws-card .bws-value--tier-gold {
+  --rank-tier-from: #e0c952;
+  --rank-tier-to: #f0e4a8;
+}
+.bws-card .bws-value--tier-silver {
+  --rank-tier-from: #a3a3c2;
+  --rank-tier-to: #e0e0eb;
+}
+.bws-card .bws-value--tier-bronze {
+  --rank-tier-from: #855c47;
+  --rank-tier-to: #b88f7a;
+}
+.bws-card .bws-value--tier-iron {
+  --rank-tier-from: #bab3ab;
+  --rank-tier-to: #dddddd;
+}
+/* On the light panel (no cover art) the pale tier stops vanish against the
+   card, so the standalone card dims them; cover cards keep osu!'s palette. */
+html:not([data-theme="dark"])
+  .profile-summary
+  > .bws-card
+  .bws-value--rank-tier {
+  filter: brightness(0.72) saturate(1.25);
+}
 .bws-card-hint {
   color: var(--site-muted, var(--color-muted));
   font-size: 0.72rem;
@@ -2536,10 +2698,7 @@ body:has(.presenter-view) .site-footer,
    purple glow, tall min-height, rounded box) must not leak into the note
    trigger, so this reset out-specifies the themed `button` rules. */
 .bws-card .bws-card-note-trigger,
-html[data-appearance]
-  .themed-site
-  .bws-card
-  button.bws-card-note-trigger {
+html[data-appearance] .themed-site .bws-card button.bws-card-note-trigger {
   display: inline-flex;
   align-items: center;
   justify-content: center;

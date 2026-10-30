@@ -149,6 +149,38 @@ describe("official osu! user profiles", () => {
       ),
     ).toThrow(/unavailable/);
   });
+  it("keeps the reported global rank percentage for tier colours", () => {
+    const withPercent = {
+      ...profileResponse,
+      statistics: {
+        ...profileResponse.statistics,
+        global_rank: 44981,
+        global_rank_percent: 0.014208208485188478,
+      },
+    };
+    expect(
+      normalizeOsuProfile(withPercent, 260001, "osu").statistics
+        .globalRankPercent,
+    ).toBeCloseTo(0.0142, 4);
+    expect(
+      normalizeOsuProfile(profileResponse, 260001, "osu").statistics
+        .globalRankPercent,
+    ).toBeNull();
+    expect(
+      normalizeOsuProfile(
+        {
+          ...profileResponse,
+          statistics: {
+            ...profileResponse.statistics,
+            global_rank_percent: 3,
+          },
+        },
+        260001,
+        "osu",
+      ).statistics.globalRankPercent,
+    ).toBeNull();
+  });
+
   it("keeps the requested ruleset's daily rank history and drops unranked days", () => {
     const p = normalizeOsuProfile(profileResponse, 260001, "osu");
     expect(p.rankHistory).toEqual({ mode: "osu", data: [16200, 15500, 15000] });

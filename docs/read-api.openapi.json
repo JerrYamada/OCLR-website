@@ -15366,6 +15366,13 @@
                               { "type": "null" }
                             ]
                           },
+                          "globalRankPercent": {
+                            "default": null,
+                            "anyOf": [
+                              { "type": "number", "minimum": 0 },
+                              { "type": "null" }
+                            ]
+                          },
                           "countryRank": {
                             "default": null,
                             "anyOf": [
@@ -15486,6 +15493,7 @@
                         },
                         "required": [
                           "globalRank",
+                          "globalRankPercent",
                           "countryRank",
                           "pp",
                           "accuracy",
@@ -15776,6 +15784,13 @@
                       { "type": "null" }
                     ]
                   },
+                  "globalRankPercent": {
+                    "default": null,
+                    "anyOf": [
+                      { "type": "number", "minimum": 0 },
+                      { "type": "null" }
+                    ]
+                  },
                   "countryRank": {
                     "default": null,
                     "anyOf": [
@@ -15893,6 +15908,7 @@
                 },
                 "required": [
                   "globalRank",
+                  "globalRankPercent",
                   "countryRank",
                   "pp",
                   "accuracy",
@@ -16420,6 +16436,13 @@
                               { "type": "null" }
                             ]
                           },
+                          "globalRankPercent": {
+                            "default": null,
+                            "anyOf": [
+                              { "type": "number", "minimum": 0 },
+                              { "type": "null" }
+                            ]
+                          },
                           "countryRank": {
                             "default": null,
                             "anyOf": [
@@ -16540,6 +16563,7 @@
                         },
                         "required": [
                           "globalRank",
+                          "globalRankPercent",
                           "countryRank",
                           "pp",
                           "accuracy",

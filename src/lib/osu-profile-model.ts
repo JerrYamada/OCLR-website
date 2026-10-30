@@ -85,6 +85,9 @@ const stats = z
   .object({
     mode: profileMode.nullish().catch(null),
     global_rank: optionalInteger,
+    // Share of the ranked population above this player (0..1); osu! computes it
+    // so the site does not have to guess a tier from the rank alone.
+    global_rank_percent: number.min(0).max(1).nullish().catch(null),
     country_rank: optionalInteger,
     pp: optionalNumber,
     hit_accuracy: number.max(100).nullish().catch(null),
@@ -230,6 +233,7 @@ export function normalizeOsuProfile(
     rankHistory: rankData.length ? { mode, data: rankData } : null,
     statistics: {
       globalRank: s?.global_rank ?? null,
+      globalRankPercent: s?.global_rank_percent ?? null,
       countryRank: s?.country_rank ?? null,
       pp: s?.pp ?? null,
       accuracy: s?.hit_accuracy ?? null,

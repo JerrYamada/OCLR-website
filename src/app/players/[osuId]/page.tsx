@@ -96,8 +96,12 @@ async function ProfileContent({
           </h1>
           {aliases.length > 0 &&
             (collapsedAliases ? (
-              <details className={styles.previousNames}>
-                <summary>
+              <span className={styles.previousNames}>
+                <button
+                  type="button"
+                  className={styles.previousNamesTrigger}
+                  aria-label={tr("Previous usernames")}
+                >
                   {tr("Previous usernames")} (+{aliases.length})
                   <svg
                     className={styles.previousNamesIcon}
@@ -122,13 +126,13 @@ async function ProfileContent({
                       strokeLinecap="round"
                     />
                   </svg>
-                </summary>
+                </button>
                 <ul className={styles.previousNamesList}>
                   {aliases.map((name) => (
                     <li key={name}>{name}</li>
                   ))}
                 </ul>
-              </details>
+              </span>
             ) : (
               <span className={styles.previousNames}>
                 {tr("Previous usernames")}: {aliasesInline}
@@ -136,16 +140,10 @@ async function ProfileContent({
             ))}
         </div>
         <p className="muted">
-          {country && (
-            <>
-              {country}
-              {profile?.countryName && profile.countryCode
-                ? ` (${profile.countryCode})`
-                : ""}
-              {" · "}
-            </>
-          )}
-          ID: {data.identity.osuId}
+          {country}
+          {profile?.countryName && profile.countryCode
+            ? ` (${profile.countryCode})`
+            : ""}
         </p>
       </div>
     </header>

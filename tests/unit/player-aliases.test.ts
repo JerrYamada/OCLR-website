@@ -15,12 +15,23 @@ describe("previous usernames", () => {
       "old",
     ]);
   });
-  it("keeps short lists inline", () => {
+  it("keeps up to five names inline", () => {
     expect(collapseAliases(["lp_Blue"])).toBe(false);
     expect(collapseAliases(["animelovers", "bob"])).toBe(false);
+    expect(collapseAliases(["Muziyami_old", "咪子", "Muzi"])).toBe(false);
+    expect(collapseAliases(["a", "b", "c", "d", "e"])).toBe(false);
   });
-  it("collapses long or numerous lists", () => {
-    expect(collapseAliases(["a", "b", "c"])).toBe(true);
-    expect(collapseAliases(["an_unusually_long_previous_username"])).toBe(true);
+  it("collapses six or more names", () => {
+    expect(collapseAliases(["a", "b", "c", "d", "e", "f"])).toBe(true);
+    expect(
+      collapseAliases([
+        "alpha_one",
+        "beta_two",
+        "gamma_three",
+        "delta_four",
+        "eps",
+        "zeta",
+      ]),
+    ).toBe(true);
   });
 });

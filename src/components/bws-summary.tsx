@@ -1,6 +1,7 @@
 import { ProfileInfo } from "./profile-info";
 import { useAppTranslations } from "@/i18n/shared";
 import type { BwsSummary as Summary } from "@/lib/bws-model";
+import { globalRankTier, type GlobalRankTier } from "@/lib/rank-tier";
 
 function BwsNote({ value }: { value: Summary }) {
   const tr = useAppTranslations();
@@ -52,9 +53,21 @@ function BwsNote({ value }: { value: Summary }) {
   );
 }
 
-function RankValue({ value }: { value: string }) {
+function RankValue({
+  value,
+  tier,
+}: {
+  value: string;
+  tier: GlobalRankTier | null;
+}) {
   return (
-    <strong className="bws-value">
+    <strong
+      className={
+        tier
+          ? `bws-value bws-value--rank-tier bws-value--tier-${tier}`
+          : "bws-value"
+      }
+    >
       <span className="bws-value-hash">#</span>
       {value}
     </strong>
@@ -106,10 +119,13 @@ function InfoTrigger({ onOpenLabel }: { onOpenLabel: string }) {
 function CompactBwsSummary({
   value,
   countryRank,
+  globalRankPercent,
 }: {
   value: Summary;
   countryRank: number | null;
+  globalRankPercent: number | null;
 }) {
+  const tier = globalRankTier(globalRankPercent);
   const tr = useAppTranslations();
   const number = (v: number, digits: number) =>
     new Intl.NumberFormat(tr.locale, {
@@ -172,9 +188,9 @@ function CompactBwsSummary({
         </div>
         <div className="bws-card-value-row">
           {value.value !== null ? (
-            <RankValue value={number(value.value, 0)} />
+            <RankValue value={number(value.value, 0)} tier={tier} />
           ) : pending && value.globalRank !== null ? (
-            <RankValue value={number(value.globalRank, 0)} />
+            <RankValue value={number(value.globalRank, 0)} tier={tier} />
           ) : (
             <span className="bws-card-state">
               {value.status === "unranked"
@@ -189,7 +205,7 @@ function CompactBwsSummary({
         <span className="bws-card-label">{tr("Country rank")}</span>
         <div className="bws-card-value-row">
           {countryRank !== null ? (
-            <RankValue value={number(countryRank, 0)} />
+            <RankValue value={number(countryRank, 0)} tier={tier} />
           ) : (
             <span className="bws-card-state">
               {tr("Unranked / unavailable")}
@@ -205,14 +221,22 @@ export function BwsSummary({
   value,
   variant = "detail",
   countryRank = null,
+  globalRankPercent = null,
 }: {
   value: Summary;
   variant?: "detail" | "compact";
   countryRank?: number | null;
+  globalRankPercent?: number | null;
 }) {
   const tr = useAppTranslations();
   if (variant === "compact")
-    return <CompactBwsSummary value={value} countryRank={countryRank} />;
+    return (
+      <CompactBwsSummary
+        value={value}
+        countryRank={countryRank}
+        globalRankPercent={globalRankPercent}
+      />
+    );
   return (
     <section className="bws-summary" aria-label={tr("Badge-weighted seeding")}>
       <div className="bws-metrics">

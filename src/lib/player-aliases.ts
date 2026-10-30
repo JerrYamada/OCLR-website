@@ -10,7 +10,10 @@ export function previousUsernames(
   );
 }
 
-/** Long alias lists collapse behind a disclosure instead of stretching the name row. */
+/**
+ * Only genuinely long alias lists collapse behind a hover/focus panel; up to five
+ * names stay inline so the row still reads at a glance.
+ */
 export function collapseAliases(names: readonly string[]): boolean {
-  return names.length > 2 || names.join(", ").length > 28;
+  return names.length > 5;
 }

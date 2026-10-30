@@ -12,13 +12,18 @@ function render(
   pp: number | null,
   pending = false,
   variant: "detail" | "compact" = "detail",
+  globalRankPercent: number | null = null,
 ) {
   const profile = normalizeOsuProfile(
     {
       id: 1,
       username: "Synthetic",
       badges: pending ? null : [],
-      statistics: { global_rank: rank, pp },
+      statistics: {
+        global_rank: rank,
+        pp,
+        global_rank_percent: globalRankPercent,
+      },
     },
     1,
     "osu",
@@ -28,6 +33,8 @@ function render(
     <NextIntlClientProvider locale="en" messages={messages} timeZone="UTC">
       <BwsSummary
         variant={variant}
+        countryRank={profile.statistics.countryRank}
+        globalRankPercent={profile.statistics.globalRankPercent}
         value={summarizeBws({ profile, stale: true, notice: null }, null)}
       />
     </NextIntlClientProvider>,
@@ -54,6 +61,18 @@ describe("shared public and staff BWS display", () => {
     expect(html).not.toContain("(Rank #");
     expect(html).not.toContain("(Original pp");
     expect(html).toContain("Original pp: 1,234.57");
+  });
+  it("colours rank values by the global rank tier", () => {
+    const html = render(10000, 1234.567, false, "compact", 0.01);
+    expect(html).toContain(
+      'class="bws-value bws-value--rank-tier bws-value--tier-gold"',
+    );
+    expect(html).not.toContain("bws-value--tier-radiant");
+  });
+  it("leaves ranks uncoloured when no percentage is available", () => {
+    const html = render(10000, 1234.567, false, "compact");
+    expect(html).toContain('<strong class="bws-value">');
+    expect(html).not.toContain("bws-value--rank-tier");
   });
   it("shows the plain rank and pp while badges await review", () => {
     expect(render(null, 0)).toContain('class="bws-value">0</strong>');
