@@ -34,7 +34,7 @@ git_read() { runuser -u "$installer" -- git -c core.fsmonitor=false -C "$source_
 [[ -z $(git_read status --porcelain) ]] || fail 'Use a clean reviewed installer checkout.'
 git_read merge-base --is-ancestor "$sha" origin/main || fail 'The reviewed SHA is not on the fetched canonical main.'
 for required_file in operator/worker.ts operator/operator.env.example operator/media-fingerprint.mjs operator/systemd/oclr-backup.service; do git_read cat-file -e "$sha:$required_file" || fail 'The selected release lacks the operator installation contract.'; done
-/usr/bin/node -e 'if(Number(process.versions.node.split(".")[0])!==24)process.exit(1)' || fail 'Use the project-selected Node 24 LTS.'
+/bin/bash "$source_dir/scripts/check-node-version.sh" /usr/bin/node || fail 'Use Node.js >=22.13 (Node.js 24 is preferred); /usr/bin/node must satisfy this requirement.'
 # PGDG client packages are often outside systemd's default PATH.
 client_dir=${OCLR_PG_BIN-}
 if [[ -z "$client_dir" ]]; then

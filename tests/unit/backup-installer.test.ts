@@ -3,6 +3,31 @@ import { execFileSync, spawnSync } from "node:child_process";
 import { mkdtempSync, rmSync, writeFileSync, symlinkSync } from "node:fs";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
+it("accepts the supported existing Node 22 runtime and rejects older or invalid versions", () => {
+  const root = mkdtempSync(join(tmpdir(), "oclr-node-check-"));
+  try {
+    for (const [version, accepted] of [
+      ["v22.23.2", true],
+      ["v22.13.0", true],
+      ["v24.22.2", true],
+      ["v22.12.9", false],
+      ["v20.19.0", false],
+      ["invalid", false],
+    ] as const) {
+      const executable = join(root, "node");
+      writeFileSync(executable, `#!/bin/sh\nprintf '%s\\n' '${version}'\n`, {
+        mode: 0o700,
+      });
+      const result = spawnSync("/bin/bash", [
+        "scripts/check-node-version.sh",
+        executable,
+      ]);
+      expect(result.status === 0, version).toBe(accepted);
+    }
+  } finally {
+    rmSync(root, { recursive: true, force: true });
+  }
+});
 it("previews installation without running host tools or touching configuration", () => {
   const root = mkdtempSync(join(tmpdir(), "oclr-installer-"));
   const script = join(process.cwd(), "scripts/install-backup-operator.sh");
