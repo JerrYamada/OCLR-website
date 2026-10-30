@@ -1,6 +1,7 @@
 import { createRoot } from "react-dom/client";
 import { NextIntlClientProvider } from "next-intl";
 import { PlayerIdBadge } from "../../src/components/player-id-badge";
+import { ProfileLevel } from "../../src/components/profile-level";
 import { BwsSummary } from "../../src/components/bws-summary";
 import { rankTierPalette } from "../../src/lib/rank-tier";
 import en from "../../messages/en.json";
@@ -33,16 +34,22 @@ const bws = {
   fetchedAt: "2026-08-14T00:00:00.000Z",
 };
 
-// The real cover branch of PlayerProfile: the player id pill anchored to the
-// card corner and the identity heading overlaid on the cover.
+// The real cover branch of PlayerProfile: the player id pill and level chip
+// anchored to the card corners, with the identity heading overlaid on the
+// cover.
 createRoot(document.getElementById("root")!).render(
   <NextIntlClientProvider locale="en" messages={en} timeZone="UTC">
     <main style={{ padding: 24 }}>
       {/* The real layout wraps every page in .themed-site; tokens live there. */}
-      <div className="themed-site" data-appearance="default" style={themeTokens}>
+      <div
+        className="themed-site"
+        data-appearance="default"
+        style={themeTokens}
+      >
         <section className="panel profile-summary">
           <PlayerIdBadge osuId={7003013} palette={rankTierPalette(0.0142)} />
           <div className="profile-cover">
+            <ProfileLevel level={75} progress={42} />
             <div className="profile-cover-content">
               <header className={styles.heading}>
                 <div className="avatar" aria-hidden="true" />

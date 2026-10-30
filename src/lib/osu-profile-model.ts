@@ -96,6 +96,7 @@ const stats = z
     ranked_score: score,
     total_score: score,
     maximum_combo: optionalInteger,
+    total_hits: optionalInteger,
     level: z
       .object({
         current: optionalInteger,
@@ -242,6 +243,7 @@ export function normalizeOsuProfile(
       rankedScore: s?.ranked_score ?? null,
       totalScore: s?.total_score ?? null,
       maximumCombo: s?.maximum_combo ?? null,
+      totalHits: s?.total_hits ?? null,
       level: s?.level
         ? {
             current: s.level.current ?? null,

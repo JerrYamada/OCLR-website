@@ -45,6 +45,7 @@ for (const [locale, messages, unavailable, seconds] of [
                       ranked_score: "0",
                       total_score: "0",
                       maximum_combo: 0,
+                      total_hits: 0,
                       level: { current: 0, progress: 0 },
                     }
                   : { ...profileResponse.statistics, play_time: 17216 },
@@ -71,23 +72,26 @@ for (const [locale, messages, unavailable, seconds] of [
           for (const label of [
             "Accuracy",
             "Play count",
+            "Total hits",
             "Play time",
             "Ranked score",
             "Total score",
-            "Maximum combo",
-            "Level",
           ])
             expect(value(label)).toBe(unavailable);
         } else if (kind === "zero") {
           expect(value("Accuracy")).toBe("0%");
           expect(value("Play count")).toBe("0");
+          expect(value("Total hits")).toBe("0");
           expect(value("Play time")).toBe(locale === "en" ? "0s" : "0秒");
           expect(value("Ranked score")).toBe("0");
           expect(value("Total score")).toBe("0");
-          expect(value("Maximum combo")).toBe("0×");
-          expect(value("Level")).toBe("0 (0%)");
         } else {
           expect(value("Play time")).toBe(seconds);
+          expect(value("Total hits")).toBe((789012).toLocaleString(locale));
+          // Total hits sits directly above the play time it contextualises.
+          expect(rows.findIndex((row) => row[1] === tr("Total hits")) + 1).toBe(
+            rows.findIndex((row) => row[1] === tr("Play time")),
+          );
           expect(value("Ranked score")).toBe("9,007,199,254,740,993");
         }
       });
