@@ -1,7 +1,12 @@
 import { test, expect } from "@playwright/test";
 import { db, closeDb } from "../../src/db";
 import { eq } from "drizzle-orm";
-import { matchResults, staffRoles, users } from "../../src/db/schema";
+import {
+  matchResults,
+  staffRoles,
+  users,
+  tournamentRounds,
+} from "../../src/db/schema";
 import { createSession } from "../../src/lib/auth/sessions";
 import {
   seedRefereeFixture,
@@ -50,6 +55,83 @@ async function seed() {
 test.describe("referee command workspace", () => {
   test.skip(!process.env.TEST_DATABASE_URL, "Requires isolated PostgreSQL");
   test.afterAll(async () => closeDb());
+  test("declares EX in the referee panel before play and persists it for scoring", async ({
+    page,
+    context,
+    baseURL,
+  }) => {
+    const seeded = await seed();
+    await context.addCookies([seeded.cookie]);
+    const endpoint = `/api/admin/tournaments/test-cup/matches/${seeded.fixtureId}/referee`;
+    await db()
+      .update(tournamentRounds)
+      .set({
+        scoringRules: { ...seeded.workspace.rules!, exPlayersPerTeam: 1 },
+      })
+      .where(eq(tournamentRounds.id, seeded.workspace.fixture.roundId));
+    const read = async (): Promise<RefereeWorkspace> =>
+      (await context.request.get(endpoint)).json();
+    async function action(change: Record<string, unknown>) {
+      const state = await read();
+      const response = await context.request.patch(endpoint, {
+        headers: { Origin: baseURL! },
+        data: {
+          ...change,
+          requestKey: crypto.randomUUID(),
+          expectedRevision: state.session?.revision ?? 0,
+          dependencyFingerprint: state.dependencyFingerprint,
+        },
+      });
+      expect(response.status()).toBe(200);
+    }
+    await action({ action: "reconfirm_dependencies" });
+    const state = await read();
+    await action({
+      action: "set_order",
+      firstBanTeamId: state.teams[0].id,
+      firstPickTeamId: state.teams[1].id,
+    });
+    await action({
+      action: "record_selection",
+      entryId: state.maps.find((m) => m.beatmapId === 10001)!.id,
+    });
+    await action({
+      action: "record_selection",
+      entryId: state.maps.find((m) => m.beatmapId === 10002)!.id,
+    });
+    await page.goto(
+      `/admin/tournaments/test-cup/matches/${seeded.fixtureId}/referee`,
+    );
+    const toggle = page.getByRole("checkbox", {
+      name: /Declare EX for this pick/,
+    });
+    await toggle.click();
+    await expect
+      .poll(async () =>
+        (await read()).projection.activeSelections.some((p) => p.exMode),
+      )
+      .toBe(true);
+    await page.reload();
+    await expect(toggle).toBeChecked();
+    const current = await read();
+    const pickId = current.projection.lastSelectionId!;
+    await action({ action: "start_attempt", pickId });
+    await page.reload();
+    await expect(toggle).toHaveCount(0);
+    const started = await read();
+    const late = await context.request.patch(endpoint, {
+      headers: { Origin: baseURL! },
+      data: {
+        action: "declare_ex",
+        pickId,
+        enabled: false,
+        requestKey: crypto.randomUUID(),
+        expectedRevision: started.session!.revision,
+        dependencyFingerprint: started.dependencyFingerprint,
+      },
+    });
+    expect(late.status()).toBe(409);
+  });
   test("keeps unpaired IRC disconnected and preserves authorized saved records", async ({
     page,
     context,

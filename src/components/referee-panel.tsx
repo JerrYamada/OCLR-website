@@ -112,6 +112,7 @@ export function RefereePanel({
     series: data.series,
   };
   const model = {
+    exPlayersPerTeam: data.rules?.exPlayersPerTeam,
     ...basis,
     orders: appliedOrders,
     events: simulation ? [...data.events, ...simulationEvents] : data.events,
@@ -251,6 +252,9 @@ export function RefereePanel({
   }
   const disabled = busy || uncertain || !data.canRecord;
   const state = simulation ? projectReferee(model) : data.projection;
+  const exPick = state.activeSelections.find(
+    (s) => s.id === state.lastSelectionId,
+  );
   function historyDetail(event: RefereeEvent) {
     const p = event.payload;
     if (p.type === "order_set") {
@@ -259,6 +263,8 @@ export function RefereePanel({
     if (p.type === "selection_recorded") {
       return `${tr("Step {number}", { number: p.stepIndex + 1 })} · ${p.kind.toUpperCase()} · ${tr("Selected by {team}", { team: teamName(p.teamId) })} · ${p.category} · ${p.beatmapId}`;
     }
+    if (p.type === "ex_declared")
+      return `${tr("EX mode")} · ${p.enabled ? tr("Yes") : tr("No")}`;
     if (p.type === "settings_saved") {
       return `${tr("Room name")}: ${p.settings.roomName || tr("Not set")} · ${tr("Timer seconds")}: ${p.settings.timerSeconds ?? tr("Not set")} · ${tr("Start countdown seconds")}: ${p.settings.startSeconds ?? tr("Not set")}`;
     }
@@ -683,6 +689,33 @@ export function RefereePanel({
               aria-labelledby="referee-pool"
             >
               <h2 id="referee-pool">{tr("Round mappool")}</h2>
+              {exPick &&
+                exPick.kind === "pick" &&
+                exPick.category !== "TB" &&
+                exPick.attempts.length === 1 &&
+                exPick.attempts[0]?.status === "pending" && (
+                  <label className="checkbox-row">
+                    <input
+                      type="checkbox"
+                      checked={Boolean(exPick.exMode)}
+                      disabled={
+                        disabled || stale || !data.rules?.exPlayersPerTeam
+                      }
+                      onChange={(event) =>
+                        void send({
+                          action: "declare_ex",
+                          pickId: exPick.id,
+                          enabled: event.target.checked,
+                        })
+                      }
+                    />
+                    <span>
+                      {tr("Declare EX for this pick")} · {tr("BID")}{" "}
+                      {exPick.beatmapId}
+                    </span>
+                  </label>
+                )}
+
               <p role="status">
                 {state.nextStep
                   ? tr("Step {number}: {action} · {team}", {
@@ -838,6 +871,11 @@ export function RefereePanel({
                           })}
                         </p>
                       )}
+                    {s.kind !== "ban" && (
+                      <p className="small muted">
+                        {s.exMode ? tr("EX mode") : tr("Normal mode")}
+                      </p>
+                    )}
                     {s.attempts.map((a) => (
                       <p className="small" key={a.id}>
                         {tr("Attempt {number}", { number: a.number })} ·{" "}

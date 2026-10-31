@@ -176,6 +176,9 @@ function proposalFrom(
       preview.blockers[0] ?? "Resolve the game review before submitting.",
     );
   return reviewedResultSchema.parse({
+    ...(context.exDeclarations.some((p) => p.exMode)
+      ? { exDeclarations: context.exDeclarations }
+      : {}),
     schemaVersion: 1,
     fixtureVersion: context.fixture.version,
     roundId: context.fixture.roundId,
@@ -211,6 +214,7 @@ function proposalFrom(
     games: preview.games
       .filter((g) => g.decision?.included)
       .map((g) => ({
+        ...(g.exMode ? { exMode: true } : {}),
         gameId: g.game.id,
         confidence: g.confidence,
         attribution: g.players.map(({ osuId, teamId, evidence }) => ({

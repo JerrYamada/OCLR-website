@@ -1,3 +1,4 @@
+import { staffFixtures } from "@/lib/fixtures";
 import { RoundManager } from "@/components/round-manager";
 import { PageHeading } from "@/components/ui";
 import { getAppTranslations } from "@/i18n/server";
@@ -32,6 +33,9 @@ async function Issue271Page({
       "manage_fixtures",
       edition,
     );
+    const competition = canManageRefereePolicy
+      ? await staffFixtures(actor, edition)
+      : undefined;
     const query = await searchParams;
     const selected = rounds.find((round) => round.id === query.round);
     return (
@@ -44,6 +48,7 @@ async function Issue271Page({
           slug={edition}
           rounds={rounds}
           refereeData={workspace}
+          competitionData={competition}
           season={tournament?.season}
           canManageRefereePolicy={canManageRefereePolicy}
           initialRoundId={selected?.id}

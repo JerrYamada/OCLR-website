@@ -89,7 +89,11 @@ test.describe("team configuration batch #543–#546", () => {
       });
     }
     await page.goto("/admin/tournaments/test-cup/matches");
-    await page.goto("/admin/tournaments/test-cup/settings#competition");
+    await page.goto("/admin/tournaments/test-cup/rounds");
+    await page
+      .getByRole("button", { name: "Edit round", exact: true })
+      .first()
+      .click();
     await expect(
       page.getByRole("button", { name: "Add group", exact: true }),
     ).toHaveCount(0);

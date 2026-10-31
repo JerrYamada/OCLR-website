@@ -39,6 +39,45 @@ function context(change: Record<string, unknown> = {}): MatchContext {
   };
 }
 describe("fixture-bound candidate scoring and explicit game review", () => {
+  it("uses only saved EX declarations for reduced lineups and rejects ambiguous or unconfigured EX", async () => {
+    const game = syntheticApiGame(1);
+    game.scores = game.scores.filter((_, i) => i === 0 || i === 2);
+    const source = await sourceOf([game]);
+    const c = context({
+      exPlayersPerTeam: 1,
+      series: { type: "first_to", wins: 1 },
+    });
+    expect(previewMatch(source, c, choices([1])).canSubmit).toBe(false);
+    c.exDeclarations = [
+      {
+        id: "00000000-0000-4000-8000-000000000001",
+        beatmapId: 10001,
+        exMode: true,
+      },
+    ];
+    const approved = previewMatch(source, c, choices([1]));
+    expect(approved.canSubmit).toBe(true);
+    expect(approved.games[0].exMode).toBe(true);
+    const missing = {
+      ...c,
+      round: {
+        scoringRules: {
+          ...syntheticScoringRules,
+          series: { type: "first_to", wins: 1 },
+        },
+      },
+    };
+    expect(previewMatch(source, missing, choices([1])).canSubmit).toBe(false);
+    c.exDeclarations = [
+      ...c.exDeclarations,
+      {
+        id: "00000000-0000-4000-8000-000000000002",
+        beatmapId: 10001,
+        exMode: false,
+      },
+    ];
+    expect(previewMatch(source, c, choices([1])).canSubmit).toBe(false);
+  });
   it("requires substantive explanations only for exclusions and scoring warnings", async () => {
     const source = await sourceOf([
       syntheticApiGame(1),

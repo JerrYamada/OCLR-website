@@ -3477,6 +3477,15 @@
     "meb365f9149a8": "Only published MP map scores are counted. Effective rating is the player's score divided by that map's average score; maps with an unusable average are skipped. Relative score, combo, misses, pass rate, team share and failed-score counts are intentionally omitted.",
     "m448d68c96649": "No published map scores are attributed to this player yet.",
     "m0971448d821f": "Map details",
-    "m20a40d7963aa": "Effective rating"
+    "m20a40d7963aa": "Effective rating",
+    "mbb0b7424e2a8": "EX players per team per game",
+    "mee16e115b011": "EX mode",
+    "m422d90ee167f": "Normal mode",
+    "mba3f34103d3f": "Declare EX for this pick",
+    "mdd03ecff90a7": "EX player count cannot exceed the normal player count.",
+    "m9917b685d8a4": "Declare EX on the current pick before its first start.",
+    "m679c47270ae3": "Configure EX player count for this round first.",
+    "mac4f6f31df34": "EX declaration is ambiguous for this beatmap. Review the referee selections.",
+    "m236e297aebea": "EX player count is not configured for this round."
   }
 }

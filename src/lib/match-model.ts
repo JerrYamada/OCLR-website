@@ -117,6 +117,7 @@ export const gameDecisionSchema = z
   .strict();
 export type GameDecision = z.infer<typeof gameDecisionSchema>;
 export type GamePreview = {
+  exMode: boolean;
   game: MatchGame;
   players: (MatchScore & {
     teamId: string | null;
@@ -158,6 +159,11 @@ export type MatchImportPreview = {
 };
 
 export type MatchContext = {
+  exDeclarations?: readonly {
+    id: string;
+    beatmapId: number;
+    exMode: boolean;
+  }[];
   fixture: {
     id: string;
     homeTeamId: string;
@@ -179,6 +185,12 @@ export type MatchContext = {
 
 export const reviewedResultSchema = z
   .object({
+    exDeclarations: z
+      .array(
+        z.object({ id: z.uuid(), beatmapId: id, exMode: z.boolean() }).strict(),
+      )
+      .max(200)
+      .optional(),
     schemaVersion: z.literal(1),
     fixtureVersion: integer,
     roundId: z.uuid(),
@@ -231,6 +243,7 @@ export const reviewedResultSchema = z
               .max(64)
               .optional(),
             warnings: z.array(z.string().max(1000)).max(200).optional(),
+            exMode: z.boolean().optional(),
             beatmapId: id.nullable(),
             beatmap: matchGameSchema.shape.beatmap,
             mods: z.array(z.string().max(16)).max(64),

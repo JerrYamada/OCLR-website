@@ -48,7 +48,12 @@ import {
 type Reader = Pick<ReturnType<typeof db>, "select">;
 export type RefereeBasis = Pick<
   RefereeModelInput,
-  "policy" | "teamIds" | "maps" | "series" | "tiedMapPolicy"
+  | "policy"
+  | "teamIds"
+  | "maps"
+  | "series"
+  | "tiedMapPolicy"
+  | "exPlayersPerTeam"
 >;
 const hash = (value: unknown) =>
   createHash("sha256").update(JSON.stringify(value)).digest("hex");
@@ -258,6 +263,7 @@ export async function readRefereeWorkspace(
     })),
     series: rules?.series ?? null,
     tiedMapPolicy: rules?.tiedMapPolicy ?? "require_replay",
+    exPlayersPerTeam: rules?.exPlayersPerTeam,
   };
   const dependencyFingerprint = hash({
     fixture: {
@@ -499,6 +505,7 @@ export async function refereeCommand(
       })),
       series: workspace.series,
       tiedMapPolicy: workspace.rules?.tiedMapPolicy ?? "require_replay",
+      exPlayersPerTeam: workspace.rules?.exPlayersPerTeam,
     };
     let basis = workspace.session?.basis ?? currentBasis;
     let dependencyFingerprint =
