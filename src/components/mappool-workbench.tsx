@@ -8,7 +8,6 @@ import type {
 } from "@/lib/mappool-workbench";
 import type { BeatmapMetadata } from "@/lib/mappool-model";
 import {
-  beatmapModeNames,
   formatBeatmapDuration,
   formatBeatmapNumber,
 } from "@/lib/mappool-model";
@@ -23,6 +22,7 @@ import type { MappoolWorkspace } from "@/lib/mappools";
 import { EntryForm } from "./mappool-editor";
 import { WorkspaceTabs } from "./workspace-tabs";
 import { BeatmapCover } from "./beatmap-cover";
+import { BeatmapActions } from "./beatmap-actions";
 import styles from "./mappool-workbench.module.css";
 async function request<T>(url: string, data?: unknown): Promise<T> {
   const response = await fetch(
@@ -89,21 +89,13 @@ function MapIdentity({
         <span className="small muted">
           {tr("BID")} {id}
         </span>
+        <BeatmapActions beatmapId={id} setId={m.setId} showWeb={false} />
       </div>
     </div>
   );
 }
 function Parameters({ m }: { m: BeatmapMetadata }) {
   const tr = useAppTranslations();
-  const statuses: Record<string, string> = {
-    graveyard: tr("Graveyard"),
-    wip: tr("Work in progress"),
-    pending: tr("Pending"),
-    ranked: tr("Ranked"),
-    approved: tr("Approved"),
-    qualified: tr("Qualified"),
-    loved: tr("Loved"),
-  };
   return (
     <div className={styles.parameters}>
       <p>
@@ -128,10 +120,6 @@ function Parameters({ m }: { m: BeatmapMetadata }) {
         <span>
           {tr("HP")} {formatBeatmapNumber(m.hp)}
         </span>
-      </p>
-      <p className="muted small">
-        {m.mode ? tr(beatmapModeNames[m.mode]) : tr("Unknown")} ·{" "}
-        {m.status ? (statuses[m.status] ?? tr("Unknown")) : tr("Unknown")}
       </p>
     </div>
   );
@@ -350,7 +338,7 @@ export function SelectionWorkbench({
     failed: tr("Lookup failed"),
   };
   return (
-    <div className={styles.workbench}>
+    <div className={`mappool-selection-workbench ${styles.workbench}`}>
       <p className="muted">
         {tr(
           "Collect candidate maps and discuss test feedback. Candidates and comments remain private to authorized staff.",
@@ -613,18 +601,6 @@ export function SelectionWorkbench({
                           </a>
                         </p>
                         <Stamp value={c.createdAt} />
-                        <details className={styles.snapshot}>
-                          <summary>{tr("Metadata snapshot")}</summary>
-                          <p>{tr("Official osu! API")}</p>
-                          <Stamp value={c.metadataFetchedAt} />
-                          <p>
-                            {new Date(data.asOf).getTime() -
-                              new Date(c.metadataFetchedAt).getTime() >
-                            86400000
-                              ? tr("Saved snapshot older than 24 hours.")
-                              : tr("Saved snapshot; not a live lookup.")}
-                          </p>
-                        </details>
                       </div>
                     </div>
                     {writable && (

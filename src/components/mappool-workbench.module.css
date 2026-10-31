@@ -1,5 +1,6 @@
 .workbench {
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   gap: 1.5rem;
   min-width: 0;
 }
@@ -112,12 +113,6 @@
 }
 .parameters span {
   white-space: nowrap;
-}
-.snapshot {
-  margin-top: 0.5rem;
-}
-.snapshot summary {
-  cursor: pointer;
 }
 .discussion {
   min-width: 0;

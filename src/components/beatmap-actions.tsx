@@ -42,6 +42,7 @@ export function BeatmapActions({
   originalSetId,
   beatmapMissing = false,
   compact = false,
+  showWeb = true,
   name,
 }: {
   beatmapId: number | null | undefined;
@@ -50,6 +51,7 @@ export function BeatmapActions({
   originalSetId?: number | null;
   beatmapMissing?: boolean;
   compact?: boolean;
+  showWeb?: boolean;
   name?: string;
 }) {
   const tr = useAppTranslations();
@@ -78,7 +80,8 @@ export function BeatmapActions({
     >
       {(["direct", "web"] as const).map(
         (kind) =>
-          links[kind] && (
+          links[kind] &&
+          (kind !== "web" || showWeb) && (
             <a
               key={kind}
               href={links[kind]!}
