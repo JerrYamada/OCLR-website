@@ -1,5 +1,3 @@
-import { remoteMode } from "@/lib/data-source";
-import { hasStreamingAccess } from "@/lib/streaming-api";
 import { ObsSourceLink } from "@/components/obs-source-link";
 import { StreamingManager } from "@/components/streaming-manager";
 import { PageHeading } from "@/components/ui";
@@ -21,8 +19,6 @@ async function Issue271Page({
     const { edition } = await params;
     const query = await searchParams;
     const actor = await requireUser();
-    const canIssue =
-      !remoteMode() && (await hasStreamingAccess(actor.osuId, edition));
     const data = await streamingWorkspace(actor, edition, {
       date: query.date ?? "",
       round: query.round ?? "",
@@ -34,26 +30,24 @@ async function Issue271Page({
           eyebrow={tr("COMPETITION")}
           title={tr("Streaming tasks")}
         />
-        <nav className="actions" aria-label={tr("Draft broadcast")}>
-          <Link
-            className="button secondary"
-            href={`/tournaments/${edition}/draft?presenter=1`}
-          >
-            {tr("Open presenter view")}
-          </Link>
-          <Link
-            className="button secondary"
-            href={`/tournaments/${edition}/draft/overlay`}
-          >
-            {tr("Open broadcast overlay")}
-          </Link>
-        </nav>
-        {canIssue && (
-          <Link className="button secondary" href={`/streaming/${edition}`}>
-            {tr("Streaming API access")}
-          </Link>
-        )}
-        <ObsSourceLink slug={edition} />
+        <details>
+          <summary>{tr("Draft broadcast")}</summary>
+          <nav className="actions" aria-label={tr("Draft broadcast")}>
+            <Link
+              className="button secondary"
+              href={`/tournaments/${edition}/draft?presenter=1`}
+            >
+              {tr("Open presenter view")}
+            </Link>
+            <Link
+              className="button secondary"
+              href={`/tournaments/${edition}/draft/overlay`}
+            >
+              {tr("Open broadcast overlay")}
+            </Link>
+          </nav>
+          <ObsSourceLink slug={edition} />
+        </details>
         <StreamingManager slug={edition} data={data} />
       </>
     );

@@ -216,6 +216,14 @@ test.describe("streaming workspace through real HTTP sessions", () => {
         ).status(),
       ).toBe(403);
       await page.goto(`/admin/tournaments/${slug}/streaming`);
+      await expect(
+        page.getByRole("link", { name: "Streaming API access", exact: true }),
+      ).toHaveCount(0);
+      const filters = page
+        .getByRole("button", { name: "Apply filters", exact: true })
+        .locator("..")
+        .locator("..");
+      await expect(filters).not.toHaveClass(/panel/);
       const card = page.getByRole("article", {
         name: fixture.label,
         exact: true,

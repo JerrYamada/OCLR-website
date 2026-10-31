@@ -160,6 +160,7 @@ const rows = files.map((file) => {
     file.endsWith("/backup-manager.tsx") ||
     file.includes("/api/streaming/") ||
     file.includes("/streaming/[edition]/page") ||
+    file === "src/app/streaming/page.tsx" ||
     file.endsWith("/streaming-access.tsx") ||
     /\/api\/games\/|\/auth\/|\/api\/health\/|\/api\/developer\/|\/registrations\/export\//.test(
       file,
@@ -265,6 +266,7 @@ const pages = files
     (p) =>
       p.endsWith("/page.tsx") &&
       !p.includes("/streaming/[edition]/page") &&
+      p !== "src/app/streaming/page.tsx" &&
       !p.includes("/admin/backups/"),
   )
   .map((p) => p.replace(/^src\/app/, "").replace(/\/page\.tsx$/, "") || "/");

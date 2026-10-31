@@ -393,3 +393,24 @@ Proposals store the active EX declarations and per-game EX flag; approval rebuil
 and compares that snapshot so a changed declaration cannot silently approve the
 old proposal. Public results still require the existing reviewed/approved publish
 flow; changing a referee declaration does not change a published result.
+
+
+### Streaming task list and API access
+
+Streaming tasks use compact rows: match/pairing, time/status, current assignment
+and booking actions. The date, round and task filters share an inline GET filter
+bar. Assignment author/time is available in row details, while revocation,
+reconfirmation and same-start conflict notices remain visible. Draft presenter,
+overlay and OBS source tools expand together rather than preceding the list with
+multiple explanation panels. Booking remains private and conflict notices compare
+only start times within this edition; they do not block booking.
+
+**Dashboard → Streaming API access** in the top-right account menu opens
+`/streaming`, where users choose an edition with a current Streamer grant before
+opening the existing `/streaming/{edition}` credential page. Admin/Developer alone
+does not reveal this entry or grant access. The picker returns only authorized
+minimal edition identities; global Streamer grants cover all editions, scoped
+grants only their edition, and revocation is checked on each request. Credential
+issuance/revocation and idle expiry remain unchanged. This is a live browser-session
+credential flow, unavailable in the remote read-only frontend; ordinary saved
+streaming workspaces remain remotely readable under their existing permissions.

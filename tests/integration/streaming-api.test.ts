@@ -32,6 +32,8 @@ import {
 } from "../../src/db/schema";
 import { createSession, readSessionContext } from "../../src/lib/auth/sessions";
 import {
+  hasStreamingMenuAccess,
+  streamingAccessEditions,
   createStreamingToken,
   revokeStreamingToken,
   listStreamingTokens,
@@ -151,6 +153,51 @@ describe.skipIf(!url)("streaming read channel #540", () => {
   afterAll(async () => {
     await closeDb();
     vi.unstubAllEnvs();
+  });
+  it("lists only live Streamer editions and never infers API access from Admin or Developer", async () => {
+    expect(await hasStreamingMenuAccess(ownerId)).toBe(true);
+    expect((await streamingAccessEditions(ownerId)).map((e) => e.slug)).toEqual(
+      [slug],
+    );
+    await db()
+      .insert(staffRoles)
+      .values([
+        {
+          userId: 540002,
+          role: "admin",
+          editionSlug: null,
+          grantedBy: ownerId,
+        },
+        {
+          userId: 540002,
+          role: "developer",
+          editionSlug: null,
+          grantedBy: ownerId,
+        },
+      ]);
+    expect(await hasStreamingMenuAccess(540002)).toBe(false);
+    await expect(streamingAccessEditions(540002)).rejects.toMatchObject({
+      status: 403,
+    });
+    await db()
+      .insert(staffRoles)
+      .values({
+        userId: 540002,
+        role: "streamer",
+        editionSlug: null,
+        grantedBy: ownerId,
+      });
+    expect(
+      (await streamingAccessEditions(540002)).map((e) => e.slug).sort(),
+    ).toEqual(["other-test", slug].sort());
+    await db()
+      .update(staffRoles)
+      .set({ revokedAt: new Date() })
+      .where(eq(staffRoles.userId, ownerId));
+    expect(await hasStreamingMenuAccess(ownerId)).toBe(false);
+    await expect(streamingAccessEditions(ownerId)).rejects.toMatchObject({
+      status: 403,
+    });
   });
   it("uses shared fixture/stage schema and keeps delayed matches; honors explicit next anchor", async () => {
     const response = await read();

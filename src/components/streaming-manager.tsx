@@ -1,6 +1,6 @@
 "use client";
 
-import { InfoNote } from "@/components/info-note";
+import styles from "./streaming-manager.module.css";
 
 import Link from "next/link";
 import { useState } from "react";
@@ -40,9 +40,6 @@ function StreamingTask({
         key={`${action}:${userId ?? ""}:${f.streamRevision}:${f.version}`}
         label={label}
         title={tr("Confirm streaming task change?")}
-        description={tr(
-          "One Streamer per match. Self-selection confirms immediately. You may cancel either kind of your own task. All changes are saved and audited.",
-        )}
         url={`/api/admin/tournaments/${slug}/streaming/${f.id}`}
         payload={{
           action,
@@ -63,11 +60,14 @@ function StreamingTask({
         : tr("Winner of {value0}", { value0: value.source })
       : tr("Team TBD"));
   return (
-    <article className="panel form-stack" aria-label={f.label}>
-      <div>
-        <p className="eyebrow">{f.roundName}</p>
+    <article className={styles.task} aria-label={f.label}>
+      <div className={styles.identity}>
+        <p className="small muted">{f.roundName}</p>
         <h2>
-          <Link href={`/admin/tournaments/${slug}/matches/${f.id}`}>
+          <Link
+            className="text-link"
+            href={`/admin/tournaments/${slug}/matches/${f.id}`}
+          >
             {f.label}
           </Link>
         </h2>
@@ -75,110 +75,122 @@ function StreamingTask({
           {slot(f.home)} {tr("vs")} {slot(f.away)}
         </p>
       </div>
-      <p>
-        {f.scheduledAt
-          ? formatDate(f.scheduledAt, f.timeZone, tr.locale)
-          : tr("Match time TBA")}{" "}
-        · {f.timeZone}
-      </p>
-      <p>
+      <div className={styles.schedule}>
+        <p>
+          {f.scheduledAt
+            ? formatDate(f.scheduledAt, f.timeZone, tr.locale)
+            : tr("Match time TBA")}
+        </p>
+        <p className="small muted">{f.timeZone}</p>
         <span className="badge">
           {f.completed ? tr("Completed") : tr(f.status)}
         </span>
-      </p>
-      {f.assignment ? (
-        <div className="form-stack">
-          <p>
-            <strong>{f.assignment.username}</strong> ·{" "}
-            {f.assignment.source === "self"
-              ? tr("Self-selected")
-              : tr("Staff-assigned")}
-          </p>
-          <p className="muted small">
-            {tr("Arranged by {value0} at {value1}", {
-              value0: f.assignment.assignedByName,
-              value1: formatDate(
-                f.assignment.assignedAt,
-                f.timeZone,
-                tr.locale,
-              ),
-            })}
-          </p>
-          {!f.assignment.eligible && (
-            <p className="notice">
-              {tr(
-                "Streamer access was revoked. Attribution is retained; reassign this task.",
-              )}
+      </div>
+      <div className={styles.assignment}>
+        {f.assignment ? (
+          <>
+            <p>
+              <strong>{f.assignment.username}</strong>
             </p>
-          )}
-          {f.assignment.needsConfirmation && (
-            <p role="status" className="notice">
-              {tr("Schedule changed — this booking needs reconfirmation.")}
+            <p className="small muted">
+              {f.assignment.source === "self"
+                ? tr("Self-selected")
+                : tr("Staff-assigned")}
             </p>
-          )}
-          {!!f.conflicts.length && (
-            <p className="notice">
-              {tr("Same start time as: {value0}", {
-                value0: f.conflicts.map((c) => c.label).join(", "),
-              })}
-            </p>
-          )}
-          {(data.canManage || (own && data.canSelect)) && (
-            <div className="actions">
-              {available &&
-                f.assignment.needsConfirmation &&
-                (data.canManage || (own && data.canSelect)) &&
-                action("reconfirm", tr("Reconfirm booking"))}
-              {(data.canManage || (own && data.canSelect)) &&
-                action("cancel", tr("Cancel streaming task"))}
-            </div>
-          )}
-        </div>
-      ) : (
-        <p className="muted">{tr("No Streamer assigned")}</p>
-      )}
-      {available && (data.canManage || (!f.assignment && data.canSelect)) && (
-        <div className="form-stack">
-          {data.canManage && (
-            <label className="field">
-              <span>{tr("Assign Streamer")}</span>
-              <select
-                value={target}
-                onChange={(event) => setTarget(event.target.value)}
-              >
-                <option value="">{tr("Choose Streamer")}</option>
-                {data.candidates.map((u) => (
-                  <option key={u.osuId} value={u.osuId}>
-                    {u.username} · {u.osuId}
-                  </option>
-                ))}
-              </select>
-            </label>
-          )}
-          {!!conflicts.length &&
-            (!f.assignment || f.assignment.userId !== selectedId) && (
-              <p role="status" className="notice">
+            <details>
+              <summary className="small muted">
+                {tr("Assignment details")}
+              </summary>
+              <p className="small muted">
+                {tr("Arranged by {value0} at {value1}", {
+                  value0: f.assignment.assignedByName,
+                  value1: formatDate(
+                    f.assignment.assignedAt,
+                    f.timeZone,
+                    tr.locale,
+                  ),
+                })}
+              </p>
+            </details>
+            {!f.assignment.eligible && (
+              <p className="notice small">
+                {tr(
+                  "Streamer access was revoked. Attribution is retained; reassign this task.",
+                )}
+              </p>
+            )}
+            {f.assignment.needsConfirmation && (
+              <p role="status" className="notice small">
+                {tr("Schedule changed — this booking needs reconfirmation.")}
+              </p>
+            )}
+            {!!f.conflicts.length && (
+              <p className="notice small">
                 {tr("Same start time as: {value0}", {
-                  value0: conflicts.map((c) => c.label).join(", "),
+                  value0: f.conflicts.map((c) => c.label).join(", "),
                 })}
               </p>
             )}
+          </>
+        ) : (
+          <p className="muted">{tr("No Streamer assigned")}</p>
+        )}
+      </div>
+      <div className={styles.controls}>
+        {f.assignment && (data.canManage || (own && data.canSelect)) && (
           <div className="actions">
-            {data.canManage &&
-              action(
-                "assign",
-                f.assignment ? tr("Reassign Streamer") : tr("Assign Streamer"),
-                Number(target) || undefined,
-              )}
-            {!f.assignment &&
-              data.canSelect &&
-              action("select", tr("Stream this match"))}
+            {available &&
+              f.assignment.needsConfirmation &&
+              action("reconfirm", tr("Reconfirm booking"))}
+            {action("cancel", tr("Cancel streaming task"))}
           </div>
-        </div>
-      )}
+        )}
+        {available && (data.canManage || (!f.assignment && data.canSelect)) && (
+          <>
+            {data.canManage && (
+              <label className="field">
+                <span>{tr("Assign Streamer")}</span>
+                <select
+                  value={target}
+                  onChange={(event) => setTarget(event.target.value)}
+                >
+                  <option value="">{tr("Choose Streamer")}</option>
+                  {data.candidates.map((u) => (
+                    <option key={u.osuId} value={u.osuId}>
+                      {u.username} · {u.osuId}
+                    </option>
+                  ))}
+                </select>
+              </label>
+            )}
+            {!!conflicts.length &&
+              (!f.assignment || f.assignment.userId !== selectedId) && (
+                <p role="status" className="notice small">
+                  {tr("Same start time as: {value0}", {
+                    value0: conflicts.map((c) => c.label).join(", "),
+                  })}
+                </p>
+              )}
+            <div className="actions">
+              {data.canManage &&
+                action(
+                  "assign",
+                  f.assignment
+                    ? tr("Reassign Streamer")
+                    : tr("Assign Streamer"),
+                  Number(target) || undefined,
+                )}
+              {!f.assignment &&
+                data.canSelect &&
+                action("select", tr("Stream this match"))}
+            </div>
+          </>
+        )}
+      </div>
     </article>
   );
 }
+
 export function StreamingManager({
   slug,
   data,
@@ -190,28 +202,22 @@ export function StreamingManager({
 }) {
   const tr = useAppTranslations();
   return (
-    <section className="form-stack" aria-label={tr("Streaming tasks")}>
-      <InfoNote>
-        <p className="muted">
-          {tr(
-            "Streaming arrangements are internal. No streaming identity or link is published by booking a task.",
-          )}
-        </p>
-      </InfoNote>
-      <InfoNote>
-        <p className="muted small">
-          {tr(
-            "Same-start warnings cover this edition only. End times are unavailable; this is not a complete overlap check. Warnings do not block booking.",
-          )}
-        </p>
-      </InfoNote>
+    <section
+      className={`form-stack ${styles.workspace}`}
+      aria-label={tr("Streaming tasks")}
+    >
+      <p className="small muted">
+        {tr(
+          "Bookings stay private and do not publish stream links. Conflict notices compare start times in this edition only and do not block booking.",
+        )}
+      </p>
       {detail ? (
         <Link href={`/admin/tournaments/${slug}/streaming?view=mine`}>
           {tr("My streaming tasks")}
         </Link>
       ) : (
-        <form className="panel form-stack" method="get">
-          <div className="form-stack">
+        <form className={styles.filters} method="get">
+          <div className={styles.filterFields}>
             <label className="field">
               <span>{tr("Date (match time zone)")}</span>
               <input type="date" name="date" defaultValue={data.filters.date} />
@@ -248,16 +254,15 @@ export function StreamingManager({
         </form>
       )}
       {!data.fixtures.length && (
-        <p className="panel">{tr("No streaming tasks match these filters.")}</p>
+        <p className="empty">{tr("No streaming tasks match these filters.")}</p>
       )}
-      {data.fixtures.map((f) => (
-        <StreamingTask
-          key={`${f.id}:${f.streamRevision}:${f.version}`}
-          slug={slug}
-          fixture={f}
-          data={data}
-        />
-      ))}
+      <ul className={styles.list}>
+        {data.fixtures.map((f) => (
+          <li key={`${f.id}:${f.streamRevision}:${f.version}`}>
+            <StreamingTask slug={slug} fixture={f} data={data} />
+          </li>
+        ))}
+      </ul>
       {detail && (
         <div className="panel form-stack">
           <h2>{tr("Streaming task history")}</h2>
