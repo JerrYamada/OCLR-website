@@ -114,12 +114,6 @@
 .parameters span {
   white-space: nowrap;
 }
-.snapshot {
-  margin-top: 0.5rem;
-}
-.snapshot summary {
-  cursor: pointer;
-}
 .discussion {
   min-width: 0;
   border-inline-start: 1px solid var(--color-border);
