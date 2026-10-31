@@ -15,6 +15,7 @@ import { db, closeDb } from "../../src/db";
 import { createSession } from "../../src/lib/auth/sessions";
 import { draftPicks } from "../../src/db/schema";
 import { prepareDraft } from "../fixtures/draft";
+const origin = process.env.OCLR_TEST_ORIGIN || "http://127.0.0.1:3100";
 const testUrl = process.env.TEST_DATABASE_URL;
 test.describe("isolated multi-captain rehearsal", () => {
   test.skip(!testUrl, "Requires isolated PostgreSQL");
@@ -37,7 +38,7 @@ test.describe("isolated multi-captain rehearsal", () => {
   async function actor(browser: Browser, id: number | null, mobile: boolean) {
     const context = await browser.newContext({
       storageState: englishStorage,
-      baseURL: "http://127.0.0.1:3100",
+      baseURL: origin,
       viewport: mobile
         ? { width: 390, height: 844 }
         : { width: 1280, height: 900 },
@@ -87,7 +88,7 @@ test.describe("isolated multi-captain rehearsal", () => {
       exact: true,
     });
     await expect(source).toHaveValue(
-      `http://127.0.0.1:3100/tournaments/${slug}/draft/overlay`,
+      `${origin}/tournaments/${slug}/draft/overlay`,
     );
     // Denied clipboard access keeps a focusable manual-copy fallback.
     await staff.page.evaluate(() =>
@@ -123,7 +124,7 @@ test.describe("isolated multi-captain rehearsal", () => {
       await staff.page.evaluate(
         () => (window as unknown as { copied: string }).copied,
       ),
-    ).toBe(`http://127.0.0.1:3100/tournaments/${slug}/draft/overlay`);
+    ).toBe(`${origin}/tournaments/${slug}/draft/overlay`);
     await expect(
       staff.page
         .locator(".obs-source-link")
@@ -159,7 +160,7 @@ test.describe("isolated multi-captain rehearsal", () => {
     expect(
       (
         await b.context.request.post(`/api/tournaments/${slug}/draft/picks`, {
-          headers: { origin: "http://127.0.0.1:3100" },
+          headers: { origin },
           data: {
             sessionId: initial.sessionId,
             turnIndex: initial.turnIndex,
@@ -174,7 +175,7 @@ test.describe("isolated multi-captain rehearsal", () => {
       (
         await spectator.context.request.post(
           `/api/tournaments/${slug}/draft/picks`,
-          { headers: { origin: "http://127.0.0.1:3100" }, data: {} },
+          { headers: { origin }, data: {} },
         )
       ).status(),
     ).toBe(401);
@@ -394,11 +395,8 @@ test.describe("isolated multi-captain rehearsal", () => {
     ).toBeVisible();
     for (const team of fixture.teamRows) {
       await staff.page.goto(`/admin/tournaments/${slug}/teams`);
-      const card = staff.page.getByRole("article").filter({
-        has: staff.page.getByRole("heading", {
-          name: team.name,
-          exact: true,
-        }),
+      const card = staff.page.getByRole("row").filter({
+        has: staff.page.getByText(team.name, { exact: true }),
       });
       await card
         .getByRole("button", { name: "Publish finalized roster", exact: true })
