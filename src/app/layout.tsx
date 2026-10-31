@@ -12,6 +12,7 @@ import type { Appearance } from "@/lib/preferences";
 import { getAppTranslations } from "@/i18n/server";
 import type { Metadata } from "next";
 import { isStaff } from "@/lib/auth/staff";
+import { hasStreamingMenuAccess } from "@/lib/streaming-api";
 import { hasDeveloperAccess } from "@/lib/developer-api";
 import { currentUser } from "@/lib/auth/user";
 import { SiteFrame } from "@/components/site-frame";
@@ -133,6 +134,7 @@ export default async function RootLayout({
   let authUnavailable = false;
   let staff = false;
   let developer = false;
+  let streaming = false;
   let scopes: AppearanceScope[] = [];
   if (remote) {
     try {
@@ -171,8 +173,13 @@ export default async function RootLayout({
   } else {
     try {
       user = await currentUser();
-      staff = user ? await isStaff(user) : false;
-      developer = user ? await hasDeveloperAccess(user.osuId) : false;
+      [staff, developer, streaming] = user
+        ? await Promise.all([
+            isStaff(user),
+            hasDeveloperAccess(user.osuId),
+            hasStreamingMenuAccess(user.osuId),
+          ])
+        : [false, false, false];
     } catch {
       authUnavailable = true;
     }
@@ -229,6 +236,7 @@ export default async function RootLayout({
                         username: user.username,
                         staff,
                         developer,
+                        streaming,
                       }
                     : null
                 }

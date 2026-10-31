@@ -23,7 +23,13 @@ test.describe("streaming API credentials", () => {
     await context.addCookies([cookie]);
     await context.route("https://a.ppy.sh/**", (route) => route.abort());
     if (isMobile) await page.setViewportSize({ width: 320, height: 844 });
-    await page.goto("/streaming/test-cup");
+    await page.goto("/dashboard");
+    await page.getByRole("button", { name: /Dashboard/ }).click();
+    await page
+      .getByRole("menuitem", { name: "Streaming API access", exact: true })
+      .click();
+    await expect(page).toHaveURL(/\/streaming$/);
+    await page.locator('a[href="/streaming/test-cup"]').click();
     await expect(
       page.getByRole("heading", { name: "Streaming API access", exact: true }),
     ).toBeVisible();

@@ -1809,6 +1809,20 @@
       "requiredVerification": "403 without database/provider access"
     },
     {
+      "file": "src/app/streaming/page.tsx",
+      "kind": "page",
+      "authority": "denied",
+      "operations": [],
+      "commands": "Denied in remote mode; connection management and preference cookies remain separate",
+      "metadata": "Inherited or static",
+      "services": [],
+      "test": "remote-e2e/full-site.spec.ts + integration/extended-read.test.ts",
+      "authorization": "Denied in remote mode",
+      "adapter": "proxy rejection",
+      "media": "Existing public assets",
+      "requiredVerification": "403 without database/provider access"
+    },
+    {
       "file": "src/app/tournaments/[edition]/bracket/page.tsx",
       "kind": "page",
       "authority": "saved-read",

@@ -1,0 +1,84 @@
+.workspace {
+  min-width: 0;
+}
+.filters {
+  display: flex;
+  align-items: end;
+  flex-wrap: wrap;
+  gap: 0.75rem 1rem;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid var(--color-border);
+}
+.filterFields {
+  display: flex;
+  flex: 1;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+.filterFields > label {
+  flex: 1;
+  min-width: 10rem;
+}
+.filters :global(.actions) {
+  gap: 0.5rem;
+}
+.list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.task {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr) minmax(0, 1fr) minmax(
+      12rem,
+      1fr
+    );
+  gap: 1rem;
+  align-items: start;
+  padding: 1rem 0;
+  border-bottom: 1px solid var(--color-border);
+}
+.task > div {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.task p {
+  margin: 0 0 0.35rem;
+}
+.task h2 {
+  margin: 0 0 0.35rem;
+  font-size: 1rem;
+}
+.task summary {
+  cursor: pointer;
+}
+.controls {
+  display: grid;
+  gap: 0.5rem;
+}
+.controls button,
+.filters button,
+.filters a {
+  font-size: 0.875rem;
+  padding: 0.4rem 0.75rem;
+}
+.controls :global(.actions) {
+  gap: 0.5rem;
+}
+@media (max-width: 1000px) {
+  .task {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  }
+}
+@media (max-width: 600px) {
+  .task {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0.75rem;
+  }
+  .filters,
+  .filterFields {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    width: 100%;
+  }
+}

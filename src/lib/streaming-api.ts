@@ -1,3 +1,4 @@
+import { getEditionChoices } from "./content";
 import { and, desc, eq, gt, isNull, lt, or, sql } from "drizzle-orm";
 import { z } from "zod";
 import { db } from "@/db";
@@ -23,6 +24,39 @@ import {
   type StreamingTokenMetadata,
 } from "./streaming-api-model";
 type Reader = Pick<ReturnType<typeof db>, "select">;
+async function streamingGrants(osuId: number) {
+  return db()
+    .select({ editionSlug: staffRoles.editionSlug })
+    .from(staffRoles)
+    .where(
+      and(
+        eq(staffRoles.userId, osuId),
+        eq(staffRoles.role, "streamer"),
+        isNull(staffRoles.revokedAt),
+      ),
+    );
+}
+/** Menu visibility only; edition endpoints independently verify their live grant. */
+export async function hasStreamingMenuAccess(osuId: number) {
+  return (await streamingGrants(osuId)).length > 0;
+}
+export async function streamingAccessEditions(osuId: number) {
+  const grants = await streamingGrants(osuId);
+  if (!grants.length)
+    throw new DeveloperApiError(
+      403,
+      "FORBIDDEN",
+      "An active Streamer grant is required.",
+    );
+  return (await getEditionChoices())
+    .filter((edition) =>
+      grants.some(
+        (grant) =>
+          grant.editionSlug === null || grant.editionSlug === edition.slug,
+      ),
+    )
+    .map(({ slug, name }) => ({ slug, name }));
+}
 export async function hasStreamingAccess(
   osuId: number,
   editionSlug: string,

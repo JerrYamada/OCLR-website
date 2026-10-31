@@ -16,6 +16,7 @@ type Account = {
   username: string;
   staff?: boolean;
   developer?: boolean;
+  streaming?: boolean;
 };
 function AccountControl({
   user,
@@ -124,6 +125,8 @@ function AccountControl({
           path === "/admin" ||
           path.startsWith("/admin/") ||
           path === "/developer" ||
+          path === "/streaming" ||
+          path.startsWith("/streaming/") ||
           undefined
         }
         onClick={() => {
@@ -167,6 +170,7 @@ function AccountControl({
           ["/dashboard", "Player dashboard"],
           ["/admin", "Staff dashboard"],
           ...(user.developer ? [["/developer", "Developer API access"]] : []),
+          ...(user.streaming ? [["/streaming", "Streaming API access"]] : []),
         ].map(([href, label]) => (
           <Link
             key={href}
