@@ -350,7 +350,7 @@ export function SelectionWorkbench({
     failed: tr("Lookup failed"),
   };
   return (
-    <div className={styles.workbench}>
+    <div className={`mappool-selection-workbench ${styles.workbench}`}>
       <p className="muted">
         {tr(
           "Collect candidate maps and discuss test feedback. Candidates and comments remain private to authorized staff.",

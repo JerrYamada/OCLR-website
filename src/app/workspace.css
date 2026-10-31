@@ -370,6 +370,7 @@
 .themed-site.private-site
   :is(
     .tournament-settings,
+    .mappool-selection-workbench,
     .mappool-workbench,
     .fixture-workspace,
     .round-manager
@@ -388,6 +389,7 @@
 .themed-site.private-site
   :is(
     .tournament-settings,
+    .mappool-selection-workbench,
     .mappool-workbench,
     .fixture-workspace,
     .round-manager
@@ -405,6 +407,7 @@
 .themed-site.private-site
   :is(
     .tournament-settings,
+    .mappool-selection-workbench,
     .mappool-workbench,
     .fixture-workspace,
     .round-manager
@@ -417,6 +420,7 @@
 .themed-site.private-site
   :is(
     .tournament-settings,
+    .mappool-selection-workbench,
     .mappool-workbench,
     .fixture-workspace,
     .round-manager
