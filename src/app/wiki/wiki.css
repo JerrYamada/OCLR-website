@@ -47,6 +47,20 @@
 .wiki-page .information-document td:first-child {
   width: 48%;
 }
+/* File links such as 512 · 256 · 128 · 64 stay on one line; the table scrolls instead. */
+.wiki-page .information-document td.wiki-links {
+  white-space: nowrap;
+}
+.wiki-page .information-document tr:has(> td.wiki-links) > td:first-child {
+  width: auto;
+  white-space: nowrap;
+}
+.wiki-page
+  .information-document
+  tr:has(> td.wiki-links)
+  > td:not(:first-child, .wiki-links) {
+  min-width: 9em;
+}
 .wiki-figure {
   margin: 1.5rem 0;
 }

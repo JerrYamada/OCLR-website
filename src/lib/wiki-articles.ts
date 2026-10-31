@@ -1,5 +1,8 @@
 import type { AppTranslator } from "@/i18n/translate";
 
+// Plain text, or text mixed with links.
+export type WikiText = string | (string | { label: string; href: string })[];
+
 export type WikiArticle = {
   slug: string;
   title: string;
@@ -8,9 +11,9 @@ export type WikiArticle = {
   sections: {
     id: string;
     title: string;
-    paragraphs?: (string | (string | { label: string; href: string })[])[];
+    paragraphs?: WikiText[];
     items?: string[];
-    table?: { headers: string[]; rows: string[][] };
+    table?: { headers: string[]; rows: WikiText[][] };
     figures?: {
       src: string;
       width: number;
@@ -214,6 +217,18 @@ export function wikiArticles(tr: AppTranslator): WikiArticle[] {
 // Official OCLR mascot, designed as a community proposal (#334); Chinese-style outfit added in #442, stickers in #536.
 // Images and licence notes in public/mascot/liru/.
 const LIRU_DESIGNER = "JerrYamada";
+const LIRU_STICKER_SIZES = [512, 256, 128, 64];
+
+// Links to one sticker's files at every size, e.g. 512 · 256 · 128 · 64.
+function liruStickerFiles(id: string, format: "png" | "webp"): WikiText {
+  return LIRU_STICKER_SIZES.flatMap((size, i) => [
+    ...(i ? [" · "] : []),
+    {
+      label: String(size),
+      href: `/mascot/liru/stickers/${format}/liru-${id}-${size}.${format}`,
+    },
+  ]);
+}
 
 function liruArticle(tr: AppTranslator): WikiArticle {
   return {
@@ -418,17 +433,24 @@ function liruArticle(tr: AppTranslator): WikiArticle {
           },
         ],
         table: {
-          headers: [tr("Sticker"), tr("Pose")],
-          rows: [
-            ["pick", tr("Holds up a white board with a green check mark")],
-            ["ban", tr("Pouts behind a white board with a red cross")],
-            ["mod-nm", tr("Sips a cup of tea")],
-            ["mod-hd", tr("Gropes her way forward in sunglasses")],
-            ["mod-hr", tr("Strikes a rock pose with an electric guitar")],
-            ["mod-dt", tr("Dashes forward with speed lines")],
-            ["mod-fm", tr("Wonders which card to take")],
-            ["mod-tb", tr("Hides half her face behind an open fan")],
-          ],
+          headers: [tr("Sticker"), tr("Pose"), "PNG", "WebP"],
+          rows: (
+            [
+              ["pick", tr("Holds up a white board with a green check mark")],
+              ["ban", tr("Pouts behind a white board with a red cross")],
+              ["mod-nm", tr("Sips a cup of tea")],
+              ["mod-hd", tr("Gropes her way forward in sunglasses")],
+              ["mod-hr", tr("Strikes a rock pose with an electric guitar")],
+              ["mod-dt", tr("Dashes forward with speed lines")],
+              ["mod-fm", tr("Wonders which card to take")],
+              ["mod-tb", tr("Hides half her face behind an open fan")],
+            ] as const
+          ).map(([id, pose]) => [
+            id,
+            pose,
+            liruStickerFiles(id, "png"),
+            liruStickerFiles(id, "webp"),
+          ]),
         },
         items: [
           tr(

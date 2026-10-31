@@ -65,6 +65,11 @@ for (const [locale, appearance] of cases)
           expect(box.width).toBeLessThanOrEqual(width);
         }
         await expect(
+          page.locator(
+            "#stickers td a[href='/mascot/liru/stickers/png/liru-pick-512.png']",
+          ),
+        ).toHaveText("512");
+        await expect(
           page.getByRole("heading", { name: labels[locale].credits }),
         ).toBeVisible();
         await expect(

@@ -169,4 +169,31 @@ describe("Liru sticker pack (#536)", () => {
       }
     }
   });
+
+  it("links every file in the manifest from the Wiki sticker table", () => {
+    const native = createTranslator({ locale: "en", messages: en.ui });
+    const tr = appTranslator(
+      (key, values) => native(key as keyof typeof en.ui, values),
+      "en",
+    );
+    const rows = wikiArticles(tr)
+      .find((article) => article.slug === "liru")!
+      .sections.find((section) => section.id === "stickers")!.table!.rows;
+    const hrefs = (cell: (typeof rows)[number][number]) =>
+      typeof cell === "string"
+        ? []
+        : cell.flatMap((part) => (typeof part === "string" ? [] : [part.href]));
+    expect(rows.map((row) => row[0])).toEqual(
+      manifest.stickers.map((s) => s.id),
+    );
+    for (const [i, sticker] of manifest.stickers.entries()) {
+      const files = Object.values(sticker.files);
+      expect(hrefs(rows[i][2]).sort()).toEqual(
+        files.map((f) => `/mascot/liru/stickers/${f.png}`).sort(),
+      );
+      expect(hrefs(rows[i][3]).sort()).toEqual(
+        files.map((f) => `/mascot/liru/stickers/${f.webp}`).sort(),
+      );
+    }
+  });
 });
