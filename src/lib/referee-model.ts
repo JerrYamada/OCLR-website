@@ -94,6 +94,7 @@ export type RefereeAttempt = {
   winnerTeamId: string | null;
 };
 export type RefereeSelection = {
+  exMode?: boolean;
   id: string;
   stepIndex: number;
   kind: "ban" | "pick" | "tb";
@@ -105,6 +106,7 @@ export type RefereeSelection = {
   voided: boolean;
 };
 export type RefereeEventPayload =
+  | { type: "ex_declared"; pickId: string; enabled: boolean }
   | { type: "order_set"; firstBanTeamId: string; firstPickTeamId: string }
   | {
       type: "selection_recorded";
@@ -143,6 +145,7 @@ export type RefereeModelInput = {
   maps: RefereeMap[];
   series: ScoringRules["series"] | null;
   tiedMapPolicy?: ScoringRules["tiedMapPolicy"];
+  exPlayersPerTeam?: number | null;
 };
 export type RefereeProjection = {
   selections: RefereeSelection[];
@@ -212,7 +215,10 @@ export function projectReferee(input: RefereeModelInput): RefereeProjection {
                 },
               ],
       });
-    else if (p.type === "selection_voided") {
+    else if (p.type === "ex_declared") {
+      const s = selections.find((s) => s.id === p.pickId);
+      if (s) s.exMode = p.enabled;
+    } else if (p.type === "selection_voided") {
       const s = selections.find((s) => s.id === p.selectionId);
       if (s) s.voided = true;
     } else if (p.type === "attempt_replayed") {
@@ -332,6 +338,13 @@ export const refereeActionSchema = z.discriminatedUnion("action", [
   z
     .object({ action: z.literal("record_selection"), entryId: z.uuid() })
     .strict(),
+  z
+    .object({
+      action: z.literal("declare_ex"),
+      pickId: z.uuid(),
+      enabled: z.boolean(),
+    })
+    .strict(),
   z.object({ action: z.literal("start_attempt"), pickId: z.uuid() }).strict(),
   z
     .object({
@@ -436,6 +449,23 @@ export function validateRefereeAction(
   }
   const selection = state.activeSelections.find((s) => s.id === action.pickId);
   if (!selection || selection.kind === "ban") fail("Choose an active pick.");
+  if (action.action === "declare_ex") {
+    if (
+      selection!.id !== state.lastSelectionId ||
+      selection!.kind !== "pick" ||
+      selection!.category === "TB" ||
+      selection!.attempts.length !== 1 ||
+      selection!.attempts[0]?.status !== "pending"
+    )
+      fail("Declare EX on the current pick before its first start.");
+    if (action.enabled && !input.exPlayersPerTeam)
+      fail("Configure EX player count for this round first.");
+    return {
+      type: "ex_declared",
+      pickId: selection!.id,
+      enabled: action.enabled,
+    };
+  }
   if (selection!.id !== state.lastSelectionId)
     fail("Withdraw later steps before correcting this pick.");
   const attempt = selection!.attempts.at(-1)!;

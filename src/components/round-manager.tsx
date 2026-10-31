@@ -1,5 +1,8 @@
 "use client";
-import { ReadOnlyFields } from "./staff-read-only";
+import Link from "next/link";
+import { RoundRules } from "./competition-settings";
+import type { FixtureWorkspace } from "@/lib/fixtures";
+import { ReadOnlyFields, StaffReadOnlyContext } from "./staff-read-only";
 import { useId, useState } from "react";
 import { useAppTranslations } from "@/i18n/shared";
 import type { MappoolWorkspace } from "@/lib/mappools";
@@ -97,6 +100,7 @@ export function RoundManager({
   initialStage,
   initialRoundId,
   refereeData,
+  competitionData,
   season,
   canManageRefereePolicy = false,
 }: {
@@ -106,6 +110,7 @@ export function RoundManager({
   initialRoundId?: string;
   refereeData?: Pick<MappoolWorkspace, "refereeRules" | "pools" | "entries">;
   season?: string | null;
+  competitionData?: FixtureWorkspace;
   canManageRefereePolicy?: boolean;
 }) {
   const tr = useAppTranslations();
@@ -283,6 +288,30 @@ export function RoundManager({
                         });
                       }}
                     />
+                    {competitionData?.rounds.find(
+                      (r) => r.round.id === round.id,
+                    ) && (
+                      <section id="competition" className="form-stack">
+                        <h3>{tr("Competition configuration")}</h3>
+                        <Link
+                          className="text-link"
+                          href={`/admin/tournaments/${slug}/teams#groups`}
+                        >
+                          {tr("Configure groups in team management")}
+                        </Link>
+                        <StaffReadOnlyContext
+                          value={!competitionData.canManage}
+                        >
+                          <RoundRules
+                            key={`rules-${round.id}-${round.version}`}
+                            slug={slug}
+                            entry={competitionData.rounds.find(
+                              (r) => r.round.id === round.id,
+                            )!}
+                          />
+                        </StaffReadOnlyContext>
+                      </section>
+                    )}
                     {canManageRefereePolicy &&
                       refereeData?.refereeRules?.find(
                         (rule) => rule.roundId === round.id,

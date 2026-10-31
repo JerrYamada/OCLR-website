@@ -48,7 +48,7 @@ async function Issue271Page({
       (await searchParams)?.view === "configuration" &&
       (data.canManage || data.canViewAll)
     )
-      redirect(`/admin/tournaments/${edition}/settings#competition`);
+      redirect(`/admin/tournaments/${edition}/rounds#competition`);
     return (
       <>
         <PageHeading

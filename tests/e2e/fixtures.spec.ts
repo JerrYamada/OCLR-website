@@ -299,12 +299,14 @@ test.describe("staff fixtures and referee assignments over HTTP", () => {
       ).json();
       expect(afterUnavailable.context.result).toBeNull();
       expect(afterUnavailable.source).toBeNull();
-      await page.goto("/admin/tournaments/test-cup/settings#competition");
+      await page.goto(
+        `/admin/tournaments/test-cup/rounds?round=${round.id}#competition`,
+      );
       const rules = page
-        .locator("#competition > section")
+        .locator("#competition")
         .filter({
           has: page.getByRole("heading", {
-            name: `${round.name}: approved competition rules`,
+            name: "Competition configuration",
             exact: true,
           }),
         })
@@ -343,23 +345,31 @@ test.describe("staff fixtures and referee assignments over HTTP", () => {
       await rules
         .getByRole("combobox", { name: /^Team score aggregation/ })
         .selectOption("sum");
-      await rules.getByLabel("Players per team per game").fill("2");
       await rules
-        .getByRole("combobox", { name: /^Series format/ })
-        .selectOption("first_to");
+        .getByLabel("Players per team per game", { exact: true })
+        .fill("2");
+      await rules
+        .getByLabel("EX players per team per game", { exact: true })
+        .fill("1");
+      await expect(
+        rules.getByLabel("Points for a draw", { exact: false }),
+      ).toHaveCount(0);
+      await expect(
+        rules.getByRole("combobox", { name: /^Series format/ }),
+      ).toHaveCount(0);
       await rules.getByLabel("Map wins required").fill("2");
-      await rules
-        .getByRole("combobox", { name: /^Failed player scores/ })
-        .selectOption("include");
-      await rules
-        .getByRole("combobox", { name: /^Tied map policy/ })
-        .selectOption("require_replay");
-      await rules
-        .getByRole("combobox", { name: /^Understrength teams/ })
-        .selectOption("false");
-      await rules
-        .getByRole("combobox", { name: /^Substitution policy/ })
-        .selectOption("false");
+      await expect(
+        rules.getByRole("combobox", { name: /^Failed player scores/ }),
+      ).toHaveCount(0);
+      await expect(
+        rules.getByRole("combobox", { name: /^Tied map policy/ }),
+      ).toHaveCount(0);
+      await expect(
+        rules.getByRole("combobox", { name: /^Understrength teams/ }),
+      ).toHaveCount(0);
+      await expect(
+        rules.getByRole("combobox", { name: /^Substitution policy/ }),
+      ).toHaveCount(0);
       if (await rules.getByLabel("Points for a win", { exact: true }).count()) {
         await rules.getByLabel("Points for a win", { exact: true }).fill("3");
         await rules.getByLabel("Points for a loss", { exact: true }).fill("0");
@@ -379,9 +389,10 @@ test.describe("staff fixtures and referee assignments over HTTP", () => {
         version: expect.stringMatching(/^release-/),
         series: { type: "first_to", wins: 2 },
         playersPerTeam: 2,
+        exPlayersPerTeam: 1,
       });
       // Route content can arrive before Next.js finishes streaming metadata.
-      await expect(page).toHaveTitle("Tournament settings");
+      await expect(page).toHaveTitle("Round management");
       expect(
         (
           await new AxeBuilder({ page })
@@ -398,7 +409,7 @@ test.describe("staff fixtures and referee assignments over HTTP", () => {
         .locator("#competition")
         .screenshot({ path: info.outputPath("competition-settings.png") });
       await page.goto("/admin/tournaments/test-cup/matches?view=configuration");
-      await expect(page).toHaveURL(/settings#competition$/);
+      await expect(page).toHaveURL(/rounds#competition$/);
       await page.goto("/admin/tournaments/test-cup/matches");
       await expect(
         page.getByRole("tab", {

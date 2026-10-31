@@ -11,6 +11,7 @@ import {
   matchResults,
   memberships,
   refereeSessions,
+  refereeEvents,
   resultAuditEvents,
   resultRevisions,
   staffRoles,
@@ -598,11 +599,34 @@ async function databaseFixtureForReview(
           .from(mappoolEntries)
           .where(eq(mappoolEntries.poolId, pool.id))
       : [];
+    const exEvents = await tx
+      .select({ id: refereeEvents.id, payload: refereeEvents.payload })
+      .from(refereeEvents)
+      .where(eq(refereeEvents.fixtureId, id))
+      .orderBy(refereeEvents.ordinal);
+    const exPicks = new Map<
+      string,
+      { id: string; beatmapId: number; exMode: boolean }
+    >();
+    for (const event of exEvents) {
+      const p = event.payload;
+      if (p.type === "selection_recorded" && p.kind !== "ban")
+        exPicks.set(event.id, {
+          id: event.id,
+          beatmapId: p.beatmapId,
+          exMode: false,
+        });
+      else if (p.type === "ex_declared") {
+        const pick = exPicks.get(p.pickId);
+        if (pick) pick.exMode = p.enabled;
+      } else if (p.type === "selection_voided") exPicks.delete(p.selectionId);
+    }
     const [result] = await tx
       .select()
       .from(matchResults)
       .where(eq(matchResults.fixtureId, id));
     return {
+      exDeclarations: [...exPicks.values()],
       fixture: { ...fixture, homeTeamId: home.id, awayTeamId: away.id },
       round,
       teams: [home, away] as const,
@@ -786,6 +810,14 @@ export async function fixtureCommand(
         return;
       }
       if (c.action === "round_rules") {
+        if (
+          c.scoringRules?.exPlayersPerTeam != null &&
+          c.scoringRules.exPlayersPerTeam > c.scoringRules.playersPerTeam
+        )
+          throw new HttpError(
+            400,
+            "EX player count cannot exceed the normal player count.",
+          );
         const [round] = await tx
           .select({
             ...getTableColumns(tournamentRounds),

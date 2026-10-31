@@ -1,3 +1,4 @@
+import { refereeCommand, refereeWorkspace } from "../../src/lib/referee";
 let fixtureEditions: unknown[];
 import { seedEditions } from "../fixtures/editions";
 import { assertTestDatabase } from "../database";
@@ -265,6 +266,75 @@ describe.skipIf(!url)(
         })
       ).review;
     }
+    it("scores saved referee EX declarations and blocks approval after the declaration changes", async () => {
+      const ctx = await fixtureForReview(admin, "test-cup", fixtureId);
+      await fixtureCommand(admin, "test-cup", {
+        ...confirm,
+        action: "round_rules",
+        roundId: ctx.round.id,
+        expectedVersion: ctx.round.version,
+        scoringRules: { ...syntheticScoringRules, exPlayersPerTeam: 1 },
+        standingsRules: null,
+      });
+      let workspace = await refereeWorkspace(referee, "test-cup", fixtureId);
+      async function live(action: Record<string, unknown>, actor = admin) {
+        const result = await refereeCommand(actor, "test-cup", fixtureId, {
+          ...action,
+          requestKey: randomUUID(),
+          expectedRevision: workspace.session?.revision ?? 0,
+          dependencyFingerprint: workspace.dependencyFingerprint,
+        });
+        workspace = result.workspace;
+      }
+      await live({
+        action: "configure_policy",
+        expectedPolicyRevision: 0,
+        policy: {
+          commands: null,
+          steps: Array.from({ length: 3 }, (_, i) => ({
+            kind: "pick",
+            actor: i % 2 ? "secondPick" : "firstPick",
+            categories: [],
+            entryIds: [],
+            avoidRepeatCategory: false,
+            tiedAt: null,
+          })),
+        },
+      });
+      await live({
+        action: "set_order",
+        firstBanTeamId: workspace.teams[0].id,
+        firstPickTeamId: workspace.teams[0].id,
+      });
+      await live({
+        action: "record_selection",
+        entryId: workspace.maps.find((m) => m.beatmapId === 10001)!.id,
+      });
+      const pickId = workspace.projection.lastSelectionId!;
+      await live({ action: "declare_ex", pickId, enabled: true }, referee);
+      source.games[0].scores = source.games[0].scores.filter(
+        (_, i) => i === 0 || i === 2,
+      );
+      source.fingerprint = createHash("sha256")
+        .update(JSON.stringify(source))
+        .digest("hex");
+      vi.mocked(fetchMatchSource).mockResolvedValue(source);
+      let view = await imported();
+      view = (
+        await resultCommand(referee, "test-cup", fixtureId, submission(view))
+      ).review;
+      expect(view.current?.proposal?.games[0].exMode).toBe(true);
+      expect(
+        view.current?.proposal?.exDeclarations?.some(
+          (p) => p.id === pickId && p.exMode,
+        ),
+      ).toBe(true);
+      await live({ action: "declare_ex", pickId, enabled: false }, referee);
+      await expect(approved(view)).rejects.toMatchObject({ status: 400 });
+      expect(
+        (await matchReview(admin, "test-cup", fixtureId)).current?.approvedAt,
+      ).toBeNull();
+    });
     it("publishes only reviewed snapshots and derives configured group standings without private data", async () => {
       let view = await imported();
       await fixtureCommand(admin, "test-cup", {

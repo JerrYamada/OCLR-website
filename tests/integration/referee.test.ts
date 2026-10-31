@@ -16,6 +16,7 @@ import {
   mappools,
   matchResults,
   refereeEvents,
+  tournamentRounds,
   refereeSessions,
   resultAuditEvents,
   staffRoles,
@@ -26,7 +27,10 @@ import {
   refereeWorkspace,
   type RefereeWorkspace,
 } from "../../src/lib/referee";
-import { assignFixtureReferees } from "../../src/lib/fixtures";
+import {
+  fixtureForReview,
+  assignFixtureReferees,
+} from "../../src/lib/fixtures";
 import { emptyRefereeSettings } from "../../src/lib/referee-commands";
 import {
   seedRefereeFixture,
@@ -108,6 +112,47 @@ describe.skipIf(!url)("private persistent referee workspace", () => {
       firstPickTeamId: w.teams[1].id,
     });
   }
+  it("persists authorized EX declarations for result scoring, rejects late edits and removes withdrawn picks", async () => {
+    await db()
+      .update(tournamentRounds)
+      .set({ scoringRules: { ...w.rules!, exPlayersPerTeam: 1 } })
+      .where(eq(tournamentRounds.id, w.fixture.roundId));
+    w = await refereeWorkspace(referee, "test-cup", fixtureId);
+    await configure();
+    const maps = w.maps.filter((m) => m.category === "NM");
+    await command({ action: "record_selection", entryId: maps[0].id });
+    await command({ action: "record_selection", entryId: maps[1].id });
+    const pickId = w.projection.lastSelectionId!;
+    await expect(
+      command({ action: "declare_ex", pickId, enabled: true }, outsider),
+    ).rejects.toMatchObject({ status: 403 });
+    const change = input({ action: "declare_ex", pickId, enabled: true });
+    const first = await refereeCommand(referee, "test-cup", fixtureId, change);
+    w = first.workspace;
+    await refereeCommand(referee, "test-cup", fixtureId, change);
+    expect(
+      (await fixtureForReview(referee, "test-cup", fixtureId)).exDeclarations,
+    ).toContainEqual({
+      id: pickId,
+      beatmapId: maps[1].beatmapId,
+      exMode: true,
+    });
+    expect(
+      (await db().select().from(refereeEvents)).filter(
+        (e) => e.payload.type === "ex_declared",
+      ),
+    ).toHaveLength(1);
+    await command({ action: "start_attempt", pickId });
+    await expect(
+      command({ action: "declare_ex", pickId, enabled: false }),
+    ).rejects.toMatchObject({ status: 409 });
+    await command({ action: "void_last" });
+    expect(
+      (
+        await fixtureForReview(referee, "test-cup", fixtureId)
+      ).exDeclarations.some((p) => p.exMode),
+    ).toBe(false);
+  });
   it("persists a two-replay cap and rejects an extra replay without writes", async () => {
     await configure();
     await command(

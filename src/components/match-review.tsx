@@ -161,6 +161,7 @@ function SourceReview({
           return (
             <details className="panel" key={g.game.id} open={undefined}>
               <summary>
+                {g.exMode && <span className="badge">{tr("EX mode")}</span>}
                 <strong>
                   {tr("Game ")}
                   {i + 1} ·{" "}
@@ -248,6 +249,7 @@ function SourceReview({
                     </tbody>
                   </table>
                 </div>
+                {g.exMode && <p className="badge">{tr("EX mode")}</p>}
                 <label className="field">
                   <span>
                     {tr("Game ")}

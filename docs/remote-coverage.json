@@ -472,11 +472,13 @@
         "getApiIdentity",
         "mappoolWorkspace",
         "privateSavedTournament",
-        "staffAccess"
+        "staffAccess",
+        "staffFixtures"
       ],
       "commands": "Denied in remote mode; connection management and preference cookies remain separate",
       "metadata": "Same file; shared request adapter for dynamic data",
       "services": [
+        "src/lib/fixtures.ts#staffFixtures",
         "src/lib/public-read-models.ts / frontend-data.ts (getApiIdentity)",
         "src/lib/mappools.ts#mappoolWorkspace",
         "src/lib/frontend-read-models.ts#privateSavedTournament",
@@ -492,11 +494,10 @@
       "file": "src/app/admin/tournaments/[edition]/settings/page.tsx",
       "kind": "page",
       "authority": "saved-read",
-      "operations": ["staffAccess", "staffFixtures", "tournamentForAdmin"],
+      "operations": ["staffAccess", "tournamentForAdmin"],
       "commands": "Denied in remote mode; connection management and preference cookies remain separate",
       "metadata": "Same file; shared request adapter for dynamic data",
       "services": [
-        "src/lib/fixtures.ts#staffFixtures",
         "src/lib/auth/staff.ts#staffAccess",
         "src/lib/tournaments.ts#tournamentForAdmin"
       ],

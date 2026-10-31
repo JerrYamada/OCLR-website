@@ -503,6 +503,32 @@ describe.skipIf(!url)(
       expect(edited.fixtures[0].label).toBe("Updated public fixture");
       expect(await db().select().from(matchResults)).toEqual([]);
     });
+    it("saves EX lineup size and rejects counts above the normal lineup without updating rules", async () => {
+      const [f] = (await fixtureCommand(admin, "test-cup", body())).fixtures;
+      const change = {
+        ...confirm,
+        action: "round_rules",
+        roundId,
+        expectedVersion: 0,
+        scoringRules: { ...rules, exPlayersPerTeam: rules.playersPerTeam + 1 },
+        standingsRules: null,
+      };
+      await expect(
+        fixtureCommand(admin, "test-cup", change),
+      ).rejects.toMatchObject({ status: 400 });
+      const saved = await fixtureCommand(admin, "test-cup", {
+        ...change,
+        scoringRules: { ...rules, exPlayersPerTeam: 1 },
+      });
+      expect(
+        saved.rounds.find((r) => r.round.id === roundId)?.round.scoringRules
+          ?.exPlayersPerTeam,
+      ).toBe(1);
+      expect(
+        (await fixtureForReview(admin, "test-cup", f.id)).round.scoringRules
+          ?.exPlayersPerTeam,
+      ).toBe(1);
+    });
     it("stores approved rule configuration without inventing defaults and rejects source cycles", async () => {
       const [f] = (await fixtureCommand(admin, "test-cup", body())).fixtures;
       expect(

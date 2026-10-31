@@ -17,6 +17,19 @@ function gamePreview(
 ): GamePreview {
   const problems = [...game.problems];
   const warnings: string[] = [];
+  const declarations =
+    context.exDeclarations?.filter((p) => p.beatmapId === game.beatmapId) ?? [];
+  const exMode = declarations.some((p) => p.exMode);
+  if (exMode && declarations.some((p) => !p.exMode))
+    problems.push(
+      "EX declaration is ambiguous for this beatmap. Review the referee selections.",
+    );
+  const requiredPlayers = exMode
+    ? rules?.exPlayersPerTeam
+    : rules?.playersPerTeam;
+  if (exMode && !requiredPlayers)
+    problems.push("EX player count is not configured for this round.");
+
   const roster = new Map(
     context.teams.flatMap((t) =>
       t.members.map((m) => [m.osuId, t.id] as const),
@@ -121,10 +134,11 @@ function gamePreview(
       ["Home", home],
       ["Away", away],
     ] as const) {
-      if (group.length !== rules.playersPerTeam) {
+      if (group.length !== requiredPlayers) {
         if (
           group.length > 0 &&
-          group.length < rules.playersPerTeam &&
+          group.length < (requiredPlayers ?? 0) &&
+          !exMode &&
           rules.allowShortHanded
         )
           warnings.push(
@@ -207,6 +221,7 @@ function gamePreview(
     }
   }
   return {
+    exMode,
     game,
     players,
     colors: {

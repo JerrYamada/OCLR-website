@@ -359,6 +359,37 @@ are UI fixtures, not provider snapshots or approved tournament selections.
 审核布局进一步收敛：赛前准备仅保留开房、规则、人员邀请与房间设置；切图通过 BP 图池，Mods、中止与计时/开赛使用 IRC 控制台。图池每行四个队伍操作横排，手机缩小按钮。执裁摘要最大固定宽度 48rem（小屏不超过容器），滚动至其位置后吸附在页头下方，只显示比分、BP 过程、重赛记录及胜局状态；长记录在各行内横向滚动。原有赛况录入和纠正功能保留在图池后的“记录与修正赛况”折叠区，不进入吸顶摘要。
 
 
-### Competition configuration in tournament settings
+### Round scoring and EX declarations
 
-Round scoring and group ranking forms live at `/admin/tournaments/[edition]/settings#competition`. The fixtures workspace retains schedule, groups and bracket views; old `?view=configuration` links redirect to settings for authorized staff. Both rule forms are always shown (group ranking only for group rounds), with no enable/disable checkboxes. Desktop places scoring and ranking side by side; mobile stacks them. Missing approved values remain unconfirmed until explicitly filled and saved; viewing the form never creates rules. Existing round version, permissions, history protections and explicit save confirmation remain enforced by the same fixture command.
+Competition rules live in **Rounds → Edit round → Competition configuration**.
+The tournament settings page links to Rounds; legacy fixture configuration links
+also lead there. Scoring and group ranking remain side by side on desktop and
+stacked on mobile. New saves use first-to-map-wins, count recorded NF scores,
+require tied maps to be replayed, and do not award group draw points. Failed-score,
+understrength, substitution, series-format and draw controls are removed. Existing
+understrength/substitution values are retained internally (new rules use false),
+and historical rule snapshots remain readable. Legacy fixed-map rounds require
+an explicit new win target before saving; their map count is not guessed as a target.
+
+Each round can save an optional **EX players per team per game** value, 1–16 and
+no greater than its normal player count. `exPlayersPerTeam` is an additive field
+in saved-read contract 1.10.0; no SQL migration is needed for these JSON snapshots.
+
+The assigned referee declares EX on the current pick in the referee panel before
+its first start. Ban/TB entries, unconfigured EX counts and late declarations are
+rejected. The versioned `declare_ex` action appends an audited `ex_declared` event
+under the existing session/fixture locks and idempotency rules. Replays retain the
+pick's EX declaration; withdrawing the pick removes it from active scoring input.
+Simulation declarations stay local. Season-specific EX eligibility, Captain/T1,
+usage and first-pick restrictions remain part of the referee's existing explicit
+rules/compliance review; this change does not replace that review with an automatic
+eligibility engine.
+
+MP review derives EX status from saved referee events, never from observed short
+lineups or a separate review checkbox. EX uses its configured exact count for both
+teams even if legacy understrength rules allow fewer players. Conflicting EX and
+normal selections for one BID block review rather than guessing their mapping.
+Proposals store the active EX declarations and per-game EX flag; approval rebuilds
+and compares that snapshot so a changed declaration cannot silently approve the
+old proposal. Public results still require the existing reviewed/approved publish
+flow; changing a referee declaration does not change a published result.

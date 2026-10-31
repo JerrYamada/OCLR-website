@@ -86,6 +86,43 @@ function act(i: RefereeModelInput, a: RefereeAction) {
   return append(i, validateRefereeAction(i, a));
 }
 describe("referee finite workflow", () => {
+  it("records EX only for the current pick before its first start, carries it across replay and voids it with the pick", () => {
+    const i = input();
+    i.exPlayersPerTeam = 1;
+    act(i, { action: "record_selection", entryId: i.maps[0].id });
+    const pick = act(i, { action: "record_selection", entryId: i.maps[1].id });
+    act(i, { action: "declare_ex", pickId: pick, enabled: true });
+    expect(
+      projectReferee(i).activeSelections.find((s) => s.id === pick)?.exMode,
+    ).toBe(true);
+    act(i, { action: "start_attempt", pickId: pick });
+    expect(() =>
+      act(i, { action: "declare_ex", pickId: pick, enabled: false }),
+    ).toThrow(/before its first start/);
+    act(i, {
+      action: "resolve_attempt",
+      pickId: pick,
+      status: "aborted",
+      winnerTeamId: null,
+    });
+    act(i, { action: "replay_attempt", pickId: pick });
+    expect(
+      projectReferee(i).activeSelections.find((s) => s.id === pick)?.exMode,
+    ).toBe(true);
+    act(i, { action: "void_last" });
+    expect(projectReferee(i).activeSelections.some((s) => s.exMode)).toBe(
+      false,
+    );
+    const missing = input();
+    act(missing, { action: "record_selection", entryId: missing.maps[0].id });
+    const next = act(missing, {
+      action: "record_selection",
+      entryId: missing.maps[1].id,
+    });
+    expect(() =>
+      act(missing, { action: "declare_ex", pickId: next, enabled: true }),
+    ).toThrow(/Configure EX/);
+  });
   function bans(category = "HD") {
     const i = input();
     i.policy!.steps = ["firstBan", "secondBan", "firstBan", "secondBan"].map(

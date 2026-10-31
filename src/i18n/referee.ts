@@ -132,6 +132,16 @@ export function refereeMessage(tr: AppTranslator, message: string): string {
       return tr("Withdraw later steps before correcting this pick.");
     case "The replay limit for this map has been reached.":
       return tr("The replay limit for this map has been reached.");
+    case "Declare EX on the current pick before its first start.":
+      return tr("Declare EX on the current pick before its first start.");
+    case "Configure EX player count for this round first.":
+      return tr("Configure EX player count for this round first.");
+    case "EX declaration is ambiguous for this beatmap. Review the referee selections.":
+      return tr(
+        "EX declaration is ambiguous for this beatmap. Review the referee selections.",
+      );
+    case "EX player count is not configured for this round.":
+      return tr("EX player count is not configured for this round.");
     default:
       return tr(message);
   }
